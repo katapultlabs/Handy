@@ -250,7 +250,7 @@ A misheard word and the right word have similar pronunciation. Other edits do no
 This test separates a correction from a rewrite.
 
 1. Normalize both runs: lowercase, remove punctuation, join words with no space. `char gebee` becomes `chargebee`.
-2. Compute a phonetic key for each side. Use the `natural` crate. `apply_custom_words()` already uses its Soundex. Prefer Double Metaphone if it is available. It handles names from other languages better.
+2. Compute a phonetic key for each side. Use Double Metaphone. The `rphonetic` crate (a port of Apache commons-codec) gives it. Soundex from the `natural` crate, which `apply_custom_words()` uses today, is too coarse: it keeps only the first letter and three digits, so `Klein` and `Cline` do not match. Double Metaphone handles names from other languages better.
 3. Accept when the keys are equal, or when the edit distance between the keys is 1.
 4. If a side has characters that the phonetic algorithm does not support (for example CJK), skip this test. Use only the "look similar" test.
 
