@@ -25,6 +25,7 @@ The user does not have to make the same correction again.
 - The user can see, disable, and delete each entry.
 - Corrections apply on the local machine. No network call is necessary.
 - The current Custom Words feature continues to work.
+- The feature is off by default. It is an experimental feature. See section 10.1.
 
 ## 3. Non-goals
 
@@ -229,17 +230,47 @@ Both are later work. The interface for a "text anchor provider" must let each pl
 2. Compute a word-level diff. The `similar` crate gives this.
 3. Walk the diff. Each change is a pair of runs: removed words and inserted words.
 4. Accept a change as a candidate when all of these are true:
-   - The removed run and the inserted run each have 1 to 4 words.
+   - The removed run and the inserted run each have 1 to 3 words. One word on each side is the normal case. Two or three words cover a name that the model split or joined, for example `char gebee` -> `ChargeBee`.
    - The runs are not the same after case folding.
    - The runs are not only punctuation or only whitespace.
    - The inserted run is not empty and the removed run is not empty.
-   - The character edit distance between the runs is below a limit. Default: 60 percent of the longer run. This filters rephrasing.
+   - The runs **sound similar**. See 8.1. This is the main test. A misheard word sounds like the right word. A rewrite does not.
+   - The runs **look similar**. The character edit distance is below a limit. Default: 60 percent of the longer run.
 5. Make a `replacement` entry from each candidate: `wrong = removed`, `right = inserted`.
 6. If the pair exists, increase `seen_count`.
 
 Do not accept a change that only adds or removes words. That is an edit, not a correction.
 Do not use an LLM in this step. The rules are enough for most cases and they are predictable.
 An optional LLM step can come later for the rejected candidates.
+
+### 8.1 Sound similarity
+
+The purpose of the Dictionary is to fix words the model **misheard**.
+A misheard word and the right word have similar pronunciation. Other edits do not.
+This test separates a correction from a rewrite.
+
+1. Normalize both runs: lowercase, remove punctuation, join words with no space. `char gebee` becomes `chargebee`.
+2. Compute a phonetic key for each side. Use the `natural` crate. `apply_custom_words()` already uses its Soundex. Prefer Double Metaphone if it is available. It handles names from other languages better.
+3. Accept when the keys are equal, or when the edit distance between the keys is 1.
+4. If a side has characters that the phonetic algorithm does not support (for example CJK), skip this test. Use only the "look similar" test.
+
+Examples:
+
+| Removed       | Inserted    | Sounds similar | Result               |
+| ------------- | ----------- | -------------- | -------------------- |
+| `Cortex`      | `Kortix`    | yes            | accept               |
+| `Klein`       | `Cline`     | yes            | accept               |
+| `char gebee`  | `ChargeBee` | yes            | accept               |
+| `the meeting` | `our sync`  | no             | reject (rewrite)     |
+| `good`        | `great`     | no             | reject (style edit)  |
+| `their`       | `there`     | yes            | accept, but see note |
+
+Note: homophone fixes such as `their` -> `there` depend on context. They pass this test but they are risky as global replacements. Keep them as `proposed` until `seen_count >= 3`. Setting `dictionary_auto_apply_threshold` controls this. A future version can mark an entry as "context-dependent" and give it to the LLM prompt only.
+
+### 8.2 Tests for `learn()`
+
+Write unit tests for each row of the table above.
+Add tests for: a paragraph the user rewrote (no entries), a single typo fix, a name split in two, a change in the middle of a long text, CJK text, an empty edit.
 
 ## 9. Trust and confirmation
 
@@ -252,11 +283,24 @@ Auto-learned entries can be wrong. The user must stay in control.
 
 ## 10. Settings
 
+### 10.1 Placement
+
+The Dictionary is an **experimental feature**.
+Handy has a switch `experimental_enabled` in Advanced settings.
+When it is on, `AdvancedSettings.tsx` shows an "Experimental" group.
+
+- The master switch `dictionary_enabled` goes in the Experimental group. Default: off.
+- When `dictionary_enabled` is off, Handy behaves as it does today. Custom Words work as before. No capture. No learning.
+- When `dictionary_enabled` is on, a "Dictionary" screen appears in the sidebar. The other switches below live on that screen.
+- The Custom Words section stays where it is while the Dictionary is off. When the Dictionary is on, the Custom Words section shows a link to the Dictionary screen.
+
+### 10.2 Fields
+
 Add these fields to `AppSettings`:
 
 | Field                             | Type | Default | Function                                                   |
 | --------------------------------- | ---- | ------- | ---------------------------------------------------------- |
-| `dictionary_enabled`              | bool | true    | Master switch for the consumer.                            |
+| `dictionary_enabled`              | bool | false   | Master switch. Experimental group.                         |
 | `dictionary_fuzzy_enabled`        | bool | true    | Tier 2 on or off.                                          |
 | `dictionary_learn_from_history`   | bool | true    | Producer 7.2 on or off.                                    |
 | `dictionary_learn_from_capture`   | bool | false   | Producer 7.3 on or off. Off by default until it is proven. |
