@@ -139,12 +139,13 @@ Run it after Tier 1. Do not run it on spans that Tier 1 changed.
 
 Tier 1 is deterministic. Tier 2 is not. The user can turn Tier 2 off.
 
-### 6.3 Performance
+### 6.3 Performance of the consumer
 
 A transcription has fewer than 1,000 words in most cases.
 The dictionary has fewer than 1,000 entries in most cases.
 A single-pass Aho-Corasick or regex-set matcher is fast enough.
 Do not call the database for each transcription. Read the table once into memory. Refresh on change.
+The budgets are in section 16.
 
 ## 7. Producers
 
@@ -406,3 +407,67 @@ Avoid:
 - Diff against `pasted_text` (section 7.2).
 - Rules-based `learn()` with a word-level diff library, size and distance limits, no LLM (section 8).
 - Apply early, in `managers/transcription.rs`, in the same place as custom words (section 6.1).
+
+## 16. Performance
+
+Performance is a design principle for this feature, not an afterthought.
+The rule: **the Dictionary must not make dictation feel slower, ever.**
+
+### 16.1 The hot path
+
+The hot path is the time between the end of transcription and the paste.
+The user waits during this time. Every millisecond counts.
+
+Only one Dictionary step runs on the hot path: the consumer (section 6).
+
+Budgets, measured on the oldest supported hardware, not on a fast machine:
+
+| Step                                              | Budget                                               |
+| ------------------------------------------------- | ---------------------------------------------------- |
+| Tier 1 exact matcher, 1,000 words x 1,000 entries | < 1 ms                                               |
+| Tier 2 fuzzy (already exists today)               | no regression against current `apply_custom_words()` |
+| Total added to the pipeline                       | < 2 ms                                               |
+
+Enforce the budgets with benchmarks (`cargo bench` or a timed unit test).
+A pull request that breaks a budget does not merge.
+
+### 16.2 Off the hot path
+
+Everything else runs off the hot path, on a background task:
+
+- `learn()` — the diff, the phonetic keys, the database write. The paste never waits for learning.
+- Matcher rebuild — rebuild in the background after a table change. The pipeline uses the old matcher until the new one is ready. Swap with an `ArcSwap` or a lock held only for the pointer swap.
+- Database writes — one UPSERT transaction, on the background task. `applied_count` updates are batched; they are statistics, not state the pipeline reads.
+- The `DictionaryUpdated` event and all UI refreshes.
+
+### 16.3 Capture and the AX API
+
+AX calls can block. An unresponsive target application can hold a call for seconds.
+
+- All AX calls run on a dedicated thread, never on the pipeline thread and never on the main thread.
+- Every AX call has a timeout: `AXUIElementSetMessagingTimeout`, 100 ms. A timeout means "skip capture", nothing more.
+- The anchor read at paste time (section 7.3.1) happens **after** the paste is sent, not before. The paste never waits for the anchor.
+- Check triggers (section 7.3.1) coalesce. A focus change during a running check does not start a second check.
+
+### 16.4 Memory
+
+This project trims memory after each dictation (`memory.rs`, `FinishGuard`). The Dictionary follows the same discipline.
+
+- An anchor holds at most 32 KB of field text. A larger field stores only the 32 KB window around the caret.
+- At most 4 anchors live at one time. A new anchor beyond that drops the oldest.
+- Anchors drop at the end of the capture window (default 180 s), on secure-input, and on application quit.
+- The in-memory dictionary table is small (< 1,000 entries, ~100 KB). Hold it as one `Arc`, not one copy per thread.
+
+### 16.5 Startup
+
+- Do not open or migrate the dictionary table on the startup path before the tray appears. `HistoryManager` already owns the database; the Dictionary migration runs with the existing migration pass.
+- Build the first matcher lazily, on the first transcription, not at startup.
+
+### 16.6 What to measure before merge
+
+Each phase (section 13) ships with numbers in the pull request:
+
+1. Pipeline time with the feature off (baseline) and on, same audio, 10 runs, report the median.
+2. Matcher build time at 100 / 1,000 / 10,000 entries.
+3. `learn()` time on a 1,000-word edit.
+4. For capture: paste-to-anchor time, and check time against a responsive and an unresponsive application.
