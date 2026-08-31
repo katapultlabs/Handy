@@ -238,7 +238,10 @@ Both are later work. The interface for a "text anchor provider" must let each pl
    - The runs **sound similar**. See 8.1. This is the main test. A misheard word sounds like the right word. A rewrite does not.
    - The runs **look similar**. The character edit distance is below a limit. Default: 60 percent of the longer run.
 5. Make a `replacement` entry from each candidate: `wrong = removed`, `right = inserted`.
-6. If the pair exists, increase `seen_count`.
+6. Set `case_mode` for the new entry:
+   - If the two sides differ only in spelling, use `'smart'`.
+   - If the case of `right` differs from the case of the matched `wrong` (example: `Maine` -> `main`, or `github` -> `GitHub`), use `'exact'`. The case is part of the correction. Smart case would undo it.
+7. If the pair exists, increase `seen_count`.
 
 Do not accept a change that only adds or removes words. That is an edit, not a correction.
 Do not use an LLM in this step. The rules are enough for most cases and they are predictable.
