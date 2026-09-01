@@ -355,11 +355,17 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
         return None;
     }
 
-    // Sound similar: Double Metaphone keys equal or one apart. When the
-    // phonetic algorithm does not cover the text (non-ASCII), the edit
-    // distance gate above stands alone.
+    // Sound similar: Double Metaphone keys equal or one apart is a strong
+    // match. Badly misheard proper nouns can differ more (e.g. "Bededa" ->
+    // "Pereira" folds to PTT vs PRR), so a weak match — the keys begin with
+    // the same sound — is also accepted; the edit-distance gate above already
+    // holds. Different first sounds ("meeting" -> "sync") stay rejected.
+    // When the phonetic algorithm does not cover the text (non-ASCII), the
+    // edit distance gate stands alone.
     if let (Some(kw), Some(kr)) = (phonetic_key(&nw), phonetic_key(&nr)) {
-        if strsim::levenshtein(&kw, &kr) > 1 {
+        let close_keys = strsim::levenshtein(&kw, &kr) <= 1;
+        let same_first_sound = kw.chars().next() == kr.chars().next();
+        if !close_keys && !same_first_sound {
             return None;
         }
     }
@@ -610,6 +616,19 @@ mod tests {
     fn rejects_rewrite() {
         assert!(learn_pairs("the meeting went well", "our sync went well").is_empty());
         assert!(learn_pairs("that is good", "that is great").is_empty());
+    }
+
+    #[test]
+    fn learns_badly_misheard_proper_noun() {
+        // Real user case: same first sound (B/P fold together), high but
+        // passing edit distance, metaphone keys two apart.
+        let pairs = learn_pairs(
+            "I'm gonna be in Bededa for the rest of the day",
+            "I'm gonna be in Pereira for the rest of the day",
+        );
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].wrong, "Bededa");
+        assert_eq!(pairs[0].right, "Pereira");
     }
 
     #[test]

@@ -309,8 +309,14 @@ mod macos_impl {
     // ------------------------------------------------------------------
 
     fn take_snapshot(pasted: String) -> Option<Anchor> {
-        let (element, pid) = focused_element()?;
-        let range = selected_range(element.0 as AXUIElementRef)?;
+        let Some((element, pid)) = focused_element() else {
+            info!("capture: no focused AX element; skipping this dictation");
+            return None;
+        };
+        let Some(range) = selected_range(element.0 as AXUIElementRef) else {
+            info!("capture: focused element reports no selected-text range (app may not expose AX text); skipping");
+            return None;
+        };
         if range.location < 0 {
             return None;
         }
@@ -336,13 +342,14 @@ mod macos_impl {
         let window = match read_window(a.element.0 as AXUIElementRef, start, len) {
             Some(w) => w,
             None => {
-                debug!("capture: window read failed; dropping anchor");
+                info!("capture: window read failed (app closed or AX text unsupported); dropping anchor");
                 return None;
             }
         };
 
         if window.contains(a.pasted.trim_end()) {
             // Unchanged so far; keep watching until the anchor expires.
+            debug!("capture: pasted text unchanged; watching");
             return Some(a);
         }
 
@@ -350,6 +357,12 @@ mod macos_impl {
         if learned.is_empty() {
             // Changed but nothing passed the gates — could be mid-edit or a
             // rewrite. Keep the anchor; a later check may see a settled edit.
+            // Counts only — never log field content.
+            info!(
+                "capture: edit detected but no pair passed the learn gates (window {} chars vs pasted {} chars); keeping anchor",
+                window.chars().count(),
+                a.pasted.chars().count()
+            );
             return Some(a);
         }
         learned.truncate(MAX_LEARNED_PER_CHECK);
