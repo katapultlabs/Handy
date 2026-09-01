@@ -271,6 +271,12 @@ fn initialize_core_logic(app_handle: &AppHandle) {
             "copy_last_transcript" => {
                 tray::copy_last_transcript(app);
             }
+            "correct_last_transcript" => {
+                // Open the settings window on History with the latest entry
+                // in edit mode. The frontend handles the navigation.
+                show_main_window(app);
+                let _ = app.emit("correct-last-transcript", ());
+            }
             "unload_model" => {
                 let transcription_manager = app.state::<Arc<TranscriptionManager>>();
                 if !transcription_manager.is_model_loaded() {

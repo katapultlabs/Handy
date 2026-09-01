@@ -21,6 +21,7 @@ import {
 } from "@/bindings";
 import { useOsType } from "@/hooks/useOsType";
 import { useSettings } from "@/hooks/useSettings";
+import { useUiStore } from "@/stores/uiStore";
 import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
@@ -78,6 +79,17 @@ export const HistorySettings: React.FC = () => {
   const osType = useOsType();
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [autoEditId, setAutoEditId] = useState<number | null>(null);
+  const correctLatestPending = useUiStore((s) => s.correctLatestPending);
+
+  // The tray's "Correct Last Transcript" sets this flag. Open the newest
+  // entry in edit mode once the list has loaded.
+  useEffect(() => {
+    if (correctLatestPending && !loading && entries.length > 0) {
+      useUiStore.getState().clearCorrectLatest();
+      setAutoEditId(entries[0].id);
+    }
+  }, [correctLatestPending, loading, entries]);
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const entriesRef = useRef<HistoryEntry[]>([]);
@@ -277,6 +289,8 @@ export const HistorySettings: React.FC = () => {
                     entry.post_processed_text ?? entry.transcription_text,
                   )
                 }
+                autoEdit={entry.id === autoEditId}
+                onAutoEditDone={() => setAutoEditId(null)}
                 getAudioUrl={getAudioUrl}
                 deleteAudio={deleteAudioEntry}
                 retryTranscription={retryHistoryEntry}
@@ -319,6 +333,9 @@ interface HistoryEntryProps {
   getAudioUrl: (fileName: string) => Promise<string | null>;
   deleteAudio: (id: number) => Promise<void>;
   retryTranscription: (id: number) => Promise<void>;
+  /** Open this entry's correction editor as soon as it renders. */
+  autoEdit?: boolean;
+  onAutoEditDone?: () => void;
 }
 
 const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
@@ -328,6 +345,8 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   getAudioUrl,
   deleteAudio,
   retryTranscription,
+  autoEdit,
+  onAutoEditDone,
 }) => {
   const { t, i18n } = useTranslation();
   const { getSetting, updateSetting } = useSettings();
@@ -350,6 +369,14 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
     setProposals([]);
     setEditing(true);
   };
+
+  // Tray-initiated: open the editor for this entry once.
+  useEffect(() => {
+    if (autoEdit && dictionaryEnabled && hasTranscription && !editing) {
+      startEdit();
+      onAutoEditDone?.();
+    }
+  }, [autoEdit]);
 
   const saveEdit = async () => {
     setEditing(false);

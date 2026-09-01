@@ -3,6 +3,7 @@
     "settings": "Inställningar...",
     "checkUpdates": "Sök efter uppdateringar...",
     "copyLastTranscript": "Kopiera senaste transkriptionen",
+    "correctLastTranscript": "Korrigera senaste transkriptionen...",
     "unloadModel": "Avlasta modell",
     "model": "Modell",
     "quit": "Avsluta",

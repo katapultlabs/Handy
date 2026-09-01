@@ -509,6 +509,20 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
         true,
         None::<&str>,
     )?;
+    // Enabled only while the experimental Dictionary is on; the item opens
+    // the History editor for the latest entry so its edit can teach the
+    // Dictionary.
+    let correct_enabled = {
+        let s = settings::get_settings(app);
+        s.experimental_enabled && s.dictionary_enabled
+    };
+    let correct_last_transcript_i = MenuItem::with_id(
+        app,
+        "correct_last_transcript",
+        &strings.correct_last_transcript,
+        correct_enabled,
+        None::<&str>,
+    )?;
     let quit_i = MenuItem::with_id(app, "quit", &strings.quit, true, quit_accelerator)?;
     let separator = || PredefinedMenuItem::separator(app);
 
@@ -522,6 +536,7 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
                 &cancel_i,
                 &separator()?,
                 &copy_last_transcript_i,
+                &correct_last_transcript_i,
                 &separator()?,
                 &settings_i,
                 &check_updates_i,
@@ -560,6 +575,7 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
                 &version_i,
                 &separator()?,
                 &copy_last_transcript_i,
+                &correct_last_transcript_i,
                 &separator()?,
                 &model_submenu,
                 &unload_model_i,
