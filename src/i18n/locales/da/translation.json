@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Fjern fyldord",
         "description": "Fjerner almindelige tøveord fra transskriptioner. Slå fra for at beholde dem."
+      },
+      "dictionary": {
+        "toggleLabel": "Ordbog",
+        "toggleDescription": "Deterministiske rettelser: erstat præcise ord eller sætninger, som modellen hører forkert. Lærer af dine rettelser i Historik.",
+        "title": "Ordbogsposter",
+        "description": "Hver post erstatter den fejlhørte tekst med din rettelse i alle transskriptioner.",
+        "wrongPlaceholder": "Hørt forkert",
+        "rightPlaceholder": "Korrekt",
+        "add": "Tilføj",
+        "remove": "Fjern {{wrong}} → {{right}}",
+        "duplicate": "Der findes allerede en post for \"{{wrong}}\"",
+        "captureLabel": "Lær af rettelser (macOS)",
+        "captureDescription": "Når Handy har indsat tekst, holder appen kortvarigt øje med teksten omkring det indsatte. Hvis du retter den tekst, føjes rettelsen automatisk til ordbogen. Den tekst, den læser, forbliver kun i hukommelsen og gemmes eller sendes aldrig nogen steder."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Transskribér igen",
       "retranscribeError": "Kunne ikke transskribere igen. Prøv igen.",
       "transcribing": "Transskriberer...",
-      "transcriptionFailed": "Transskription mislykkedes. Du kan transskribere igen ved hjælp af genforsøgsikonet."
+      "transcriptionFailed": "Transskription mislykkedes. Du kan transskribere igen ved hjælp af genforsøgsikonet.",
+      "dictionary": {
+        "editTitle": "Ret transskription (lærer ordbogen op)",
+        "saveEdit": "Lær af rettelsen",
+        "cancelEdit": "Annuller",
+        "nothingLearned": "Der blev ikke lært nogen rettelser af denne ændring",
+        "proposalsTitle": "Lærte rettelser – klik for at føje dem til ordbogen:",
+        "added": "Føjet til ordbogen: {{wrong}} → {{right}}",
+        "dismiss": "Afvis"
+      }
     },
     "debug": {
       "title": "Fejlfinding",

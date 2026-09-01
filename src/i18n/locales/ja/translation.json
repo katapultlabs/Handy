@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "フィラー語を削除",
         "description": "文字起こしから一般的なフィラー語を削除します。残すにはオフにしてください。"
+      },
+      "dictionary": {
+        "toggleLabel": "辞書",
+        "toggleDescription": "確定的な置換：モデルが誤認識する単語やフレーズをそのまま置き換えます。履歴での編集内容から学習します。",
+        "title": "辞書エントリ",
+        "description": "各エントリは、すべての文字起こしで聞き間違えられたテキストをあなたの修正に置き換えます。",
+        "wrongPlaceholder": "誤認識",
+        "rightPlaceholder": "正しい表記",
+        "add": "追加",
+        "remove": "{{wrong}} → {{right}} を削除",
+        "duplicate": "「{{wrong}}」のエントリは既に存在します",
+        "captureLabel": "編集から学習（macOS）",
+        "captureDescription": "Handy が貼り付けた後、貼り付けたテキストの周辺を短時間だけ監視します。そのテキストを修正すると、修正内容が自動的に辞書へ追加されます。読み取ったテキストはメモリ上にのみ保持され、保存も送信もされません。"
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "再文字起こし",
       "retranscribeError": "再文字起こしに失敗しました。もう一度お試しください。",
       "transcribing": "文字起こし中…",
-      "transcriptionFailed": "文字起こしに失敗しました。リトライアイコンを使用して再文字起こしできます。"
+      "transcriptionFailed": "文字起こしに失敗しました。リトライアイコンを使用して再文字起こしできます。",
+      "dictionary": {
+        "editTitle": "文字起こしを修正（辞書に学習させます）",
+        "saveEdit": "修正から学習",
+        "cancelEdit": "キャンセル",
+        "nothingLearned": "この編集からは修正を学習できませんでした",
+        "proposalsTitle": "学習した修正 — クリックして辞書に追加：",
+        "added": "辞書に追加しました：{{wrong}} → {{right}}",
+        "dismiss": "閉じる"
+      }
     },
     "debug": {
       "title": "デバッグ",

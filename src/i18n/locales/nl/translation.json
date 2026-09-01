@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Opvulwoorden verwijderen",
         "description": "Verwijdert veelvoorkomende aarzelwoorden uit transcripties. Schakel dit uit om ze te behouden."
+      },
+      "dictionary": {
+        "toggleLabel": "Woordenboek",
+        "toggleDescription": "Deterministische correcties: vervang exacte woorden of zinnen die het model verkeerd verstaat. Leert van je bewerkingen in Geschiedenis.",
+        "title": "Woordenboekvermeldingen",
+        "description": "Elke vermelding vervangt de verkeerd verstane tekst door jouw correctie in elke transcriptie.",
+        "wrongPlaceholder": "Verkeerd verstaan",
+        "rightPlaceholder": "Correct",
+        "add": "Toevoegen",
+        "remove": "{{wrong}} → {{right}} verwijderen",
+        "duplicate": "Er bestaat al een vermelding voor \"{{wrong}}\"",
+        "captureLabel": "Leren van bewerkingen (macOS)",
+        "captureDescription": "Nadat Handy tekst heeft geplakt, kijkt het kort naar de tekst rond het geplakte fragment. Als je die tekst corrigeert, wordt de correctie automatisch aan het woordenboek toegevoegd. De gelezen tekst blijft alleen in het geheugen en wordt nooit opgeslagen of ergens naartoe verzonden."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Opnieuw transcriberen",
       "retranscribeError": "Opnieuw transcriberen mislukt. Probeer het opnieuw.",
       "transcribing": "Transcriberen...",
-      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram."
+      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram.",
+      "dictionary": {
+        "editTitle": "Transcriptie corrigeren (leert het woordenboek bij)",
+        "saveEdit": "Leren van correctie",
+        "cancelEdit": "Annuleren",
+        "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
+        "proposalsTitle": "Geleerde correcties — klik om ze aan het woordenboek toe te voegen:",
+        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
+        "dismiss": "Sluiten"
+      }
     },
     "debug": {
       "title": "Probleemoplossing",

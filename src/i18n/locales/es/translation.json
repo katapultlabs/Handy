@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Eliminar muletillas",
         "description": "Elimina las muletillas más comunes de las transcripciones. Desactívalo para conservarlas."
+      },
+      "dictionary": {
+        "toggleLabel": "Diccionario",
+        "toggleDescription": "Correcciones deterministas: reemplaza palabras o frases exactas que el modelo transcribe mal. Aprende de tus ediciones en el Historial.",
+        "title": "Entradas del diccionario",
+        "description": "Cada entrada reemplaza el texto mal escuchado por tu corrección en todas las transcripciones.",
+        "wrongPlaceholder": "Mal escuchado",
+        "rightPlaceholder": "Correcto",
+        "add": "Agregar",
+        "remove": "Eliminar {{wrong}} → {{right}}",
+        "duplicate": "Ya existe una entrada para \"{{wrong}}\"",
+        "captureLabel": "Aprender de las ediciones (macOS)",
+        "captureDescription": "Después de que Handy pega el texto, observa brevemente el texto cercano a lo que pegó. Si corriges ese texto, la corrección se agrega automáticamente al diccionario. El texto que lee permanece solo en memoria y nunca se guarda ni se envía a ningún sitio."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Re-transcribir",
       "retranscribeError": "No se pudo re-transcribir. Por favor, inténtalo de nuevo.",
       "transcribing": "Transcribiendo...",
-      "transcriptionFailed": "La transcripción falló. Puedes re-transcribir usando el icono de reintentar."
+      "transcriptionFailed": "La transcripción falló. Puedes re-transcribir usando el icono de reintentar.",
+      "dictionary": {
+        "editTitle": "Corregir la transcripción (enseña al diccionario)",
+        "saveEdit": "Aprender de la corrección",
+        "cancelEdit": "Cancelar",
+        "nothingLearned": "No se aprendió ninguna corrección de esta edición",
+        "proposalsTitle": "Correcciones aprendidas: haz clic para agregarlas al diccionario:",
+        "added": "Agregado al diccionario: {{wrong}} → {{right}}",
+        "dismiss": "Descartar"
+      }
     },
     "debug": {
       "title": "Depuración",

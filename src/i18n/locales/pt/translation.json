@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Remover palavras de preenchimento",
         "description": "Remove hesitações comuns das transcrições. Desative para mantê-las."
+      },
+      "dictionary": {
+        "toggleLabel": "Dicionário",
+        "toggleDescription": "Correções determinísticas: substitua palavras ou frases exatas que o modelo erra. Aprende com suas edições no Histórico.",
+        "title": "Entradas do dicionário",
+        "description": "Cada entrada substitui o texto ouvido incorretamente pela sua correção em todas as transcrições.",
+        "wrongPlaceholder": "Ouvido errado",
+        "rightPlaceholder": "Correto",
+        "add": "Adicionar",
+        "remove": "Remover {{wrong}} → {{right}}",
+        "duplicate": "Já existe uma entrada para \"{{wrong}}\"",
+        "captureLabel": "Aprender com edições (macOS)",
+        "captureDescription": "Depois que o Handy cola o texto, ele observa brevemente o texto próximo ao que foi colado. Se você corrigir esse texto, a correção é adicionada automaticamente ao dicionário. O texto lido permanece apenas na memória e nunca é armazenado nem enviado a lugar algum."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Re-transcrever",
       "retranscribeError": "Falha ao re-transcrever. Por favor, tente novamente.",
       "transcribing": "Transcrevendo...",
-      "transcriptionFailed": "A transcrição falhou. Você pode re-transcrever usando o ícone de tentar novamente."
+      "transcriptionFailed": "A transcrição falhou. Você pode re-transcrever usando o ícone de tentar novamente.",
+      "dictionary": {
+        "editTitle": "Corrigir transcrição (ensina o dicionário)",
+        "saveEdit": "Aprender com a correção",
+        "cancelEdit": "Cancelar",
+        "nothingLearned": "Nenhuma correção aprendida com esta edição",
+        "proposalsTitle": "Correções aprendidas — clique para adicionar ao dicionário:",
+        "added": "Adicionado ao dicionário: {{wrong}} → {{right}}",
+        "dismiss": "Dispensar"
+      }
     },
     "debug": {
       "title": "Depuração",

@@ -12,9 +12,10 @@
 //!   Metaphone phonetic similarity — a misheard word *sounds* like its fix; a
 //!   rewrite does not.
 //!
-//! MVP deviations from the design doc: entries live in settings (not SQLite),
-//! there is no proposed/active state machine (the frontend confirms pairs
-//! before they are stored), and there is no in-place capture yet.
+//! MVP deviations from the design doc: entries live in settings (not SQLite)
+//! and there is no proposed/active state machine (History-edit pairs are
+//! confirmed in the frontend; capture-learned pairs apply immediately —
+//! see `dictionary_capture.rs`).
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -182,7 +183,11 @@ fn capitalize_first(s: &str) -> String {
 fn render_replacement(matched: &str, entry: &DictionaryEntry, sentence_start: bool) -> String {
     match entry.case_mode {
         CaseMode::Exact => {
-            if sentence_start && entry.right.chars().next().is_some_and(|c| c.is_lowercase()) {
+            // Sentence-start capitalization applies only to an entirely
+            // lowercase `right` ("main" -> "Main"). Anything carrying its own
+            // casing (iPhone, eBay, macOS) is inserted verbatim.
+            let all_lowercase = !entry.right.chars().any(|c| c.is_uppercase());
+            if sentence_start && all_lowercase {
                 capitalize_first(&entry.right)
             } else {
                 entry.right.clone()
@@ -435,6 +440,21 @@ mod tests {
         assert_eq!(
             apply_dictionary("I pushed to Maine yesterday", &e),
             "I pushed to main yesterday"
+        );
+    }
+
+    #[test]
+    fn exact_preserves_brand_casing_at_sentence_start() {
+        let e = [entry("iphone", "iPhone", CaseMode::Exact)];
+        assert_eq!(apply_dictionary("iphone is great.", &e), "iPhone is great.");
+        assert_eq!(
+            apply_dictionary("I got an iphone today", &e),
+            "I got an iPhone today"
+        );
+        let e = [entry("mac os", "macOS", CaseMode::Exact)];
+        assert_eq!(
+            apply_dictionary("mac os updated itself.", &e),
+            "macOS updated itself."
         );
     }
 

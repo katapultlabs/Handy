@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Dolgu Sözcüklerini Kaldır",
         "description": "Transkripsiyonlardaki yaygın duraksama sözcüklerini kaldırır. Bunları korumak için kapatın."
+      },
+      "dictionary": {
+        "toggleLabel": "Sözlük",
+        "toggleDescription": "Kesin düzeltmeler: modelin yanlış algıladığı kelimeleri veya ifadeleri birebir değiştirin. Geçmiş'teki düzenlemelerinizden öğrenir.",
+        "title": "Sözlük girdileri",
+        "description": "Her girdi, yanlış duyulan metni her transkripsiyonda sizin düzeltmenizle değiştirir.",
+        "wrongPlaceholder": "Yanlış duyulan",
+        "rightPlaceholder": "Doğrusu",
+        "add": "Ekle",
+        "remove": "{{wrong}} → {{right}} kaydını kaldır",
+        "duplicate": "\"{{wrong}}\" için bir girdi zaten var",
+        "captureLabel": "Düzenlemelerden öğren (macOS)",
+        "captureDescription": "Handy metni yapıştırdıktan sonra, yapıştırdığı metnin çevresini kısa bir süre izler. O metni düzeltirseniz, düzeltme otomatik olarak sözlüğe eklenir. Okunan metin yalnızca bellekte kalır; hiçbir zaman saklanmaz veya hiçbir yere gönderilmez."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Yeniden transkribe et",
       "retranscribeError": "Yeniden transkripsiyon başarısız oldu. Lütfen tekrar deneyin.",
       "transcribing": "Transkribe ediliyor...",
-      "transcriptionFailed": "Transkripsiyon başarısız oldu. Yeniden deneme simgesini kullanarak tekrar transkribe edebilirsiniz."
+      "transcriptionFailed": "Transkripsiyon başarısız oldu. Yeniden deneme simgesini kullanarak tekrar transkribe edebilirsiniz.",
+      "dictionary": {
+        "editTitle": "Transkripsiyonu düzelt (sözlüğe öğretir)",
+        "saveEdit": "Düzeltmeden öğren",
+        "cancelEdit": "İptal",
+        "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
+        "proposalsTitle": "Öğrenilen düzeltmeler — sözlüğe eklemek için tıklayın:",
+        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
+        "dismiss": "Kapat"
+      }
     },
     "debug": {
       "title": "Hata Ayıklama",

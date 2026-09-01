@@ -410,7 +410,7 @@
         "remove": "Remove {{wrong}} → {{right}}",
         "duplicate": "An entry for \"{{wrong}}\" already exists",
         "captureLabel": "Learn from edits (macOS)",
-        "captureDescription": "After Handy pastes, watch the text field briefly. If you correct the pasted text, the fix is added to the Dictionary automatically. Handy reads only a small window around what it pasted, keeps it in memory only, and never sends it anywhere."
+        "captureDescription": "After Handy pastes, it briefly watches the text near what it pasted. If you correct that text, the fix is added to the Dictionary automatically. The text it reads stays in memory only and is never stored or sent anywhere."
       }
     },
     "postProcessing": {
@@ -483,7 +483,7 @@
       "transcriptionFailed": "Transcription failed. You can re-transcribe using the retry icon.",
       "dictionary": {
         "editTitle": "Correct transcription (teaches the Dictionary)",
-        "saveEdit": "Save & learn",
+        "saveEdit": "Learn from correction",
         "cancelEdit": "Cancel",
         "nothingLearned": "No corrections learned from this edit",
         "proposalsTitle": "Learned corrections — click to add to the Dictionary:",

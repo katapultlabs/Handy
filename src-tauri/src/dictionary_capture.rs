@@ -69,11 +69,14 @@ impl CaptureManager {
     pub fn snapshot_before_paste(&self, pasted_text: String) {
         #[cfg(target_os = "macos")]
         {
+            let deadline =
+                std::time::Instant::now() + std::time::Duration::from_millis(SNAPSHOT_BUDGET_MS);
             let (ack_tx, ack_rx) = std::sync::mpsc::channel();
             if self
                 .tx
                 .send(macos_impl::Msg::Snapshot {
                     pasted: pasted_text,
+                    deadline,
                     ack: ack_tx,
                 })
                 .is_ok()
@@ -92,6 +95,14 @@ impl CaptureManager {
         #[cfg(target_os = "macos")]
         {
             let _ = self.tx.send(macos_impl::Msg::Check);
+        }
+    }
+
+    /// Drop any pending anchor — the paste it belonged to did not happen.
+    pub fn cancel(&self) {
+        #[cfg(target_os = "macos")]
+        {
+            let _ = self.tx.send(macos_impl::Msg::Cancel);
         }
     }
 }
@@ -118,8 +129,16 @@ mod macos_impl {
     const AX_VALUE_CFRANGE_TYPE: u32 = 4;
 
     pub enum Msg {
-        Snapshot { pasted: String, ack: Sender<()> },
+        Snapshot {
+            pasted: String,
+            /// Discard the request past this point: the caller stopped
+            /// waiting, the paste went ahead, and a late snapshot would
+            /// anchor the wrong caret or application.
+            deadline: Instant,
+            ack: Sender<()>,
+        },
         Check,
+        Cancel,
     }
 
     /// RAII wrapper so every AX/CF object gets released exactly once.
@@ -158,12 +177,26 @@ mod macos_impl {
         let mut anchor: Option<Anchor> = None;
         loop {
             match rx.recv_timeout(Duration::from_secs(POLL_TICK_SECS)) {
-                Ok(Msg::Snapshot { pasted, ack }) => {
-                    anchor = take_snapshot(pasted);
-                    let _ = ack.send(());
+                Ok(Msg::Snapshot {
+                    pasted,
+                    deadline,
+                    ack,
+                }) => {
+                    if Instant::now() > deadline {
+                        debug!("capture: discarding stale snapshot request");
+                    } else {
+                        anchor = take_snapshot(pasted);
+                        let _ = ack.send(());
+                    }
                 }
                 Ok(Msg::Check) => {
                     anchor = run_check(&app, anchor);
+                }
+                Ok(Msg::Cancel) => {
+                    if anchor.is_some() {
+                        debug!("capture: anchor cancelled (paste failed)");
+                    }
+                    anchor = None;
                 }
                 Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
                     anchor = on_tick(&app, anchor);
@@ -392,6 +425,15 @@ mod macos_impl {
 
     fn store_learned(app: &AppHandle, learned: Vec<DictionaryEntry>) {
         let mut settings = crate::settings::get_settings(app);
+        // Authoritative runtime gate: the user may have turned the feature (or
+        // Experimental as a whole) off while this anchor was live.
+        if !settings.experimental_enabled
+            || !settings.dictionary_enabled
+            || !settings.dictionary_capture_enabled
+        {
+            debug!("capture: learning disabled since anchor was taken; discarding");
+            return;
+        }
         let mut added: Vec<DictionaryEntry> = Vec::new();
         for entry in learned {
             let dup = settings.dictionary_entries.iter().any(|e| {
@@ -405,9 +447,12 @@ mod macos_impl {
         if added.is_empty() {
             return;
         }
-        for e in &added {
-            info!("capture: learned '{}' -> '{}'", e.wrong, e.right);
-        }
+        // Counts only — learned pairs can contain confidential names, and the
+        // log file must never hold field content (design doc section 12).
+        info!(
+            "capture: learned {} new dictionary entr(y/ies)",
+            added.len()
+        );
         crate::settings::write_settings(app, settings);
         if let Err(err) = (DictionaryLearnedEvent { entries: added }).emit(app) {
             warn!("capture: failed to emit learned event: {err}");

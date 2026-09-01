@@ -1764,13 +1764,6 @@ fn post_process_transcription_text(
     supported_languages: &[String],
 ) -> String {
     fail_open_text_transform(raw, |raw| {
-        // Tier 1: deterministic dictionary replacements (experimental),
-        // before the fuzzy custom-words pass so exact fixes win.
-        let raw = if settings.dictionary_enabled && !settings.dictionary_entries.is_empty() {
-            crate::dictionary::apply_dictionary(&raw, &settings.dictionary_entries)
-        } else {
-            raw
-        };
         let corrected = if !settings.custom_words.is_empty() && !custom_words_already_prompted {
             apply_custom_words(
                 &raw,
@@ -1779,6 +1772,18 @@ fn post_process_transcription_text(
             )
         } else {
             raw
+        };
+        // Deterministic dictionary replacements (experimental) run AFTER the
+        // fuzzy custom-words pass: whatever the fuzzy matcher produces, an
+        // exact entry has the last word — fuzzy can never undo a deterministic
+        // fix (e.g. Custom Word "Maine" vs Dictionary "Maine -> main").
+        let corrected = if settings.experimental_enabled
+            && settings.dictionary_enabled
+            && !settings.dictionary_entries.is_empty()
+        {
+            crate::dictionary::apply_dictionary(&corrected, &settings.dictionary_entries)
+        } else {
+            corrected
         };
 
         // Last-resort language evidence: confidence-gated detection from the

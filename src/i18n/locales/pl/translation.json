@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Usuń wyrazy wypełniające",
         "description": "Usuwa typowe słowa wyrażające wahanie z transkrypcji. Wyłącz, aby je zachować."
+      },
+      "dictionary": {
+        "toggleLabel": "Słownik",
+        "toggleDescription": "Deterministyczne poprawki: zastępuj dokładne słowa lub zwroty, które model błędnie rozpoznaje. Uczy się na podstawie Twoich zmian w Historii.",
+        "title": "Wpisy słownika",
+        "description": "Każdy wpis zastępuje błędnie rozpoznany tekst Twoją poprawką w każdej transkrypcji.",
+        "wrongPlaceholder": "Błędnie rozpoznane",
+        "rightPlaceholder": "Poprawnie",
+        "add": "Dodaj",
+        "remove": "Usuń {{wrong}} → {{right}}",
+        "duplicate": "Wpis dla \"{{wrong}}\" już istnieje",
+        "captureLabel": "Ucz się ze zmian (macOS)",
+        "captureDescription": "Po wklejeniu tekstu przez Handy aplikacja przez chwilę obserwuje tekst w pobliżu wklejonego fragmentu. Jeśli go poprawisz, poprawka zostanie automatycznie dodana do słownika. Odczytany tekst pozostaje wyłącznie w pamięci i nigdy nie jest zapisywany ani nigdzie wysyłany."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Transkrybuj ponownie",
       "retranscribeError": "Nie udało się ponownie transkrybować. Spróbuj ponownie.",
       "transcribing": "Transkrybuję...",
-      "transcriptionFailed": "Transkrypcja nie powiodła się. Możesz transkrybować ponownie za pomocą ikony ponowienia."
+      "transcriptionFailed": "Transkrypcja nie powiodła się. Możesz transkrybować ponownie za pomocą ikony ponowienia.",
+      "dictionary": {
+        "editTitle": "Popraw transkrypcję (uczy słownik)",
+        "saveEdit": "Ucz się z poprawki",
+        "cancelEdit": "Anuluj",
+        "nothingLearned": "Z tej zmiany nie nauczono się żadnych poprawek",
+        "proposalsTitle": "Wyuczone poprawki — kliknij, aby dodać je do słownika:",
+        "added": "Dodano do słownika: {{wrong}} → {{right}}",
+        "dismiss": "Odrzuć"
+      }
     },
     "debug": {
       "title": "Debugowanie",

@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "군더더기 표현 제거",
         "description": "전사에서 흔한 머뭇거림 표현을 제거합니다. 그대로 두려면 이 옵션을 끄세요."
+      },
+      "dictionary": {
+        "toggleLabel": "사전",
+        "toggleDescription": "결정적 교정: 모델이 잘못 인식하는 단어나 구를 그대로 교체합니다. 기록에서의 편집 내용을 학습합니다.",
+        "title": "사전 항목",
+        "description": "각 항목은 모든 변환 결과에서 잘못 인식된 텍스트를 사용자의 교정으로 바꿉니다.",
+        "wrongPlaceholder": "잘못 인식된 표현",
+        "rightPlaceholder": "올바른 표현",
+        "add": "추가",
+        "remove": "{{wrong}} → {{right}} 제거",
+        "duplicate": "\"{{wrong}}\"에 대한 항목이 이미 있습니다",
+        "captureLabel": "편집에서 학습 (macOS)",
+        "captureDescription": "Handy가 텍스트를 붙여넣은 뒤, 붙여넣은 위치 주변의 텍스트를 잠시 확인합니다. 해당 텍스트를 수정하면 그 수정 내용이 자동으로 사전에 추가됩니다. 읽어들인 텍스트는 메모리에만 남으며 저장되거나 어디로도 전송되지 않습니다."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "다시 전사",
       "retranscribeError": "다시 전사에 실패했습니다. 다시 시도해주세요.",
       "transcribing": "전사 중...",
-      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다."
+      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다.",
+      "dictionary": {
+        "editTitle": "변환된 텍스트 교정 (사전을 학습시킵니다)",
+        "saveEdit": "교정 내용 학습",
+        "cancelEdit": "취소",
+        "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
+        "proposalsTitle": "학습된 교정 — 클릭하여 사전에 추가:",
+        "added": "사전에 추가됨: {{wrong}} → {{right}}",
+        "dismiss": "닫기"
+      }
     },
     "debug": {
       "title": "디버그",

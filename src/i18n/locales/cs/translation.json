@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Odstranit výplňová slova",
         "description": "Odstraňuje běžná slova vyjadřující váhání z přepisů. Vypnutím je zachováte."
+      },
+      "dictionary": {
+        "toggleLabel": "Slovník",
+        "toggleDescription": "Deterministické opravy: nahraďte přesná slova nebo fráze, které model chybně rozpozná. Učí se z vašich úprav v Historii.",
+        "title": "Položky slovníku",
+        "description": "Každá položka nahradí špatně rozpoznaný text vaší opravou v každém přepisu.",
+        "wrongPlaceholder": "Špatně rozpoznáno",
+        "rightPlaceholder": "Správně",
+        "add": "Přidat",
+        "remove": "Odebrat {{wrong}} → {{right}}",
+        "duplicate": "Položka pro \"{{wrong}}\" již existuje",
+        "captureLabel": "Učit se z úprav (macOS)",
+        "captureDescription": "Poté, co Handy vloží text, krátce sleduje text v okolí vloženého. Pokud tento text opravíte, oprava se automaticky přidá do slovníku. Přečtený text zůstává pouze v paměti a nikdy se neukládá ani nikam neodesílá."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Přepsat znovu",
       "retranscribeError": "Opětovný přepis se nezdařil. Zkuste to prosím znovu.",
       "transcribing": "Přepisuji...",
-      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování."
+      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování.",
+      "dictionary": {
+        "editTitle": "Opravit přepis (učí slovník)",
+        "saveEdit": "Naučit se z opravy",
+        "cancelEdit": "Zrušit",
+        "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
+        "proposalsTitle": "Naučené opravy – kliknutím je přidáte do slovníku:",
+        "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
+        "dismiss": "Zavřít"
+      }
     },
     "debug": {
       "title": "Ladění",

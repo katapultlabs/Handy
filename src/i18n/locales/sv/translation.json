@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Ta bort utfyllnadsord",
         "description": "Tar bort vanliga tvekljud från transkriberingar. Stäng av för att behålla dem."
+      },
+      "dictionary": {
+        "toggleLabel": "Ordbok",
+        "toggleDescription": "Deterministiska korrigeringar: ersätt exakta ord eller fraser som modellen hör fel. Lär sig av dina ändringar i Historik.",
+        "title": "Ordboksposter",
+        "description": "Varje post ersätter den felhörda texten med din korrigering i alla transkriptioner.",
+        "wrongPlaceholder": "Felhört",
+        "rightPlaceholder": "Korrekt",
+        "add": "Lägg till",
+        "remove": "Ta bort {{wrong}} → {{right}}",
+        "duplicate": "Det finns redan en post för \"{{wrong}}\"",
+        "captureLabel": "Lär av ändringar (macOS)",
+        "captureDescription": "När Handy har klistrat in text bevakar appen kort texten runt det inklistrade. Om du korrigerar den texten läggs korrigeringen automatiskt till i ordboken. Texten som läses stannar bara i minnet och lagras eller skickas aldrig någonstans."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Transkribera igen",
       "retranscribeError": "Misslyckades med att transkribera igen. Försök igen.",
       "transcribing": "Transkriberar...",
-      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök."
+      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök.",
+      "dictionary": {
+        "editTitle": "Korrigera transkription (lär upp ordboken)",
+        "saveEdit": "Lär av korrigeringen",
+        "cancelEdit": "Avbryt",
+        "nothingLearned": "Inga korrigeringar lärdes in från den här ändringen",
+        "proposalsTitle": "Inlärda korrigeringar – klicka för att lägga till dem i ordboken:",
+        "added": "Tillagd i ordboken: {{wrong}} → {{right}}",
+        "dismiss": "Avfärda"
+      }
     },
     "debug": {
       "title": "Felsökning",

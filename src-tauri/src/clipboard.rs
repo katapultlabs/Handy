@@ -794,7 +794,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
     // paste target is unknowable (external script / none) or secure input is
     // active.
     #[cfg(target_os = "macos")]
-    if settings.dictionary_enabled
+    if settings.experimental_enabled
+        && settings.dictionary_enabled
         && settings.dictionary_capture_enabled
         && !matches!(
             paste_method,
@@ -807,6 +808,18 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         }
     }
 
+    // If the paste itself fails, the capture anchor must not outlive it —
+    // otherwise capture would compare pre-existing field content against text
+    // that never arrived.
+    #[cfg(target_os = "macos")]
+    let cancel_capture = || {
+        if let Some(capture) = app_handle.try_state::<crate::dictionary_capture::CaptureManager>() {
+            capture.cancel();
+        }
+    };
+    #[cfg(not(target_os = "macos"))]
+    let cancel_capture = || {};
+
     // Perform the paste operation
     match paste_method {
         PasteMethod::None => {
@@ -818,7 +831,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                 &app_handle,
                 #[cfg(target_os = "linux")]
                 settings.typing_tool,
-            )?;
+            )
+            .inspect_err(|_| cancel_capture())?;
         }
         PasteMethod::CtrlV | PasteMethod::CtrlShiftV | PasteMethod::ShiftInsert => {
             // Debug-gated receipt-sequenced paste (#502): restore the clipboard
@@ -852,7 +866,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                 &paste_method,
                 paste_delay_ms,
                 paste_delay_after_ms,
-            )?
+            )
+            .inspect_err(|_| cancel_capture())?
         }
         PasteMethod::ExternalScript => {
             let script_path = settings

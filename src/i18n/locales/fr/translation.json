@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Supprimer les mots de remplissage",
         "description": "Supprime les hésitations courantes des transcriptions. Désactivez cette option pour les conserver."
+      },
+      "dictionary": {
+        "toggleLabel": "Dictionnaire",
+        "toggleDescription": "Corrections déterministes : remplacez les mots ou expressions exacts que le modèle transcrit mal. Apprend de vos modifications dans l'Historique.",
+        "title": "Entrées du dictionnaire",
+        "description": "Chaque entrée remplace le texte mal entendu par votre correction dans toutes les transcriptions.",
+        "wrongPlaceholder": "Mal entendu",
+        "rightPlaceholder": "Correct",
+        "add": "Ajouter",
+        "remove": "Supprimer {{wrong}} → {{right}}",
+        "duplicate": "Une entrée pour \"{{wrong}}\" existe déjà",
+        "captureLabel": "Apprendre des modifications (macOS)",
+        "captureDescription": "Après que Handy a collé le texte, il surveille brièvement le texte à proximité de ce qu'il a collé. Si vous corrigez ce texte, la correction est ajoutée automatiquement au dictionnaire. Le texte lu reste uniquement en mémoire et n'est jamais enregistré ni envoyé où que ce soit."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Re-transcrire",
       "retranscribeError": "Impossible de re-transcrire. Veuillez réessayer.",
       "transcribing": "Transcription en cours...",
-      "transcriptionFailed": "La transcription a échoué. Vous pouvez re-transcrire en utilisant l'icône de réessai."
+      "transcriptionFailed": "La transcription a échoué. Vous pouvez re-transcrire en utilisant l'icône de réessai.",
+      "dictionary": {
+        "editTitle": "Corriger la transcription (enrichit le dictionnaire)",
+        "saveEdit": "Apprendre de la correction",
+        "cancelEdit": "Annuler",
+        "nothingLearned": "Aucune correction n'a été apprise à partir de cette modification",
+        "proposalsTitle": "Corrections apprises — cliquez pour les ajouter au dictionnaire :",
+        "added": "Ajouté au dictionnaire : {{wrong}} → {{right}}",
+        "dismiss": "Ignorer"
+      }
     },
     "debug": {
       "title": "Débogage",

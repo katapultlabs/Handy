@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Füllwörter entfernen",
         "description": "Entfernt häufige Verzögerungslaute aus Transkriptionen. Deaktivieren Sie diese Option, um sie beizubehalten."
+      },
+      "dictionary": {
+        "toggleLabel": "Wörterbuch",
+        "toggleDescription": "Deterministische Korrekturen: Ersetze exakte Wörter oder Wendungen, die das Modell falsch erkennt. Lernt aus deinen Bearbeitungen im Verlauf.",
+        "title": "Wörterbucheinträge",
+        "description": "Jeder Eintrag ersetzt den falsch verstandenen Text in jeder Transkription durch deine Korrektur.",
+        "wrongPlaceholder": "Falsch verstanden",
+        "rightPlaceholder": "Korrekt",
+        "add": "Hinzufügen",
+        "remove": "{{wrong}} → {{right}} entfernen",
+        "duplicate": "Ein Eintrag für \"{{wrong}}\" existiert bereits",
+        "captureLabel": "Aus Bearbeitungen lernen (macOS)",
+        "captureDescription": "Nachdem Handy den Text eingefügt hat, beobachtet es kurz den Text rund um das Eingefügte. Wenn du diesen Text korrigierst, wird die Korrektur automatisch zum Wörterbuch hinzugefügt. Der gelesene Text bleibt nur im Arbeitsspeicher und wird nie gespeichert oder irgendwohin gesendet."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Erneut transkribieren",
       "retranscribeError": "Erneute Transkription fehlgeschlagen. Bitte versuche es erneut.",
       "transcribing": "Transkribiere...",
-      "transcriptionFailed": "Transkription fehlgeschlagen. Du kannst über das Wiederholen-Symbol erneut transkribieren."
+      "transcriptionFailed": "Transkription fehlgeschlagen. Du kannst über das Wiederholen-Symbol erneut transkribieren.",
+      "dictionary": {
+        "editTitle": "Transkription korrigieren (bringt es dem Wörterbuch bei)",
+        "saveEdit": "Aus Korrektur lernen",
+        "cancelEdit": "Abbrechen",
+        "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
+        "proposalsTitle": "Gelernte Korrekturen – zum Hinzufügen zum Wörterbuch klicken:",
+        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
+        "dismiss": "Verwerfen"
+      }
     },
     "debug": {
       "title": "Debug",

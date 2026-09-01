@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Loại bỏ từ đệm",
         "description": "Loại bỏ các từ ngập ngừng phổ biến khỏi bản chép lời. Tắt để giữ lại các từ này."
+      },
+      "dictionary": {
+        "toggleLabel": "Từ điển",
+        "toggleDescription": "Sửa lỗi cố định: thay thế chính xác các từ hoặc cụm từ mà mô hình nhận dạng sai. Học từ các chỉnh sửa của bạn trong Lịch sử.",
+        "title": "Mục từ điển",
+        "description": "Mỗi mục sẽ thay thế văn bản bị nghe nhầm bằng bản sửa của bạn trong mọi bản ghi.",
+        "wrongPlaceholder": "Nghe nhầm",
+        "rightPlaceholder": "Đúng",
+        "add": "Thêm",
+        "remove": "Xóa {{wrong}} → {{right}}",
+        "duplicate": "Đã có mục cho \"{{wrong}}\"",
+        "captureLabel": "Học từ chỉnh sửa (macOS)",
+        "captureDescription": "Sau khi Handy dán văn bản, ứng dụng sẽ theo dõi trong giây lát phần văn bản quanh nội dung vừa dán. Nếu bạn sửa văn bản đó, bản sửa sẽ được tự động thêm vào từ điển. Văn bản được đọc chỉ nằm trong bộ nhớ và không bao giờ được lưu trữ hay gửi đi đâu."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Phiên âm lại",
       "retranscribeError": "Không thể phiên âm lại. Vui lòng thử lại.",
       "transcribing": "Đang phiên âm...",
-      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại."
+      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại.",
+      "dictionary": {
+        "editTitle": "Sửa bản ghi (dạy cho từ điển)",
+        "saveEdit": "Học từ bản sửa",
+        "cancelEdit": "Hủy",
+        "nothingLearned": "Không học được bản sửa nào từ lần chỉnh sửa này",
+        "proposalsTitle": "Các bản sửa đã học — nhấp để thêm vào từ điển:",
+        "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}",
+        "dismiss": "Bỏ qua"
+      }
     },
     "debug": {
       "title": "Gỡ lỗi",

@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "移除語助詞",
         "description": "從轉錄中移除常見的語助詞。關閉此選項即可保留這些詞。"
+      },
+      "dictionary": {
+        "toggleLabel": "詞典",
+        "toggleDescription": "確定性修正：直接替換模型辨識錯誤的字詞或片語。會從你在歷史記錄中的編輯學習。",
+        "title": "詞典項目",
+        "description": "每個項目都會在所有轉錄中，將聽錯的文字替換為你的修正。",
+        "wrongPlaceholder": "聽錯的文字",
+        "rightPlaceholder": "正確文字",
+        "add": "新增",
+        "remove": "刪除 {{wrong}} → {{right}}",
+        "duplicate": "「{{wrong}}」的項目已存在",
+        "captureLabel": "從編輯中學習（macOS）",
+        "captureDescription": "Handy 貼上文字後，會短暫留意所貼上內容附近的文字。若你修正了那段文字，修正內容會自動加入詞典。讀取到的文字僅保留在記憶體中，絕不會儲存或傳送到任何地方。"
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "重新轉錄",
       "retranscribeError": "重新轉錄失敗，請重試。",
       "transcribing": "轉錄中...",
-      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。"
+      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。",
+      "dictionary": {
+        "editTitle": "修正轉錄（用於訓練詞典）",
+        "saveEdit": "從修正中學習",
+        "cancelEdit": "取消",
+        "nothingLearned": "本次編輯未學到任何修正",
+        "proposalsTitle": "已學到的修正 — 點擊以加入詞典：",
+        "added": "已加入詞典：{{wrong}} → {{right}}",
+        "dismiss": "關閉"
+      }
     },
     "debug": {
       "title": "偵錯",
