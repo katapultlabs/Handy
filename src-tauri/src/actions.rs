@@ -470,6 +470,14 @@ impl ShortcutAction for TranscribeAction {
         let start_time = Instant::now();
         debug!("TranscribeAction::start called for binding: {}", binding_id);
 
+        // A new dictation is the strongest "done editing the last one" signal:
+        // ask the capture thread to check the previous paste's anchor now
+        // (non-blocking send; see dictionary_capture.rs).
+        #[cfg(target_os = "macos")]
+        if let Some(capture) = app.try_state::<crate::dictionary_capture::CaptureManager>() {
+            capture.check_now();
+        }
+
         // Load model in the background
         let tm = app.state::<Arc<TranscriptionManager>>();
         let rm = app.state::<Arc<AudioRecordingManager>>();

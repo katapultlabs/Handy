@@ -431,6 +431,10 @@ pub struct AppSettings {
     /// wrong -> right corrections). See docs/DICTIONARY_DESIGN.md.
     #[serde(default)]
     pub dictionary_enabled: bool,
+    /// Learn corrections from edits made in the target application after a
+    /// paste (macOS accessibility read-back). Off until the user opts in.
+    #[serde(default)]
+    pub dictionary_capture_enabled: bool,
     #[serde(default)]
     pub dictionary_entries: Vec<crate::dictionary::DictionaryEntry>,
     #[serde(default)]
@@ -940,6 +944,7 @@ pub fn get_default_settings() -> AppSettings {
         log_level: default_log_level(),
         custom_words: Vec::new(),
         dictionary_enabled: false,
+        dictionary_capture_enabled: false,
         dictionary_entries: Vec::new(),
         model_unload_timeout: ModelUnloadTimeout::default(),
         word_correction_threshold: default_word_correction_threshold(),

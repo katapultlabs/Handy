@@ -139,6 +139,8 @@ const settingUpdaters: {
   custom_words: (value) => commands.updateCustomWords(value as string[]),
   dictionary_enabled: (value) =>
     commands.changeDictionaryEnabledSetting(value as boolean),
+  dictionary_capture_enabled: (value) =>
+    commands.changeDictionaryCaptureEnabledSetting(value as boolean),
   dictionary_entries: (value) =>
     commands.updateDictionaryEntries(value as DictionaryEntry[]),
   word_correction_threshold: (value) =>

@@ -408,7 +408,9 @@
         "rightPlaceholder": "Correct",
         "add": "Add",
         "remove": "Remove {{wrong}} → {{right}}",
-        "duplicate": "An entry for \"{{wrong}}\" already exists"
+        "duplicate": "An entry for \"{{wrong}}\" already exists",
+        "captureLabel": "Learn from edits (macOS)",
+        "captureDescription": "After Handy pastes, watch the text field briefly. If you correct the pasted text, the fix is added to the Dictionary automatically. Handy reads only a small window around what it pasted, keeps it in memory only, and never sends it anywhere."
       }
     },
     "postProcessing": {

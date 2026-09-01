@@ -18,7 +18,7 @@ import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
-import { commands } from "@/bindings";
+import { commands, events } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
 type OnboardingStep = "accessibility" | "model" | "done";
@@ -57,6 +57,24 @@ function App() {
   useEffect(() => {
     initializeRTL(i18n.language);
   }, [i18n.language]);
+
+  // Dictionary in-place capture: surface entries learned from the user's
+  // edits in the target application.
+  useEffect(() => {
+    const unlisten = events.dictionaryLearnedEvent.listen((event) => {
+      for (const entry of event.payload.entries) {
+        toast.success(
+          t("settings.history.dictionary.added", {
+            wrong: entry.wrong,
+            right: entry.right,
+          }),
+        );
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [t]);
 
   // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
   useEffect(() => {

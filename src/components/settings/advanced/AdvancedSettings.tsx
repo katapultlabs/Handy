@@ -3,7 +3,11 @@ import { useTranslation } from "react-i18next";
 import { ShowOverlay } from "../ShowOverlay";
 import { ModelUnloadTimeoutSetting } from "../ModelUnloadTimeout";
 import { CustomWords } from "../CustomWords";
-import { DictionaryToggle, DictionaryEntries } from "../Dictionary";
+import {
+  DictionaryToggle,
+  DictionaryCaptureToggle,
+  DictionaryEntries,
+} from "../Dictionary";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { StartHidden } from "../StartHidden";
 import { AutostartToggle } from "../AutostartToggle";
@@ -69,7 +73,13 @@ export const AdvancedSettings: React.FC = () => {
           <PostProcessingToggle descriptionMode="tooltip" grouped={true} />
           <DictionaryToggle descriptionMode="tooltip" grouped={true} />
           {dictionaryEnabled && (
-            <DictionaryEntries descriptionMode="tooltip" grouped={true} />
+            <>
+              <DictionaryCaptureToggle
+                descriptionMode="tooltip"
+                grouped={true}
+              />
+              <DictionaryEntries descriptionMode="tooltip" grouped={true} />
+            </>
           )}
           <KeyboardImplementationSelector
             descriptionMode="tooltip"

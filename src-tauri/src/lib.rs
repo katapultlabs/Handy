@@ -9,6 +9,7 @@ pub mod cli;
 mod clipboard;
 mod commands;
 mod dictionary;
+mod dictionary_capture;
 mod helpers;
 mod input;
 mod llm_client;
@@ -656,6 +657,7 @@ pub fn run(cli_args: CliArgs) {
             shortcut::set_post_process_selected_prompt,
             shortcut::update_custom_words,
             shortcut::change_dictionary_enabled_setting,
+            shortcut::change_dictionary_capture_enabled_setting,
             shortcut::update_dictionary_entries,
             shortcut::learn_dictionary_pairs,
             shortcut::suspend_all_bindings,
@@ -740,6 +742,7 @@ pub fn run(cli_args: CliArgs) {
             managers::history::HistoryUpdatePayload,
             managers::transcription::StreamTextEvent,
             managers::transcription::StreamPhaseEvent,
+            dictionary_capture::DictionaryLearnedEvent,
         ]);
 
     #[cfg(debug_assertions)] // <- Only export on non-release builds
@@ -943,6 +946,7 @@ pub fn run(cli_args: CliArgs) {
             WEBVIEW_LOG_STREAMING.store(settings.debug_mode, Ordering::Relaxed);
             let app_handle = app.handle().clone();
             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
+            app.manage(dictionary_capture::CaptureManager::new(app_handle.clone()));
 
             initialize_core_logic(&app_handle);
 

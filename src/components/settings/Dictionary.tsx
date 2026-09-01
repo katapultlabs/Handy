@@ -37,6 +37,26 @@ export const DictionaryToggle: React.FC<SectionProps> = React.memo(
   },
 );
 
+export const DictionaryCaptureToggle: React.FC<SectionProps> = React.memo(
+  ({ descriptionMode = "tooltip", grouped = false }) => {
+    const { t } = useTranslation();
+    const { getSetting, updateSetting, isUpdating } = useSettings();
+    const enabled = getSetting("dictionary_capture_enabled") || false;
+
+    return (
+      <ToggleSwitch
+        checked={enabled}
+        onChange={(v) => updateSetting("dictionary_capture_enabled", v)}
+        isUpdating={isUpdating("dictionary_capture_enabled")}
+        label={t("settings.advanced.dictionary.captureLabel")}
+        description={t("settings.advanced.dictionary.captureDescription")}
+        descriptionMode={descriptionMode}
+        grouped={grouped}
+      />
+    );
+  },
+);
+
 const sanitize = (s: string) =>
   s.replace(/[<>]/g, "").replace(/\s+/g, " ").trim();
 
