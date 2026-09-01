@@ -427,6 +427,12 @@ pub struct AppSettings {
     pub log_level: LogLevel,
     #[serde(default)]
     pub custom_words: Vec<String>,
+    /// Master switch for the experimental Dictionary (deterministic
+    /// wrong -> right corrections). See docs/DICTIONARY_DESIGN.md.
+    #[serde(default)]
+    pub dictionary_enabled: bool,
+    #[serde(default)]
+    pub dictionary_entries: Vec<crate::dictionary::DictionaryEntry>,
     #[serde(default)]
     pub model_unload_timeout: ModelUnloadTimeout,
     #[serde(default = "default_word_correction_threshold")]
@@ -933,6 +939,8 @@ pub fn get_default_settings() -> AppSettings {
         debug_mode: false,
         log_level: default_log_level(),
         custom_words: Vec::new(),
+        dictionary_enabled: false,
+        dictionary_entries: Vec::new(),
         model_unload_timeout: ModelUnloadTimeout::default(),
         word_correction_threshold: default_word_correction_threshold(),
         history_limit: default_history_limit(),
