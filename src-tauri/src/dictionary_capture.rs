@@ -25,7 +25,9 @@ use tauri::AppHandle;
 
 const SNAPSHOT_BUDGET_MS: u64 = 100;
 const CHECK_INTERVAL_SECS: u64 = 20;
-const POLL_TICK_SECS: u64 = 5;
+/// Focus changes are polled at this cadence, so it bounds how quickly an
+/// app-switch triggers a check. One AX pid read per tick — negligible cost.
+const POLL_TICK_SECS: u64 = 2;
 const ANCHOR_TTL_SECS: u64 = 180;
 /// UTF-16 units read before the anchor and slack after the pasted length,
 /// bounding how much target text is ever read on the AXStringForRange path.
@@ -139,6 +141,8 @@ mod macos_impl {
         pasted_u16: usize,
         created: Instant,
         last_check: Instant,
+        /// Last focused pid seen by the poll, to edge-trigger on transitions.
+        last_seen_pid: Option<i32>,
     }
 
     pub fn spawn(app: AppHandle) -> Sender<Msg> {
@@ -170,14 +174,18 @@ mod macos_impl {
     }
 
     fn on_tick(app: &AppHandle, anchor: Option<Anchor>) -> Option<Anchor> {
-        let a = anchor?;
+        let mut a = anchor?;
         if a.created.elapsed() > Duration::from_secs(ANCHOR_TTL_SECS) {
             debug!("capture: anchor expired");
             return None;
         }
-        // Focus moved to another app, or the periodic interval elapsed: check.
-        let focus_changed = focused_pid().is_some_and(|pid| pid != a.pid);
-        if focus_changed || a.last_check.elapsed() > Duration::from_secs(CHECK_INTERVAL_SECS) {
+        // Edge-trigger on a focus transition away from the target app; between
+        // transitions, fall back to the periodic interval.
+        let current = focused_pid();
+        let focus_transition = current.is_some() && current != a.last_seen_pid;
+        a.last_seen_pid = current.or(a.last_seen_pid);
+        let moved_away = focus_transition && current != Some(a.pid);
+        if moved_away || a.last_check.elapsed() > Duration::from_secs(CHECK_INTERVAL_SECS) {
             return run_check(app, Some(a));
         }
         Some(a)
@@ -330,6 +338,7 @@ mod macos_impl {
             pasted_u16,
             created: Instant::now(),
             last_check: Instant::now(),
+            last_seen_pid: Some(pid),
         })
     }
 

@@ -47,6 +47,7 @@ function App() {
   const refreshOutputDevices = useSettingsStore(
     (state) => state.refreshOutputDevices,
   );
+  const refreshSettings = useSettingsStore((state) => state.refreshSettings);
   const hasCompletedPostOnboardingInit = useRef(false);
 
   useEffect(() => {
@@ -70,11 +71,14 @@ function App() {
           }),
         );
       }
+      // The entries were written backend-side; pull them into the store so
+      // the Dictionary panel shows them immediately.
+      refreshSettings();
     });
     return () => {
       unlisten.then((fn) => fn());
     };
-  }, [t]);
+  }, [t, refreshSettings]);
 
   // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
   useEffect(() => {
