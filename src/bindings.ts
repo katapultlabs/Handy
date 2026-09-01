@@ -338,7 +338,7 @@ async updateDictionaryEntries(entries: DictionaryEntry[]) : Promise<Result<null,
 },
 /**
  * Pure learning step: diff an original transcription against the user's
- * edit and propose dictionary entries. Stores nothing — the frontend
+ * edit and propose dictionary entries. This stores nothing. The frontend
  * confirms which proposals become entries.
  */
 async learnDictionaryPairs(original: string, corrected: string) : Promise<DictionaryEntry[]> {

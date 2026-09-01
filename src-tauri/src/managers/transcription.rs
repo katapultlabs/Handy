@@ -1774,9 +1774,9 @@ fn post_process_transcription_text(
             raw
         };
         // Deterministic dictionary replacements (experimental) run AFTER the
-        // fuzzy custom-words pass: whatever the fuzzy matcher produces, an
-        // exact entry has the last word — fuzzy can never undo a deterministic
-        // fix (e.g. Custom Word "Maine" vs Dictionary "Maine -> main").
+        // fuzzy custom-words pass. An exact entry always has the last word,
+        // so the fuzzy matcher can never undo a deterministic fix. Example:
+        // Custom Word "Maine" vs Dictionary "Maine -> main".
         let corrected = if settings.experimental_enabled
             && settings.dictionary_enabled
             && !settings.dictionary_entries.is_empty()

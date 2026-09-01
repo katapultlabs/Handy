@@ -93,7 +93,7 @@ export const DictionaryEntries: React.FC<SectionProps> = React.memo(
       const entry: DictionaryEntry = {
         wrong: wrongClean,
         right: rightClean,
-        // Manual entries keep the user's exact casing — it is what they typed.
+        // Manual entries keep the user's exact casing. It is what they typed.
         case_mode: "exact",
         source: "manual",
       };

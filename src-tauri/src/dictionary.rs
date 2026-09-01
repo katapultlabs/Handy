@@ -1,21 +1,22 @@
-//! The Dictionary: deterministic wrong -> right transcription corrections.
+//! The Dictionary replaces misheard words with the user's corrections.
 //!
-//! MVP of the design in `docs/DICTIONARY_DESIGN.md`. Two parts:
+//! This is the MVP of the design in `docs/DICTIONARY_DESIGN.md`. It has two
+//! parts:
 //!
-//! - [`apply_dictionary`]: the Tier 1 exact matcher. One pass, longest match
-//!   first, no cascading (a replacement's output is never re-matched), literal
-//!   insertion (no `$` expansion), word boundaries only where the pattern edge
-//!   is alphanumeric (so `C++`, `.NET`, `@handle` match), case handling per
-//!   entry.
-//! - [`learn_pairs`]: turns an (original, corrected) text pair into proposed
-//!   entries. Word-level diff gated by size, edit distance, and Double
-//!   Metaphone phonetic similarity — a misheard word *sounds* like its fix; a
-//!   rewrite does not.
+//! - [`apply_dictionary`] is the exact matcher. It makes one pass. The
+//!   longest match wins. It never re-matches its own output. It inserts the
+//!   replacement as literal text, so `$` does not expand. It adds a word
+//!   boundary only where the pattern edge is alphanumeric, so `C++`, `.NET`,
+//!   and `@handle` match. Each entry selects its own case handling.
+//! - [`learn_pairs`] turns an (original, corrected) text pair into proposed
+//!   entries. A word-level diff finds the changes. Gates on run size, edit
+//!   distance, and Double Metaphone similarity keep only real corrections.
+//!   A misheard word sounds like its fix. A rewrite does not.
 //!
-//! MVP deviations from the design doc: entries live in settings (not SQLite)
-//! and there is no proposed/active state machine (History-edit pairs are
-//! confirmed in the frontend; capture-learned pairs apply immediately —
-//! see `dictionary_capture.rs`).
+//! MVP deviations from the design doc: entries live in settings, not SQLite.
+//! There is no proposed/active state machine. History-edit pairs are
+//! confirmed in the frontend. Capture-learned pairs apply immediately (see
+//! `dictionary_capture.rs`).
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -203,9 +204,9 @@ fn render_replacement(matched: &str, entry: &DictionaryEntry, sentence_start: bo
 
 /// Apply the dictionary to `text` in one pass.
 ///
-/// Longest `wrong` wins on overlap. Spans produced by a replacement are never
-/// re-matched. Insertion is literal — no regex, no `$` expansion. Whitespace
-/// outside the matched spans is untouched.
+/// The longest `wrong` wins on overlap. Spans that a replacement produced are
+/// never re-matched. Insertion is literal: no regex, no `$` expansion.
+/// Whitespace outside the matched spans is not changed.
 pub fn apply_dictionary(text: &str, entries: &[DictionaryEntry]) -> String {
     if text.is_empty() || entries.is_empty() {
         return text.to_string();
@@ -360,13 +361,13 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
         return None;
     }
 
-    // Sound similar: Double Metaphone keys equal or one apart is a strong
-    // match. Badly misheard proper nouns can differ more (e.g. "Bededa" ->
-    // "Pereira" folds to PTT vs PRR), so a weak match — the keys begin with
-    // the same sound — is also accepted; the edit-distance gate above already
-    // holds. Different first sounds ("meeting" -> "sync") stay rejected.
-    // When the phonetic algorithm does not cover the text (non-ASCII), the
-    // edit distance gate stands alone.
+    // Sound similar: equal Double Metaphone keys, or keys one apart, are a
+    // strong match. Badly misheard proper nouns can differ more. Example:
+    // "Bededa" -> "Pereira" folds to PTT vs PRR. So a weak match, where the
+    // keys begin with the same sound, is also accepted. The edit-distance
+    // gate above already holds. Different first sounds ("meeting" -> "sync")
+    // stay rejected. When the phonetic algorithm does not cover the text
+    // (non-ASCII), the edit-distance gate stands alone.
     if let (Some(kw), Some(kr)) = (phonetic_key(&nw), phonetic_key(&nr)) {
         let close_keys = strsim::levenshtein(&kw, &kr) <= 1;
         let same_first_sound = kw.chars().next() == kr.chars().next();

@@ -1,32 +1,35 @@
-//! In-place dictionary capture (macOS): learn corrections from edits the user
-//! makes to pasted text in the target application.
+//! In-place dictionary capture (macOS). Handy learns corrections from edits
+//! the user makes to pasted text in the target application.
 //!
-//! Implements the design in `docs/DICTIONARY_DESIGN.md` sections 7.3 and 16.3:
+//! This implements `docs/DICTIONARY_DESIGN.md` sections 7.3 and 16.3:
 //!
-//! - **Snapshot** just before the paste: focused AX element + caret position.
-//!   Runs on a dedicated AX thread with a 100 ms budget; the paste never waits
-//!   longer, and on timeout capture is skipped for this dictation. The
-//!   snapshot never reads field content.
-//! - **Check** later: read a bounded window around the anchor
-//!   (`AXStringForRange`, falling back to a truncated `AXValue` read), compare
-//!   with what was pasted, and feed differences through the same
-//!   [`crate::dictionary::learn_pairs`] gates as History edits.
-//! - **Triggers**: the next dictation start, a focused-app change (polled from
-//!   the AX thread — no main-thread observer needed), and a 20 s timer.
-//!   Anchors expire after 180 s.
+//! - **Snapshot**, just before the paste. Read the focused AX element and the
+//!   caret position. This runs on a dedicated AX thread with a 100 ms budget.
+//!   The paste never waits longer. On timeout, capture skips this dictation.
+//!   The snapshot never reads field content.
+//! - **Check**, later. Read a bounded window around the anchor with
+//!   `AXStringForRange`, or a truncated `AXValue` read when the application
+//!   does not support it. Compare the window with the pasted text. Feed the
+//!   differences through the same [`crate::dictionary::learn_pairs`] gates as
+//!   History edits.
+//! - **Triggers**: the next dictation start, a focused-app change (polled
+//!   from the AX thread, so no main-thread observer is needed), and a 20 s
+//!   timer. Anchors expire after 180 s.
 //!
 //! Every AX call happens on the dedicated thread with per-element messaging
-//! timeouts, so an unresponsive target application can never stall dictation.
+//! timeouts. An unresponsive target application can never stall dictation.
 //! All other platforms get a no-op manager.
 
-#![allow(dead_code)]
+// The manager's methods are called only from macOS-gated code paths, so the
+// other platforms see them as dead code.
+#![cfg_attr(not(target_os = "macos"), allow(dead_code))]
 
 use tauri::AppHandle;
 
 const SNAPSHOT_BUDGET_MS: u64 = 100;
 const CHECK_INTERVAL_SECS: u64 = 20;
 /// Focus changes are polled at this cadence, so it bounds how quickly an
-/// app-switch triggers a check. One AX pid read per tick — negligible cost.
+/// app-switch triggers a check. Each tick costs one cheap AX pid read.
 const POLL_TICK_SECS: u64 = 2;
 const ANCHOR_TTL_SECS: u64 = 180;
 /// UTF-16 units read before the anchor and slack after the pasted length,
@@ -98,7 +101,7 @@ impl CaptureManager {
         }
     }
 
-    /// Drop any pending anchor — the paste it belonged to did not happen.
+    /// Drop any pending anchor. The paste it belonged to did not happen.
     pub fn cancel(&self) {
         #[cfg(target_os = "macos")]
         {
@@ -187,9 +190,9 @@ mod macos_impl {
                     } else {
                         let taken = take_snapshot(pasted);
                         // The AX calls above carry their own messaging
-                        // timeouts and can outlive the caller's budget. If
-                        // they did, the paste already went ahead and the caret
-                        // we read may be post-paste — discard the result.
+                        // timeouts and can outlive the caller's budget. In
+                        // that case the paste already went ahead, and the
+                        // caret we read can be post-paste. Discard the result.
                         if Instant::now() > deadline {
                             debug!("capture: snapshot finished late; discarding");
                         } else {
@@ -399,8 +402,8 @@ mod macos_impl {
         };
 
         if window.trim().is_empty() {
-            // The field was cleared — the message was sent or the document
-            // closed. Nothing left to learn from; stop watching.
+            // The field was cleared: the message was sent or the document
+            // closed. There is nothing left to learn from. Stop watching.
             debug!("capture: field is empty; dropping anchor");
             return None;
         }
@@ -413,9 +416,9 @@ mod macos_impl {
 
         let mut learned = learn_pairs(a.pasted.trim_end(), window.trim());
         if learned.is_empty() {
-            // Changed but nothing passed the gates — could be mid-edit or a
-            // rewrite. Keep the anchor; a later check may see a settled edit.
-            // Counts only — never log field content.
+            // The text changed but nothing passed the gates. The user may be
+            // mid-edit, or this is a rewrite. Keep the anchor; a later check
+            // may see a settled edit. Log counts only, never field content.
             info!(
                 "capture: edit detected but no pair passed the learn gates (window {} chars vs pasted {} chars); keeping anchor",
                 window.chars().count(),
@@ -456,12 +459,9 @@ mod macos_impl {
         if added.is_empty() {
             return;
         }
-        // Counts only — learned pairs can contain confidential names, and the
-        // log file must never hold field content (design doc section 12).
-        info!(
-            "capture: learned {} new dictionary entr(y/ies)",
-            added.len()
-        );
+        // Log counts only. Learned pairs can contain confidential names, and
+        // the log file must never hold field content (design doc section 12).
+        info!("capture: learned {} new dictionary entries", added.len());
         crate::settings::write_settings(app, settings);
         if let Err(err) = (DictionaryLearnedEvent { entries: added }).emit(app) {
             warn!("capture: failed to emit learned event: {err}");

@@ -808,8 +808,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         }
     }
 
-    // If the paste itself fails, the capture anchor must not outlive it —
-    // otherwise capture would compare pre-existing field content against text
+    // If the paste itself fails, the capture anchor must not outlive it.
+    // Otherwise capture would compare pre-existing field content against text
     // that never arrived.
     #[cfg(target_os = "macos")]
     let cancel_capture = || {
