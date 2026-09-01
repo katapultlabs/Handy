@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.10.0-dict.1. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.1. It is a test build. It adds the Dictionary:
 
 - Handy learns your corrections. It then fixes the same mistake in every
   later transcription.
@@ -40,6 +40,8 @@ the release version.
 2. Turn on "Enable experimental features".
 3. In the Experimental group, turn on "Dictionary".
 4. Turn on "Learn from edits (macOS)" for in-place learning.
+5. In the App group above, turn off "Check for updates". An upstream
+   release would otherwise offer to replace this test build.
 
 ## 4. Test it
 
