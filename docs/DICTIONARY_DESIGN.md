@@ -29,7 +29,7 @@ The user does not have to make the same correction again.
 
 ## 3. Non-goals
 
-- Handy does not read the full content of the target application.
+- Handy does not retain or transmit the content of the target application. Capture reads a bounded window around the pasted text (section 7.3.1), compares it, and drops it. Where the platform only offers a full-value read, Handy truncates to the window at once and never stores or sends the rest.
 - Handy does not send the target application content to a server.
 - Handy does not change text that the user did not dictate.
 - Per-application dictionaries are not part of the first version. The data model permits them later.
@@ -82,12 +82,25 @@ CREATE TABLE dictionary (
   enabled       INTEGER NOT NULL DEFAULT 1,
   seen_count    INTEGER NOT NULL DEFAULT 1,    -- times a producer proposed this pair
   applied_count INTEGER NOT NULL DEFAULT 0,    -- times the consumer used it
-  app_id        TEXT,                          -- NULL = all applications (reserved)
+  app_id        TEXT NOT NULL DEFAULT '',      -- '' = all applications (reserved)
+  wrong_key     TEXT NOT NULL,                 -- normalized: lowercase wrong, '' for vocabulary
+  right_key     TEXT NOT NULL,                 -- normalized: lowercase right
   created_at    INTEGER NOT NULL,
-  updated_at    INTEGER NOT NULL,
-  UNIQUE (wrong, right, app_id)
+  updated_at    INTEGER NOT NULL
 );
+CREATE UNIQUE INDEX dictionary_pair ON dictionary (wrong_key, right_key, app_id);
+CREATE UNIQUE INDEX dictionary_active_wrong ON dictionary (wrong_key, app_id)
+  WHERE state = 'active' AND wrong_key != '';
 ```
+
+Do not use `NULL` in a unique key. SQLite treats each `NULL` as distinct, so the
+`UPSERT` never conflicts and `seen_count` never increases. Use `''` sentinels
+and the normalized `*_key` columns instead. `ON CONFLICT` targets `dictionary_pair`.
+
+The `dictionary_active_wrong` index enforces one active replacement per `wrong`.
+When a new pair for an existing active `wrong` reaches activation, the old entry
+moves to `state = 'proposed'` and the new one becomes active, in one transaction.
+The last correction wins. The user can flip this in the Dictionary screen.
 
 Rules:
 
@@ -95,7 +108,10 @@ Rules:
 - `match_mode = 'word'` matches on word boundaries. `'phrase'` matches a run of words.
 - `case_mode = 'smart'` keeps the case pattern of the matched text. `'exact'` writes `right` as stored.
 - A producer that proposes a pair that exists increases `seen_count`. It does not make a second row. Use one SQL `UPSERT` in one transaction.
-- `state = 'rejected'` means the user dismissed the pair. Producers do not propose it again. The consumer does not apply it.
+- The same `UPSERT` statement performs the activation: when the new `seen_count` reaches the entry's threshold and `state = 'proposed'`, set `state = 'active'`. This is one atomic write. No separate pass promotes entries.
+- The threshold for an entry is `dictionary_auto_apply_threshold` (default 2). For a homophone pair (both sides are real words in the active language) the threshold is `dictionary_auto_apply_threshold + 1`. A change to the setting applies to future proposals; it does not demote active entries.
+- A user confirmation sets `state = 'active'` directly, at any count.
+- `state = 'rejected'` means the user dismissed the pair. The `UPSERT` still increases `seen_count`, but it never changes `rejected` to another state. Only the user can, in the Dictionary screen.
 - Only `state = 'active'` and `enabled = 1` entries apply.
 
 ### 5.1 Migration of Custom Words
@@ -104,10 +120,18 @@ On first start after the update:
 
 1. Read `settings.custom_words`.
 2. Insert each word as a vocabulary entry with `source = 'manual'`.
-3. Keep `settings.custom_words` in sync with the vocabulary entries. Old code paths continue to work.
 
+After the migration, **the dictionary table is the single owner** of vocabulary.
+`settings.custom_words` becomes a derived copy: the active, enabled vocabulary entries.
+
+- Every dictionary mutation (add, edit, delete, disable, reject) rewrites `settings.custom_words` from the table, in the same operation.
+- The legacy `update_custom_words` command writes through the dictionary, not to the setting directly.
+- No other code writes `settings.custom_words`.
+
+This rule exists because the Whisper `initial_prompt` path reads `settings.custom_words`
+directly (`managers/transcription.rs`). Without one owner, a word disabled in the
+Dictionary would still reach the model through the prompt.
 Do not remove `settings.custom_words` in the first version.
-The Whisper `initial_prompt` path reads it. See `managers/transcription.rs`.
 
 ## 6. Consumer: apply the Dictionary
 
@@ -134,8 +158,15 @@ Tier 1: **Exact replacements.** Apply all enabled entries that have `wrong`.
 7. Keep the punctuation that touches the matched text.
 8. If `right` is empty, remove the match and the one space next to it. Do not run a whitespace cleanup on the whole text. That removes line breaks.
 
-Tier 2: **Fuzzy vocabulary.** Run the current `apply_custom_words()` on the vocabulary entries.
+Tier 2: **Fuzzy vocabulary.** The same algorithm as today's `apply_custom_words()`, on the vocabulary entries.
 Run it after Tier 1. Do not run it on spans that Tier 1 changed.
+
+The current function cannot do this as it is. It takes no span input. It also
+rebuilds the text with `split_whitespace()` and `join(" ")`, which removes line
+breaks and repeated spaces — an existing defect that this work fixes. Build one
+span-aware pass: tokenize once with byte offsets, let Tier 1 mark its output
+spans as protected, run the fuzzy pass over the unprotected spans, and copy the
+original whitespace through unchanged.
 
 Tier 1 is deterministic. Tier 2 is not. The user can turn Tier 2 off.
 
@@ -187,16 +218,17 @@ Build it last. Build it for macOS first.
 macOS gives an Accessibility API (AX). Handy already has the Accessibility permission.
 The `objc2-application-services` crate gives the bindings.
 
-At paste time:
+Just before the paste (the **snapshot**):
 
 1. Get the focused element: `AXUIElementCreateSystemWide()` -> `kAXFocusedUIElementAttribute`.
-2. Read `kAXValueAttribute` (the full text) and `kAXSelectedTextRangeAttribute` (the caret).
-3. Store an **anchor**: the element reference, the process id, the caret position before the paste, the pasted text, and the time.
-4. Do not store the full field text on disk. Keep it in memory only.
+2. Read `kAXSelectedTextRangeAttribute` (the caret and any selection the paste will replace).
+3. Store an **anchor**: the element reference, the process id, the caret position, the selection length, the pasted text, and the time.
+4. The snapshot runs on the AX thread with a 100 ms budget (section 16.3). The paste does not wait past that budget: on timeout, paste without an anchor and skip capture for this dictation. The snapshot never reads the field content.
+5. Do not store field text on disk. Anchor data stays in memory only.
 
 At check time:
 
-1. Read `kAXValueAttribute` from the anchored element again.
+1. Read a bounded window of text around the anchor from the element. Prefer `kAXStringForRangeParameterizedAttribute` with a range of the pasted length plus margin. If the application does not support it, read `kAXValueAttribute` and keep only the 32 KB window around the anchor; drop the rest at once.
 2. Find the pasted text near the anchor position. Use a fuzzy locator, because the user can type before the anchor.
 3. Compare the text at that location with the pasted text.
 4. If the text changed, call `learn(pasted, current, "capture")`.
@@ -232,7 +264,7 @@ Both are later work. The interface for a "text anchor provider" must let each pl
 3. Walk the diff. Each change is a pair of runs: removed words and inserted words.
 4. Accept a change as a candidate when all of these are true:
    - The removed run and the inserted run each have 1 to 3 words. One word on each side is the normal case. Two or three words cover a name that the model split or joined, for example `char gebee` -> `ChargeBee`.
-   - The runs are not the same after case folding.
+   - The runs are not identical. A case-only change (`github` -> `GitHub`) is a valid candidate: it skips the two similarity tests below, and step 6 stores it with `case_mode = 'exact'`. Runs that are identical including case are not candidates.
    - The runs are not only punctuation or only whitespace.
    - The inserted run is not empty and the removed run is not empty.
    - The runs **sound similar**. See 8.1. This is the main test. A misheard word sounds like the right word. A rewrite does not.
@@ -269,7 +301,7 @@ Examples:
 | `good`        | `great`     | no             | reject (style edit)  |
 | `their`       | `there`     | yes            | accept, but see note |
 
-Note: homophone fixes such as `their` -> `there` depend on context. They pass this test but they are risky as global replacements. Keep them as `proposed` until `seen_count >= 3`. Setting `dictionary_auto_apply_threshold` controls this. A future version can mark an entry as "context-dependent" and give it to the LLM prompt only.
+Note: homophone fixes such as `their` -> `there` depend on context. They pass this test but they are risky as global replacements. Their activation threshold is one higher than normal: `dictionary_auto_apply_threshold + 1`. See the activation rules in section 5. A future version can mark an entry as "context-dependent" and give it to the LLM prompt only.
 
 ### 8.2 Tests for `learn()`
 
@@ -334,10 +366,10 @@ Events:
 
 ## 12. Privacy
 
-- All data stays on the local machine.
+- All data stays on the local machine, with one exception, below.
 - Capture reads only the focused element. It keeps the text in memory for the anchor lifetime. It writes only the learned pairs.
 - Capture is off by default.
-- The LLM post-process step receives the vocabulary list only if the prompt uses `${dictionary}`.
+- The exception: if the user puts `${dictionary}` in a post-process prompt, the dictionary words go to the configured LLM provider with each post-processed transcription. That provider can be remote. The placeholder documentation and the prompt editor must say this. A test must show the dictionary is sent only when the prompt contains the placeholder.
 
 ## 13. Build order
 
@@ -353,7 +385,7 @@ Each phase is one pull request. Each phase works on its own.
 ## 14. Open questions
 
 - Should a `capture` entry from one application apply in all applications? First version: yes. `app_id` is reserved for later.
-- Should Handy learn case-only changes, for example `github` -> `GitHub`? Proposal: yes, with `case_mode = 'exact'`.
+- (Decided) Handy learns case-only changes, for example `github` -> `GitHub`, with `case_mode = 'exact'`. See section 8, step 4.
 - How does the anchor behave when the paste method is `direct` typing? The text arrives one character at a time. The anchor must wait for the typing to end.
 - Does the Whisper `initial_prompt` path need the replacement entries, or only the vocabulary entries? Proposal: only vocabulary. The prompt tells the model what words exist. It cannot tell it what to replace.
 
@@ -449,7 +481,7 @@ AX calls can block. An unresponsive target application can hold a call for secon
 
 - All AX calls run on a dedicated thread, never on the pipeline thread and never on the main thread.
 - Every AX call has a timeout: `AXUIElementSetMessagingTimeout`, 100 ms. A timeout means "skip capture", nothing more.
-- The anchor read at paste time (section 7.3.1) happens **after** the paste is sent, not before. The paste never waits for the anchor.
+- The anchor snapshot (section 7.3.1) runs just before the paste, on the AX thread, inside one 100 ms budget. On timeout the paste proceeds without an anchor. The snapshot reads only the caret range, never the field content, so it is one cheap AX call.
 - Check triggers (section 7.3.1) coalesce. A focus change during a running check does not start a second check.
 
 ### 16.4 Memory
