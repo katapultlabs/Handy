@@ -356,6 +356,13 @@ mod macos_impl {
             }
         };
 
+        if window.trim().is_empty() {
+            // The field was cleared — the message was sent or the document
+            // closed. Nothing left to learn from; stop watching.
+            debug!("capture: field is empty; dropping anchor");
+            return None;
+        }
+
         if window.contains(a.pasted.trim_end()) {
             // Unchanged so far; keep watching until the anchor expires.
             debug!("capture: pasted text unchanged; watching");

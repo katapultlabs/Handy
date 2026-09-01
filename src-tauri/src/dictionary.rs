@@ -213,7 +213,7 @@ pub fn apply_dictionary(text: &str, entries: &[DictionaryEntry]) -> String {
         .iter()
         .filter(|e| !e.wrong.trim().is_empty())
         .collect();
-    order.sort_by(|a, b| b.wrong.chars().count().cmp(&a.wrong.chars().count()));
+    order.sort_by_key(|e| std::cmp::Reverse(e.wrong.chars().count()));
 
     // Claimed spans in original byte offsets, kept sorted and non-overlapping.
     let mut claims: Vec<(usize, usize, String)> = Vec::new();
