@@ -185,8 +185,17 @@ mod macos_impl {
                     if Instant::now() > deadline {
                         debug!("capture: discarding stale snapshot request");
                     } else {
-                        anchor = take_snapshot(pasted);
-                        let _ = ack.send(());
+                        let taken = take_snapshot(pasted);
+                        // The AX calls above carry their own messaging
+                        // timeouts and can outlive the caller's budget. If
+                        // they did, the paste already went ahead and the caret
+                        // we read may be post-paste — discard the result.
+                        if Instant::now() > deadline {
+                            debug!("capture: snapshot finished late; discarding");
+                        } else {
+                            anchor = taken;
+                            let _ = ack.send(());
+                        }
                     }
                 }
                 Ok(Msg::Check) => {
