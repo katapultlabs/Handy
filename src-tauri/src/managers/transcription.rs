@@ -1764,6 +1764,13 @@ fn post_process_transcription_text(
     supported_languages: &[String],
 ) -> String {
     fail_open_text_transform(raw, |raw| {
+        // Tier 1: deterministic dictionary replacements (experimental),
+        // before the fuzzy custom-words pass so exact fixes win.
+        let raw = if settings.dictionary_enabled && !settings.dictionary_entries.is_empty() {
+            crate::dictionary::apply_dictionary(&raw, &settings.dictionary_entries)
+        } else {
+            raw
+        };
         let corrected = if !settings.custom_words.is_empty() && !custom_words_already_prompted {
             apply_custom_words(
                 &raw,

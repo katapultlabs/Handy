@@ -838,6 +838,51 @@ pub fn update_custom_words(app: AppHandle, words: Vec<String>) -> Result<(), Str
 
 #[tauri::command]
 #[specta::specta]
+pub fn change_dictionary_capture_enabled_setting(
+    app: AppHandle,
+    enabled: bool,
+) -> Result<(), String> {
+    let mut settings = settings::get_settings(&app);
+    settings.dictionary_capture_enabled = enabled;
+    settings::write_settings(&app, settings);
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn change_dictionary_enabled_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
+    let mut settings = settings::get_settings(&app);
+    settings.dictionary_enabled = enabled;
+    settings::write_settings(&app, settings);
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_dictionary_entries(
+    app: AppHandle,
+    entries: Vec<crate::dictionary::DictionaryEntry>,
+) -> Result<(), String> {
+    let mut settings = settings::get_settings(&app);
+    settings.dictionary_entries = entries;
+    settings::write_settings(&app, settings);
+    Ok(())
+}
+
+/// Pure learning step: diff an original transcription against the user's
+/// edit and propose dictionary entries. Stores nothing — the frontend
+/// confirms which proposals become entries.
+#[tauri::command]
+#[specta::specta]
+pub fn learn_dictionary_pairs(
+    original: String,
+    corrected: String,
+) -> Vec<crate::dictionary::DictionaryEntry> {
+    crate::dictionary::learn_pairs(&original, &corrected)
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn change_word_correction_threshold_setting(
     app: AppHandle,
     threshold: f64,

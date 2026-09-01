@@ -1,16 +1,26 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { readFile } from "@tauri-apps/plugin-fs";
-import { Check, Copy, FolderOpen, RotateCcw, Star, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  FolderOpen,
+  Pencil,
+  RotateCcw,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   commands,
   events,
+  type DictionaryEntry,
   type HistoryEntry,
   type HistoryUpdatePayload,
 } from "@/bindings";
 import { useOsType } from "@/hooks/useOsType";
+import { useSettings } from "@/hooks/useSettings";
 import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
@@ -37,6 +47,10 @@ const IconButton: React.FC<{
 );
 
 const PAGE_SIZE = 30;
+
+// JSX literal strings are disallowed by the i18n lint rule; the arrow is
+// punctuation, not translatable copy.
+const LEARN_ARROW = "→";
 
 interface OpenRecordingsButtonProps {
   onClick: () => void;
@@ -312,10 +326,66 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   retryTranscription,
 }) => {
   const { t, i18n } = useTranslation();
+  const { getSetting, updateSetting } = useSettings();
   const [showCopied, setShowCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
   const hasTranscription = entry.transcription_text.trim().length > 0;
+
+  // --- Dictionary: edit this entry and learn corrections from the edit ---
+  const dictionaryEnabled = getSetting("dictionary_enabled") || false;
+  // Diff against what Handy actually pasted (post-processed when it exists),
+  // not the raw transcription — otherwise applied corrections re-learn.
+  const pastedText = entry.post_processed_text ?? entry.transcription_text;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [proposals, setProposals] = useState<DictionaryEntry[]>([]);
+
+  const startEdit = () => {
+    setDraft(pastedText);
+    setProposals([]);
+    setEditing(true);
+  };
+
+  const saveEdit = async () => {
+    setEditing(false);
+    if (draft.trim() === pastedText.trim()) {
+      return;
+    }
+    try {
+      const learned = await commands.learnDictionaryPairs(pastedText, draft);
+      if (learned.length === 0) {
+        toast.info(t("settings.history.dictionary.nothingLearned"));
+        return;
+      }
+      setProposals(learned);
+    } catch (error) {
+      console.error("Failed to learn from edit:", error);
+    }
+  };
+
+  const addProposal = (proposal: DictionaryEntry) => {
+    const entries: DictionaryEntry[] = getSetting("dictionary_entries") || [];
+    const dup = entries.some(
+      (e) =>
+        e.wrong.toLowerCase() === proposal.wrong.toLowerCase() &&
+        e.right === proposal.right,
+    );
+    if (!dup) {
+      updateSetting("dictionary_entries", [...entries, proposal]);
+    }
+    setProposals((prev) =>
+      prev.filter(
+        (p) => !(p.wrong === proposal.wrong && p.right === proposal.right),
+      ),
+    );
+    toast.success(
+      t("settings.history.dictionary.added", {
+        wrong: proposal.wrong,
+        right: proposal.right,
+      }),
+    );
+  };
 
   const handleLoadAudio = useCallback(
     () => getAudioUrl(entry.file_name),
@@ -387,6 +457,16 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
               fill={entry.saved ? "currentColor" : "none"}
             />
           </IconButton>
+          {dictionaryEnabled && (
+            <IconButton
+              onClick={editing ? saveEdit : startEdit}
+              disabled={!hasTranscription || retrying}
+              active={editing}
+              title={t("settings.history.dictionary.editTitle")}
+            >
+              <Pencil width={16} height={16} />
+            </IconButton>
+          )}
           <IconButton
             onClick={handleRetranscribe}
             disabled={retrying}
@@ -412,34 +492,91 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
         </div>
       </div>
 
-      <p
-        className={`italic text-sm pb-2 ${
-          retrying
-            ? ""
-            : hasTranscription
-              ? "text-text/90 select-text cursor-text whitespace-pre-wrap break-words"
-              : "text-text/40"
-        }`}
-        style={
-          retrying
-            ? { animation: "transcribe-pulse 3s ease-in-out infinite" }
-            : undefined
-        }
-      >
-        {retrying && (
-          <style>{`
+      {editing && (
+        <div className="flex flex-col gap-2">
+          <textarea
+            className="text-sm w-full min-h-24 p-2 rounded-md border border-mid-gray/30 bg-transparent text-text/90"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <Button onClick={saveEdit} variant="primary" size="sm">
+              {t("settings.history.dictionary.saveEdit")}
+            </Button>
+            <Button
+              onClick={() => setEditing(false)}
+              variant="secondary"
+              size="sm"
+            >
+              {t("settings.history.dictionary.cancelEdit")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {proposals.length > 0 && (
+        <div className="flex flex-col gap-1 rounded-md border border-logo-primary/30 p-2">
+          <p className="text-xs text-text/60">
+            {t("settings.history.dictionary.proposalsTitle")}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {proposals.map((p) => (
+              <Button
+                key={`${p.wrong}→${p.right}`}
+                onClick={() => addProposal(p)}
+                variant="secondary"
+                size="sm"
+                className="inline-flex items-center gap-1 cursor-pointer"
+              >
+                <span>
+                  {p.wrong} {LEARN_ARROW} {p.right}
+                </span>
+                <Check width={12} height={12} />
+              </Button>
+            ))}
+            <Button
+              onClick={() => setProposals([])}
+              variant="secondary"
+              size="sm"
+              className="cursor-pointer text-text/50"
+            >
+              {t("settings.history.dictionary.dismiss")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!editing && (
+        <p
+          className={`italic text-sm pb-2 ${
+            retrying
+              ? ""
+              : hasTranscription
+                ? "text-text/90 select-text cursor-text whitespace-pre-wrap break-words"
+                : "text-text/40"
+          }`}
+          style={
+            retrying
+              ? { animation: "transcribe-pulse 3s ease-in-out infinite" }
+              : undefined
+          }
+        >
+          {retrying && (
+            <style>{`
             @keyframes transcribe-pulse {
               0%, 100% { color: color-mix(in srgb, var(--color-text) 40%, transparent); }
               50% { color: color-mix(in srgb, var(--color-text) 90%, transparent); }
             }
           `}</style>
-        )}
-        {retrying
-          ? t("settings.history.transcribing")
-          : hasTranscription
-            ? entry.transcription_text
-            : t("settings.history.transcriptionFailed")}
-      </p>
+          )}
+          {retrying
+            ? t("settings.history.transcribing")
+            : hasTranscription
+              ? entry.transcription_text
+              : t("settings.history.transcriptionFailed")}
+        </p>
+      )}
 
       <AudioPlayer onLoadRequest={handleLoadAudio} className="w-full" />
     </div>

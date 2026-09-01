@@ -789,6 +789,24 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         paste_method, paste_delay_ms, paste_delay_after_ms
     );
 
+    // Dictionary in-place capture: anchor the focused field just before the
+    // paste (bounded 100 ms wait; see dictionary_capture.rs). Skipped when the
+    // paste target is unknowable (external script / none) or secure input is
+    // active.
+    #[cfg(target_os = "macos")]
+    if settings.dictionary_enabled
+        && settings.dictionary_capture_enabled
+        && !matches!(
+            paste_method,
+            PasteMethod::ExternalScript | PasteMethod::None
+        )
+        && !crate::secure_input::is_enabled_now()
+    {
+        if let Some(capture) = app_handle.try_state::<crate::dictionary_capture::CaptureManager>() {
+            capture.snapshot_before_paste(text.clone());
+        }
+    }
+
     // Perform the paste operation
     match paste_method {
         PasteMethod::None => {

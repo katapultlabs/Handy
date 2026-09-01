@@ -398,6 +398,19 @@
       "fillerWordRemoval": {
         "title": "Remove Filler Words",
         "description": "Removes common hesitation words from transcriptions. Turn off to keep them."
+      },
+      "dictionary": {
+        "toggleLabel": "Dictionary",
+        "toggleDescription": "Deterministic corrections: replace exact words or phrases the model gets wrong. Learns from your edits in History.",
+        "title": "Dictionary entries",
+        "description": "Each entry replaces the misheard text with your correction in every transcription.",
+        "wrongPlaceholder": "Misheard",
+        "rightPlaceholder": "Correct",
+        "add": "Add",
+        "remove": "Remove {{wrong}} → {{right}}",
+        "duplicate": "An entry for \"{{wrong}}\" already exists",
+        "captureLabel": "Learn from edits (macOS)",
+        "captureDescription": "After Handy pastes, watch the text field briefly. If you correct the pasted text, the fix is added to the Dictionary automatically. Handy reads only a small window around what it pasted, keeps it in memory only, and never sends it anywhere."
       }
     },
     "postProcessing": {
@@ -467,7 +480,16 @@
       "retranscribe": "Re-transcribe",
       "retranscribeError": "Failed to re-transcribe. Please try again.",
       "transcribing": "Transcribing...",
-      "transcriptionFailed": "Transcription failed. You can re-transcribe using the retry icon."
+      "transcriptionFailed": "Transcription failed. You can re-transcribe using the retry icon.",
+      "dictionary": {
+        "editTitle": "Correct transcription (teaches the Dictionary)",
+        "saveEdit": "Save & learn",
+        "cancelEdit": "Cancel",
+        "nothingLearned": "No corrections learned from this edit",
+        "proposalsTitle": "Learned corrections — click to add to the Dictionary:",
+        "added": "Added to Dictionary: {{wrong}} → {{right}}",
+        "dismiss": "Dismiss"
+      }
     },
     "debug": {
       "title": "Debug",
