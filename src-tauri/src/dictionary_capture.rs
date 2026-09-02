@@ -282,6 +282,17 @@ mod macos_impl {
         focused_element().map(|(_, pid)| pid)
     }
 
+    /// True when the element is a password field (role or subrole
+    /// `AXSecureTextField`). Both attributes are CFStrings.
+    fn is_secure_text_field(element: AXUIElementRef) -> bool {
+        const SECURE: &str = "AXSecureTextField";
+        ["AXRole", "AXSubrole"].iter().any(|attr| {
+            ax_attr(element, attr)
+                .and_then(|v| cf_to_string(&v))
+                .is_some_and(|s| s == SECURE)
+        })
+    }
+
     fn selected_range(element: AXUIElementRef) -> Option<CFRange> {
         let v = ax_attr(element, "AXSelectedTextRange")?;
         let mut range = CFRange {
@@ -366,6 +377,13 @@ mod macos_impl {
             info!("capture: no focused AX element; skipping this dictation");
             return None;
         };
+        // Never read a password field. This is checked on the element itself.
+        // A global "secure input is on" check is too wide: loginwindow or a
+        // chat app can hold secure input for hours and block every capture.
+        if is_secure_text_field(element.0 as AXUIElementRef) {
+            info!("capture: focused element is a secure text field; skipping");
+            return None;
+        }
         let Some(range) = selected_range(element.0 as AXUIElementRef) else {
             info!("capture: focused element reports no selected-text range (app may not expose AX text); skipping");
             return None;

@@ -242,7 +242,11 @@ Check triggers (any one of them):
 
 #### 7.3.2 When capture cannot work
 
-- Secure input is active. `secure_input.rs` detects this. Skip capture.
+- The focused element is a password field (AX role or subrole
+  `AXSecureTextField`). Skip capture. Do not use the global secure-input
+  state from `secure_input.rs` for this: another process (loginwindow, a
+  chat application) can hold secure input for hours and would block every
+  capture.
 - The element does not give `kAXValueAttribute`. Some applications do not. Skip capture.
 - The paste method is `external_script`. Handy does not know where the text went. Skip capture.
 - The pasted text is not found near the anchor. The user deleted it or moved it. Skip capture.
@@ -490,7 +494,7 @@ This project trims memory after each dictation (`memory.rs`, `FinishGuard`). The
 
 - An anchor holds at most 32 KB of field text. A larger field stores only the 32 KB window around the caret.
 - At most 4 anchors live at one time. A new anchor beyond that drops the oldest.
-- Anchors drop at the end of the capture window (default 180 s), on secure-input, and on application quit.
+- Anchors drop at the end of the capture window (default 180 s) and on application quit.
 - The in-memory dictionary table is small (< 1,000 entries, ~100 KB). Hold it as one `Arc`, not one copy per thread.
 
 ### 16.5 Startup

@@ -791,19 +791,26 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
 
     // Dictionary in-place capture: anchor the focused field just before the
     // paste (bounded 100 ms wait; see dictionary_capture.rs). Skipped when the
-    // paste target is unknowable (external script / none) or secure input is
-    // active.
+    // paste target is unknowable (external script / none). Password fields
+    // are refused by the capture thread from the element's AX role; a global
+    // secure-input check is not used, because another process (loginwindow,
+    // a chat app) can hold secure input for hours and block every capture.
     #[cfg(target_os = "macos")]
     if settings.experimental_enabled
         && settings.dictionary_enabled
         && settings.dictionary_capture_enabled
-        && !matches!(
+    {
+        if matches!(
             paste_method,
             PasteMethod::ExternalScript | PasteMethod::None
-        )
-        && !crate::secure_input::is_enabled_now()
-    {
-        if let Some(capture) = app_handle.try_state::<crate::dictionary_capture::CaptureManager>() {
+        ) {
+            log::debug!(
+                "capture: skipped, paste method {:?} has no known target",
+                paste_method
+            );
+        } else if let Some(capture) =
+            app_handle.try_state::<crate::dictionary_capture::CaptureManager>()
+        {
             capture.snapshot_before_paste(text.clone());
         }
     }
