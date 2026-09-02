@@ -487,9 +487,7 @@
         "saveEdit": "למד מהתיקון",
         "cancelEdit": "ביטול",
         "nothingLearned": "לא נלמדו תיקונים מעריכה זו",
-        "proposalsTitle": "תיקונים שנלמדו — לחצו כדי להוסיף אותם למילון:",
-        "added": "נוסף למילון: {{wrong}} → {{right}}",
-        "dismiss": "התעלם"
+        "added": "נוסף למילון: {{wrong}} → {{right}}"
       }
     },
     "debug": {

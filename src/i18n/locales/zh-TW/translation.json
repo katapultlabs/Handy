@@ -487,9 +487,7 @@
         "saveEdit": "從修正中學習",
         "cancelEdit": "取消",
         "nothingLearned": "本次編輯未學到任何修正",
-        "proposalsTitle": "已學到的修正 — 點擊以加入詞典：",
-        "added": "已加入詞典：{{wrong}} → {{right}}",
-        "dismiss": "關閉"
+        "added": "已加入詞典：{{wrong}} → {{right}}"
       }
     },
     "debug": {

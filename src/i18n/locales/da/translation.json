@@ -487,9 +487,7 @@
         "saveEdit": "Lær af rettelsen",
         "cancelEdit": "Annuller",
         "nothingLearned": "Der blev ikke lært nogen rettelser af denne ændring",
-        "proposalsTitle": "Lærte rettelser – klik for at føje dem til ordbogen:",
-        "added": "Føjet til ordbogen: {{wrong}} → {{right}}",
-        "dismiss": "Afvis"
+        "added": "Føjet til ordbogen: {{wrong}} → {{right}}"
       }
     },
     "debug": {

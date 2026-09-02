@@ -487,9 +487,7 @@
         "saveEdit": "교정 내용 학습",
         "cancelEdit": "취소",
         "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
-        "proposalsTitle": "학습된 교정 — 클릭하여 사전에 추가:",
-        "added": "사전에 추가됨: {{wrong}} → {{right}}",
-        "dismiss": "닫기"
+        "added": "사전에 추가됨: {{wrong}} → {{right}}"
       }
     },
     "debug": {

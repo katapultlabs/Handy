@@ -49,10 +49,6 @@ const IconButton: React.FC<{
 
 const PAGE_SIZE = 30;
 
-// JSX literal strings are disallowed by the i18n lint rule; the arrow is
-// punctuation, not translatable copy.
-const LEARN_ARROW = "→";
-
 interface OpenRecordingsButtonProps {
   onClick: () => void;
   label: string;
@@ -362,11 +358,9 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   const pastedText = entry.post_processed_text ?? entry.transcription_text;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
-  const [proposals, setProposals] = useState<DictionaryEntry[]>([]);
 
   const startEdit = () => {
     setDraft(pastedText);
-    setProposals([]);
     setEditing(true);
   };
 
@@ -389,33 +383,32 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
         toast.info(t("settings.history.dictionary.nothingLearned"));
         return;
       }
-      setProposals(learned);
+      // Add every learned pair at once. An edit made in Handy's own editor
+      // is a clear correction, so it does not need a second confirmation.
+      // This matches in-place capture; the Dictionary panel can delete it.
+      const entries: DictionaryEntry[] = getSetting("dictionary_entries") || [];
+      const fresh = learned.filter(
+        (p) =>
+          !entries.some(
+            (e) =>
+              e.wrong.toLowerCase() === p.wrong.toLowerCase() &&
+              e.right === p.right,
+          ),
+      );
+      if (fresh.length > 0) {
+        updateSetting("dictionary_entries", [...entries, ...fresh]);
+      }
+      for (const p of learned) {
+        toast.success(
+          t("settings.history.dictionary.added", {
+            wrong: p.wrong,
+            right: p.right,
+          }),
+        );
+      }
     } catch (error) {
       console.error("Failed to learn from edit:", error);
     }
-  };
-
-  const addProposal = (proposal: DictionaryEntry) => {
-    const entries: DictionaryEntry[] = getSetting("dictionary_entries") || [];
-    const dup = entries.some(
-      (e) =>
-        e.wrong.toLowerCase() === proposal.wrong.toLowerCase() &&
-        e.right === proposal.right,
-    );
-    if (!dup) {
-      updateSetting("dictionary_entries", [...entries, proposal]);
-    }
-    setProposals((prev) =>
-      prev.filter(
-        (p) => !(p.wrong === proposal.wrong && p.right === proposal.right),
-      ),
-    );
-    toast.success(
-      t("settings.history.dictionary.added", {
-        wrong: proposal.wrong,
-        right: proposal.right,
-      }),
-    );
   };
 
   const handleLoadAudio = useCallback(
@@ -541,38 +534,6 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
               size="sm"
             >
               {t("settings.history.dictionary.cancelEdit")}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {proposals.length > 0 && (
-        <div className="flex flex-col gap-1 rounded-md border border-logo-primary/30 p-2">
-          <p className="text-xs text-text/60">
-            {t("settings.history.dictionary.proposalsTitle")}
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {proposals.map((p) => (
-              <Button
-                key={`${p.wrong}→${p.right}`}
-                onClick={() => addProposal(p)}
-                variant="secondary"
-                size="sm"
-                className="inline-flex items-center gap-1 cursor-pointer"
-              >
-                <span>
-                  {p.wrong} {LEARN_ARROW} {p.right}
-                </span>
-                <Check width={12} height={12} />
-              </Button>
-            ))}
-            <Button
-              onClick={() => setProposals([])}
-              variant="secondary"
-              size="sm"
-              className="cursor-pointer text-text/50"
-            >
-              {t("settings.history.dictionary.dismiss")}
             </Button>
           </div>
         </div>

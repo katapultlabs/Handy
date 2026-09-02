@@ -487,9 +487,7 @@
         "saveEdit": "Học từ bản sửa",
         "cancelEdit": "Hủy",
         "nothingLearned": "Không học được bản sửa nào từ lần chỉnh sửa này",
-        "proposalsTitle": "Các bản sửa đã học — nhấp để thêm vào từ điển:",
-        "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}",
-        "dismiss": "Bỏ qua"
+        "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}"
       }
     },
     "debug": {

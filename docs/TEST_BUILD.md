@@ -12,8 +12,8 @@ This is Handy 0.9.6+dict.1. It is a test build. It adds the Dictionary:
 - Three ways to teach it:
   1. Correct the pasted text where it landed (WhatsApp, Notes, Telegram,
      most macOS applications). Handy sees the edit and learns it.
-  2. Menu bar icon -> "Correct Last Transcript...". Edit the text and click
-     the learned pair.
+  2. Menu bar icon -> "Correct Last Transcript...", or the pencil on a
+     History entry. Edit the text and click Save. Handy learns the fix.
   3. Settings -> Advanced -> Experimental -> Dictionary. Add word pairs by
      hand.
 
@@ -53,6 +53,11 @@ the release version.
 
 If in-place learning does not trigger (some applications do not expose
 their text), use the menu bar: "Correct Last Transcript...".
+
+Handy learns only small fixes that sound like the wrong word: one to three
+words on each side, for example "Bededa" -> "Pereira". If you rewrite a
+sentence, add or delete words, or fix punctuation, Handy shows "No
+corrections learned from this edit". This is by design.
 
 ## 5. Control what it learned
 

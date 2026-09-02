@@ -487,9 +487,7 @@
         "saveEdit": "Naučit se z opravy",
         "cancelEdit": "Zrušit",
         "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
-        "proposalsTitle": "Naučené opravy – kliknutím je přidáte do slovníku:",
-        "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
-        "dismiss": "Zavřít"
+        "added": "Přidáno do slovníku: {{wrong}} → {{right}}"
       }
     },
     "debug": {

@@ -487,9 +487,7 @@
         "saveEdit": "Learn from correction",
         "cancelEdit": "Cancel",
         "nothingLearned": "No corrections learned from this edit",
-        "proposalsTitle": "Learned corrections — click to add to the Dictionary:",
-        "added": "Added to Dictionary: {{wrong}} → {{right}}",
-        "dismiss": "Dismiss"
+        "added": "Added to Dictionary: {{wrong}} → {{right}}"
       }
     },
     "debug": {

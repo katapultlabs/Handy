@@ -487,9 +487,7 @@
         "saveEdit": "Leren van correctie",
         "cancelEdit": "Annuleren",
         "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
-        "proposalsTitle": "Geleerde correcties — klik om ze aan het woordenboek toe te voegen:",
-        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
-        "dismiss": "Sluiten"
+        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}"
       }
     },
     "debug": {

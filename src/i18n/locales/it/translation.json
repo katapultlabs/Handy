@@ -487,9 +487,7 @@
         "saveEdit": "Impara dalla correzione",
         "cancelEdit": "Annulla",
         "nothingLearned": "Nessuna correzione appresa da questa modifica",
-        "proposalsTitle": "Correzioni apprese — clicca per aggiungerle al dizionario:",
-        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}",
-        "dismiss": "Ignora"
+        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}"
       }
     },
     "debug": {

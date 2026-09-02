@@ -487,9 +487,7 @@
         "saveEdit": "Aus Korrektur lernen",
         "cancelEdit": "Abbrechen",
         "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
-        "proposalsTitle": "Gelernte Korrekturen – zum Hinzufügen zum Wörterbuch klicken:",
-        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
-        "dismiss": "Verwerfen"
+        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}"
       }
     },
     "debug": {

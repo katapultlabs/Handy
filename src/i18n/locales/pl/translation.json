@@ -487,9 +487,7 @@
         "saveEdit": "Ucz się z poprawki",
         "cancelEdit": "Anuluj",
         "nothingLearned": "Z tej zmiany nie nauczono się żadnych poprawek",
-        "proposalsTitle": "Wyuczone poprawki — kliknij, aby dodać je do słownika:",
-        "added": "Dodano do słownika: {{wrong}} → {{right}}",
-        "dismiss": "Odrzuć"
+        "added": "Dodano do słownika: {{wrong}} → {{right}}"
       }
     },
     "debug": {

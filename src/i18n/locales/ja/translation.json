@@ -487,9 +487,7 @@
         "saveEdit": "修正から学習",
         "cancelEdit": "キャンセル",
         "nothingLearned": "この編集からは修正を学習できませんでした",
-        "proposalsTitle": "学習した修正 — クリックして辞書に追加：",
-        "added": "辞書に追加しました：{{wrong}} → {{right}}",
-        "dismiss": "閉じる"
+        "added": "辞書に追加しました：{{wrong}} → {{right}}"
       }
     },
     "debug": {

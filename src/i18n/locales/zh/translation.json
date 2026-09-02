@@ -487,9 +487,7 @@
         "saveEdit": "从更正中学习",
         "cancelEdit": "取消",
         "nothingLearned": "本次修改未学到任何更正",
-        "proposalsTitle": "已学到的更正 — 点击添加到词典：",
-        "added": "已添加到词典：{{wrong}} → {{right}}",
-        "dismiss": "关闭"
+        "added": "已添加到词典：{{wrong}} → {{right}}"
       }
     },
     "debug": {

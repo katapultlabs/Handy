@@ -487,9 +487,7 @@
         "saveEdit": "Lär av korrigeringen",
         "cancelEdit": "Avbryt",
         "nothingLearned": "Inga korrigeringar lärdes in från den här ändringen",
-        "proposalsTitle": "Inlärda korrigeringar – klicka för att lägga till dem i ordboken:",
-        "added": "Tillagd i ordboken: {{wrong}} → {{right}}",
-        "dismiss": "Avfärda"
+        "added": "Tillagd i ordboken: {{wrong}} → {{right}}"
       }
     },
     "debug": {

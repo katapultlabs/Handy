@@ -487,9 +487,7 @@
         "saveEdit": "Düzeltmeden öğren",
         "cancelEdit": "İptal",
         "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
-        "proposalsTitle": "Öğrenilen düzeltmeler — sözlüğe eklemek için tıklayın:",
-        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
-        "dismiss": "Kapat"
+        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}"
       }
     },
     "debug": {
