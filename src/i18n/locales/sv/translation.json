@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "Transkriberar...",
-    "processing": "Bearbetar..."
+    "processing": "Bearbetar...",
+    "learned": "Inlärt: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Nytt i Handy v{{version}}"

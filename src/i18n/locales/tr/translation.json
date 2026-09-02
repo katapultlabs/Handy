@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "Transkribe ediliyor...",
-    "processing": "İşleniyor..."
+    "processing": "İşleniyor...",
+    "learned": "Öğrenildi: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Handy v{{version}} yenilikleri"

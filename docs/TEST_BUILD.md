@@ -48,7 +48,9 @@ the release version.
 1. Dictate a sentence with a word Handy gets wrong. A name works well.
 2. Fix the word in the application where the text landed.
 3. Switch applications, or start the next dictation.
-4. Handy shows a toast: "Added to Dictionary: wrong -> right".
+4. Handy shows "Learned: wrong -> right" in the recording overlay for two
+   seconds. If the overlay is set to None, there is no notice on screen.
+   The settings window also shows a toast.
 5. Dictate the sentence again. The word comes out right.
 
 If in-place learning does not trigger (some applications do not expose

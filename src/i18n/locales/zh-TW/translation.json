@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "正在轉錄...",
-    "processing": "處理中..."
+    "processing": "處理中...",
+    "learned": "已學習：{{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

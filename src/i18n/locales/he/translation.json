@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "מתמלל...",
-    "processing": "מעבד..."
+    "processing": "מעבד...",
+    "learned": "נלמד: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "חדש ב-Handy v{{version}}"

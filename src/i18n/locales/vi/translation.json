@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "Đang chuyển đổi...",
-    "processing": "Đang xử lý..."
+    "processing": "Đang xử lý...",
+    "learned": "Đã học: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Điểm mới trong Handy v{{version}}"

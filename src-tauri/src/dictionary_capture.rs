@@ -463,6 +463,8 @@ mod macos_impl {
         // the log file must never hold field content (design doc section 12).
         info!("capture: learned {} new dictionary entries", added.len());
         crate::settings::write_settings(app, settings);
+        // The overlay is visible even when the settings window is closed.
+        crate::overlay::show_learned_overlay(app, added.clone());
         if let Err(err) = (DictionaryLearnedEvent { entries: added }).emit(app) {
             warn!("capture: failed to emit learned event: {err}");
         }

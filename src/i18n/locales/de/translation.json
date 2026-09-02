@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "Transkribiere...",
-    "processing": "Verarbeite..."
+    "processing": "Verarbeite...",
+    "learned": "Gelernt: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Neu in Handy v{{version}}"

@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "Транскрибиране...",
-    "processing": "Обработка..."
+    "processing": "Обработка...",
+    "learned": "Научено: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Ново в Handy v{{version}}"

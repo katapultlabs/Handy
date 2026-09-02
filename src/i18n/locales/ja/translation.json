@@ -712,7 +712,8 @@
   },
   "overlay": {
     "transcribing": "文字起こし中…",
-    "processing": "処理中…"
+    "processing": "処理中…",
+    "learned": "学習済み: {{wrong}} → {{right}}"
   },
   "whatsNew": {
     "title": "Handy v{{version}} の新機能"

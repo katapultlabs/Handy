@@ -450,6 +450,27 @@
     transform: rotate(1turn);
   }
 }
+/* learned notice (Dictionary capture) — check mark + "Learned: a → b" */
+.scheck {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--s-accent);
+  background: var(--s-accent-soft);
+  flex: none;
+}
+.scheck svg {
+  width: 10px;
+  height: 10px;
+  display: block;
+}
+.swork-label.slearned {
+  color: var(--color-text);
+}
+
 .swork-label {
   font-size: 12px;
   color: var(--s-muted);
