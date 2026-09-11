@@ -71,7 +71,53 @@ Click an entry to delete it.
 Download Handy from https://handy.computer and install it over this build.
 Your settings and history stay.
 
-## 7. Report problems
+## 7. Build it yourself (macOS, Apple Silicon)
+
+The source is on the `feat/dictionary-mvp` branch of
+https://github.com/katapultlabs/Handy. A build takes about 5 minutes
+after the first compile, and about 15 minutes the first time.
+
+1. Install the tools once:
+
+   ```bash
+   xcode-select --install
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   curl -fsSL https://bun.sh/install | bash
+   brew install cmake
+   ```
+
+2. Get the code and the VAD model:
+
+   ```bash
+   git clone https://github.com/katapultlabs/Handy.git
+   cd Handy
+   git checkout feat/dictionary-mvp
+   bun install
+   mkdir -p src-tauri/resources/models
+   curl -o src-tauri/resources/models/silero_vad_v4.onnx https://blob.handy.computer/silero_vad_v4.onnx
+   ```
+
+3. Build the application bundle:
+
+   ```bash
+   CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri build --bundles app
+   ```
+
+   The build ends with an error about a missing `TAURI_SIGNING_PRIVATE_KEY`.
+   This is expected. It only affects the auto-update artifact, not the
+   application.
+
+4. The application is at `src-tauri/target/release/bundle/macos/Handy.app`.
+   Install it with the steps in section 2.
+
+To run in development mode instead, with hot reload and debug logs, quit
+the installed Handy first and run:
+
+```bash
+CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri dev
+```
+
+## 8. Report problems
 
 Tell us:
 
