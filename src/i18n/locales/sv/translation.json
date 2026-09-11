@@ -487,7 +487,8 @@
         "saveEdit": "Lär av korrigeringen",
         "cancelEdit": "Avbryt",
         "nothingLearned": "Inga korrigeringar lärdes in från den här ändringen",
-        "added": "Tillagd i ordboken: {{wrong}} → {{right}}"
+        "added": "Tillagd i ordboken: {{wrong}} → {{right}}",
+        "undo": "Ångra"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Transkriberar...",
     "processing": "Bearbetar...",
-    "learned": "Inlärt: {{wrong}} → {{right}}"
+    "learned": "Inlärt: {{wrong}} → {{right}}",
+    "undo": "Ångra"
   },
   "whatsNew": {
     "title": "Nytt i Handy v{{version}}"

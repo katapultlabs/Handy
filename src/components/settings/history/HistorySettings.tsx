@@ -404,6 +404,12 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
             wrong: p.wrong,
             right: p.right,
           }),
+          {
+            action: {
+              label: t("settings.history.dictionary.undo"),
+              onClick: () => commands.removeDictionaryEntry(p.wrong, p.right),
+            },
+          },
         );
       }
     } catch (error) {

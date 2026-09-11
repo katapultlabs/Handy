@@ -487,7 +487,8 @@
         "saveEdit": "Düzeltmeden öğren",
         "cancelEdit": "İptal",
         "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
-        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}"
+        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
+        "undo": "Geri al"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Transkribe ediliyor...",
     "processing": "İşleniyor...",
-    "learned": "Öğrenildi: {{wrong}} → {{right}}"
+    "learned": "Öğrenildi: {{wrong}} → {{right}}",
+    "undo": "Geri al"
   },
   "whatsNew": {
     "title": "Handy v{{version}} yenilikleri"

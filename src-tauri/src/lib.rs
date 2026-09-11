@@ -666,6 +666,7 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_dictionary_capture_enabled_setting,
             shortcut::update_dictionary_entries,
             shortcut::learn_dictionary_pairs,
+            shortcut::remove_dictionary_entry,
             shortcut::suspend_all_bindings,
             shortcut::resume_all_bindings,
             shortcut::change_mute_while_recording_setting,

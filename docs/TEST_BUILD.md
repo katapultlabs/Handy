@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.3. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.4. It is a test build. It adds the Dictionary:
 
 - Handy learns your corrections. It then fixes the same mistake in every
   later transcription.
@@ -48,9 +48,10 @@ the release version.
 1. Dictate a sentence with a word Handy gets wrong. A name works well.
 2. Fix the word in the application where the text landed.
 3. Switch applications, or start the next dictation.
-4. Handy shows "Learned: wrong -> right" in the recording overlay for two
-   seconds. If the overlay is set to None, there is no notice on screen.
-   The settings window also shows a toast.
+4. Handy shows "Learned: wrong -> right" in the recording overlay for four
+   seconds. Click Undo on it if the pair is wrong. If the overlay is set
+   to None, there is no notice on screen. The settings window also shows
+   a toast with Undo.
 5. Dictate the sentence again. The word comes out right.
 
 If in-place learning does not trigger (some applications do not expose
@@ -60,6 +61,14 @@ Handy learns only small fixes that sound like the wrong word: one to three
 words on each side, for example "Bededa" -> "Pereira". If you rewrite a
 sentence, add or delete words, or fix punctuation, Handy shows "No
 corrections learned from this edit". This is by design.
+
+Handy also does not learn style and grammar edits, because an entry
+applies to every later transcription:
+
+- Common words on both sides: "there" -> "their", "the" -> "The".
+- Contractions: "we are" -> "we're".
+- Punctuation or spacing between the same words: "so there" ->
+  "so, there", "hand created" -> "hand-created".
 
 ## 5. Control what it learned
 

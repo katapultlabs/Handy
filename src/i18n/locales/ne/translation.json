@@ -487,7 +487,8 @@
         "saveEdit": "सुधारबाट सिक्नुहोस्",
         "cancelEdit": "रद्द गर्नुहोस्",
         "nothingLearned": "यो सम्पादनबाट कुनै सुधार सिकिएन",
-        "added": "शब्दकोशमा थपियो: {{wrong}} → {{right}}"
+        "added": "शब्दकोशमा थपियो: {{wrong}} → {{right}}",
+        "undo": "पूर्ववत गर्नुहोस्"
       }
     },
     "debug": {
@@ -716,7 +717,8 @@
   "overlay": {
     "transcribing": "ट्रान्सक्राइब गरिँदैछ...",
     "processing": "प्रशोधन गरिँदैछ...",
-    "learned": "सिकियो: {{wrong}} → {{right}}"
+    "learned": "सिकियो: {{wrong}} → {{right}}",
+    "undo": "पूर्ववत गर्नुहोस्"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} ले 1 सर्टकट रोकिरहेको हुन सक्छ",

@@ -487,7 +487,8 @@
         "saveEdit": "Impara dalla correzione",
         "cancelEdit": "Annulla",
         "nothingLearned": "Nessuna correzione appresa da questa modifica",
-        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}"
+        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}",
+        "undo": "Annulla"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Trascrizione...",
     "processing": "Elaborazione...",
-    "learned": "Imparato: {{wrong}} → {{right}}"
+    "learned": "Imparato: {{wrong}} → {{right}}",
+    "undo": "Annulla"
   },
   "whatsNew": {
     "title": "Novità in Handy v{{version}}"

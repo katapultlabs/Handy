@@ -82,6 +82,13 @@ function App() {
             wrong: entry.wrong,
             right: entry.right,
           }),
+          {
+            action: {
+              label: t("settings.history.dictionary.undo"),
+              onClick: () =>
+                commands.removeDictionaryEntry(entry.wrong, entry.right),
+            },
+          },
         );
       }
       // The entries were written backend-side; pull them into the store so
@@ -92,6 +99,18 @@ function App() {
       unlisten.then((fn) => fn());
     };
   }, [t, refreshSettings]);
+
+  // An entry was removed from another window (overlay Undo) or by the
+  // backend. Reload so no window keeps a stale copy that a later save
+  // would write back.
+  useEffect(() => {
+    const unlisten = listen("dictionary-entries-changed", () => {
+      refreshSettings();
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [refreshSettings]);
 
   // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
   useEffect(() => {

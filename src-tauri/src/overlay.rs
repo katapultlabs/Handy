@@ -679,8 +679,9 @@ static OVERLAY_SESSION_ACTIVE: AtomicBool = AtomicBool::new(false);
 /// session hides (see `hide_recording_overlay`).
 static PENDING_LEARNED: Mutex<Option<Vec<DictionaryEntry>>> = Mutex::new(None);
 
-/// How long the "learned" notice stays on screen.
-const LEARNED_OVERLAY_MS: u64 = 2400;
+/// How long the "learned" notice stays on screen. Long enough to read the
+/// pair and click Undo.
+const LEARNED_OVERLAY_MS: u64 = 4000;
 
 /// Show a short "Learned: wrong -> right" notice in the overlay. In-place
 /// capture calls this when it adds pairs to the Dictionary. The settings

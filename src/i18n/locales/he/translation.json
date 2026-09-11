@@ -487,7 +487,8 @@
         "saveEdit": "למד מהתיקון",
         "cancelEdit": "ביטול",
         "nothingLearned": "לא נלמדו תיקונים מעריכה זו",
-        "added": "נוסף למילון: {{wrong}} → {{right}}"
+        "added": "נוסף למילון: {{wrong}} → {{right}}",
+        "undo": "בטל"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "מתמלל...",
     "processing": "מעבד...",
-    "learned": "נלמד: {{wrong}} → {{right}}"
+    "learned": "נלמד: {{wrong}} → {{right}}",
+    "undo": "בטל"
   },
   "whatsNew": {
     "title": "חדש ב-Handy v{{version}}"

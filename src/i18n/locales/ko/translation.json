@@ -487,7 +487,8 @@
         "saveEdit": "교정 내용 학습",
         "cancelEdit": "취소",
         "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
-        "added": "사전에 추가됨: {{wrong}} → {{right}}"
+        "added": "사전에 추가됨: {{wrong}} → {{right}}",
+        "undo": "실행 취소"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "텍스트로 변환 중...",
     "processing": "처리 중...",
-    "learned": "학습됨: {{wrong}} → {{right}}"
+    "learned": "학습됨: {{wrong}} → {{right}}",
+    "undo": "실행 취소"
   },
   "whatsNew": {
     "title": "Handy v{{version}}의 새 소식"

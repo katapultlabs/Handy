@@ -487,7 +487,8 @@
         "saveEdit": "Учене от корекцията",
         "cancelEdit": "Отказ",
         "nothingLearned": "От тази редакция не са научени корекции",
-        "added": "Добавено в речника: {{wrong}} → {{right}}"
+        "added": "Добавено в речника: {{wrong}} → {{right}}",
+        "undo": "Отмени"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Транскрибиране...",
     "processing": "Обработка...",
-    "learned": "Научено: {{wrong}} → {{right}}"
+    "learned": "Научено: {{wrong}} → {{right}}",
+    "undo": "Отмени"
   },
   "whatsNew": {
     "title": "Ново в Handy v{{version}}"

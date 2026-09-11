@@ -487,7 +487,8 @@
         "saveEdit": "Навчитися з виправлення",
         "cancelEdit": "Скасувати",
         "nothingLearned": "З цієї правки не вивчено жодного виправлення",
-        "added": "Додано до словника: {{wrong}} → {{right}}"
+        "added": "Додано до словника: {{wrong}} → {{right}}",
+        "undo": "Скасувати"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Обробка...",
     "processing": "Постобробка...",
-    "learned": "Вивчено: {{wrong}} → {{right}}"
+    "learned": "Вивчено: {{wrong}} → {{right}}",
+    "undo": "Скасувати"
   },
   "whatsNew": {
     "title": "Нове в Handy v{{version}}"

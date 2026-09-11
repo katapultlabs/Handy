@@ -881,6 +881,24 @@ pub fn learn_dictionary_pairs(
     crate::dictionary::learn_pairs(&original, &corrected)
 }
 
+/// Remove one dictionary entry. The "Undo" on the overlay notice and on the
+/// learned toast call this. Emits `dictionary-entries-changed` so every
+/// window reloads its settings copy.
+#[tauri::command]
+#[specta::specta]
+pub fn remove_dictionary_entry(app: AppHandle, wrong: String, right: String) -> Result<(), String> {
+    let mut settings = settings::get_settings(&app);
+    let before = settings.dictionary_entries.len();
+    settings
+        .dictionary_entries
+        .retain(|e| !(e.wrong.eq_ignore_ascii_case(&wrong) && e.right == right));
+    if settings.dictionary_entries.len() != before {
+        settings::write_settings(&app, settings);
+        let _ = app.emit("dictionary-entries-changed", ());
+    }
+    Ok(())
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn change_word_correction_threshold_setting(

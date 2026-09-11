@@ -487,7 +487,8 @@
         "saveEdit": "Học từ bản sửa",
         "cancelEdit": "Hủy",
         "nothingLearned": "Không học được bản sửa nào từ lần chỉnh sửa này",
-        "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}"
+        "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}",
+        "undo": "Hoàn tác"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Đang chuyển đổi...",
     "processing": "Đang xử lý...",
-    "learned": "Đã học: {{wrong}} → {{right}}"
+    "learned": "Đã học: {{wrong}} → {{right}}",
+    "undo": "Hoàn tác"
   },
   "whatsNew": {
     "title": "Điểm mới trong Handy v{{version}}"

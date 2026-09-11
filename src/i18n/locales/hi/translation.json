@@ -487,7 +487,8 @@
         "saveEdit": "सुधार से सीखें",
         "cancelEdit": "रद्द करें",
         "nothingLearned": "इस संपादन से कोई सुधार नहीं सीखा गया",
-        "added": "शब्दकोश में जोड़ा गया: {{wrong}} → {{right}}"
+        "added": "शब्दकोश में जोड़ा गया: {{wrong}} → {{right}}",
+        "undo": "पूर्ववत करें"
       }
     },
     "debug": {
@@ -716,7 +717,8 @@
   "overlay": {
     "transcribing": "ट्रांसक्राइब हो रहा है...",
     "processing": "प्रोसेस हो रहा है...",
-    "learned": "सीखा: {{wrong}} → {{right}}"
+    "learned": "सीखा: {{wrong}} → {{right}}",
+    "undo": "पूर्ववत करें"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} शायद 1 शॉर्टकट को ब्लॉक कर रहा है",

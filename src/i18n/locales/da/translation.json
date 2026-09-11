@@ -487,7 +487,8 @@
         "saveEdit": "Lær af rettelsen",
         "cancelEdit": "Annuller",
         "nothingLearned": "Der blev ikke lært nogen rettelser af denne ændring",
-        "added": "Føjet til ordbogen: {{wrong}} → {{right}}"
+        "added": "Føjet til ordbogen: {{wrong}} → {{right}}",
+        "undo": "Fortryd"
       }
     },
     "debug": {
@@ -716,7 +717,8 @@
   "overlay": {
     "transcribing": "Transskriberer...",
     "processing": "Behandler...",
-    "learned": "Lært: {{wrong}} → {{right}}"
+    "learned": "Lært: {{wrong}} → {{right}}",
+    "undo": "Fortryd"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokerer muligvis 1 genvej",

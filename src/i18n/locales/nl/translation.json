@@ -487,7 +487,8 @@
         "saveEdit": "Leren van correctie",
         "cancelEdit": "Annuleren",
         "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
-        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}"
+        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
+        "undo": "Ongedaan maken"
       }
     },
     "debug": {
@@ -716,7 +717,8 @@
   "overlay": {
     "transcribing": "Transcriberen...",
     "processing": "Verwerken...",
-    "learned": "Geleerd: {{wrong}} → {{right}}"
+    "learned": "Geleerd: {{wrong}} → {{right}}",
+    "undo": "Ongedaan maken"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokkeert mogelijk 1 sneltoets",

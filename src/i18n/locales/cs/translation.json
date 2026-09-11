@@ -487,7 +487,8 @@
         "saveEdit": "Naučit se z opravy",
         "cancelEdit": "Zrušit",
         "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
-        "added": "Přidáno do slovníku: {{wrong}} → {{right}}"
+        "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
+        "undo": "Zpět"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Přepisuji...",
     "processing": "Zpracovávám...",
-    "learned": "Naučeno: {{wrong}} → {{right}}"
+    "learned": "Naučeno: {{wrong}} → {{right}}",
+    "undo": "Zpět"
   },
   "whatsNew": {
     "title": "Novinky v Handy v{{version}}"

@@ -327,7 +327,19 @@ const RecordingOverlay: React.FC = () => {
             <span className="swork-label slearned" title={label}>
               {label}
             </span>
-            <div className="sbase-r" />
+            <div className="sbase-r">
+              {first && (
+                <button
+                  className="sundo"
+                  onClick={() => {
+                    commands.removeDictionaryEntry(first.wrong, first.right);
+                    setIsVisible(false);
+                  }}
+                >
+                  {t("overlay.undo")}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

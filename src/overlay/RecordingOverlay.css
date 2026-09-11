@@ -470,6 +470,28 @@
 .swork-label.slearned {
   color: var(--color-text);
 }
+.sundo {
+  height: 22px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 11px;
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--s-muted);
+  background: var(--s-hair);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+.sundo:hover {
+  background: var(--s-accent-soft);
+  color: var(--color-text);
+}
 
 .swork-label {
   font-size: 12px;

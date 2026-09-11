@@ -487,7 +487,8 @@
         "saveEdit": "从更正中学习",
         "cancelEdit": "取消",
         "nothingLearned": "本次修改未学到任何更正",
-        "added": "已添加到词典：{{wrong}} → {{right}}"
+        "added": "已添加到词典：{{wrong}} → {{right}}",
+        "undo": "撤销"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "正在转录...",
     "processing": "处理中...",
-    "learned": "已学习：{{wrong}} → {{right}}"
+    "learned": "已学习：{{wrong}} → {{right}}",
+    "undo": "撤销"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

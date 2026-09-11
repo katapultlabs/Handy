@@ -345,6 +345,19 @@ async learnDictionaryPairs(original: string, corrected: string) : Promise<Dictio
     return await TAURI_INVOKE("learn_dictionary_pairs", { original, corrected });
 },
 /**
+ * Remove one dictionary entry. The "Undo" on the overlay notice and on the
+ * learned toast call this. Emits `dictionary-entries-changed` so every
+ * window reloads its settings copy.
+ */
+async removeDictionaryEntry(wrong: string, right: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("remove_dictionary_entry", { wrong, right }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
  * Temporarily unregister all bindings while the user is recording a
  * shortcut in the UI. This avoids firing actions while keys are recorded.
  */

@@ -487,7 +487,8 @@
         "saveEdit": "Ucz się z poprawki",
         "cancelEdit": "Anuluj",
         "nothingLearned": "Z tej zmiany nie nauczono się żadnych poprawek",
-        "added": "Dodano do słownika: {{wrong}} → {{right}}"
+        "added": "Dodano do słownika: {{wrong}} → {{right}}",
+        "undo": "Cofnij"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Transkrypcja...",
     "processing": "Przetwarzanie...",
-    "learned": "Nauczono: {{wrong}} → {{right}}"
+    "learned": "Nauczono: {{wrong}} → {{right}}",
+    "undo": "Cofnij"
   },
   "whatsNew": {
     "title": "Nowości w Handy v{{version}}"

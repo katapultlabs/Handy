@@ -487,7 +487,8 @@
         "saveEdit": "修正から学習",
         "cancelEdit": "キャンセル",
         "nothingLearned": "この編集からは修正を学習できませんでした",
-        "added": "辞書に追加しました：{{wrong}} → {{right}}"
+        "added": "辞書に追加しました：{{wrong}} → {{right}}",
+        "undo": "元に戻す"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "文字起こし中…",
     "processing": "処理中…",
-    "learned": "学習済み: {{wrong}} → {{right}}"
+    "learned": "学習済み: {{wrong}} → {{right}}",
+    "undo": "元に戻す"
   },
   "whatsNew": {
     "title": "Handy v{{version}} の新機能"

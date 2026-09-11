@@ -487,7 +487,8 @@
         "saveEdit": "Aus Korrektur lernen",
         "cancelEdit": "Abbrechen",
         "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
-        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}"
+        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
+        "undo": "Rückgängig"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "Transkribiere...",
     "processing": "Verarbeite...",
-    "learned": "Gelernt: {{wrong}} → {{right}}"
+    "learned": "Gelernt: {{wrong}} → {{right}}",
+    "undo": "Rückgängig"
   },
   "whatsNew": {
     "title": "Neu in Handy v{{version}}"

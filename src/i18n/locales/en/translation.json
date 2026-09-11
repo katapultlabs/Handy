@@ -487,7 +487,8 @@
         "saveEdit": "Learn from correction",
         "cancelEdit": "Cancel",
         "nothingLearned": "No corrections learned from this edit",
-        "added": "Added to Dictionary: {{wrong}} → {{right}}"
+        "added": "Added to Dictionary: {{wrong}} → {{right}}",
+        "undo": "Undo"
       }
     },
     "debug": {
@@ -716,7 +717,8 @@
   "overlay": {
     "transcribing": "Transcribing...",
     "processing": "Processing...",
-    "learned": "Learned: {{wrong}} → {{right}}"
+    "learned": "Learned: {{wrong}} → {{right}}",
+    "undo": "Undo"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} may be blocking 1 shortcut",

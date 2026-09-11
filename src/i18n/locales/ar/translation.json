@@ -464,7 +464,8 @@
         "saveEdit": "التعلّم من التصحيح",
         "cancelEdit": "إلغاء",
         "nothingLearned": "لم يتم تعلّم أي تصحيحات من هذا التعديل",
-        "added": "تمت الإضافة إلى القاموس: {{wrong}} → {{right}}"
+        "added": "تمت الإضافة إلى القاموس: {{wrong}} → {{right}}",
+        "undo": "تراجع"
       }
     },
     "debug": {
@@ -713,7 +714,8 @@
   "overlay": {
     "transcribing": "...جاري التفريغ",
     "processing": "...جاري المعالجة",
-    "learned": "تم التعلّم: {{wrong}} → {{right}}"
+    "learned": "تم التعلّم: {{wrong}} → {{right}}",
+    "undo": "تراجع"
   },
   "whatsNew": {
     "title": "الجديد في Handy v{{version}}"
