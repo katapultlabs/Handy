@@ -181,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Post-Processing Hotkey",
             "description": "Optional: A dedicated hotkey that always applies AI post-processing to your transcription."
+          },
+          "paste_last_transcript": {
+            "name": "Paste Last Transcript",
+            "description": "Pastes the most recent transcription again, wherever the cursor is."
           }
         },
         "errors": {

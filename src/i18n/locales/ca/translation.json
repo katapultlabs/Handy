@@ -181,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Drecera de postprocessament",
             "description": "Opcional: una drecera específica que sempre aplica postprocessament amb IA a la transcripció."
+          },
+          "paste_last_transcript": {
+            "name": "Enganxa l'última transcripció",
+            "description": "Torna a enganxar la transcripció més recent allà on hi hagi el cursor."
           }
         },
         "errors": {

@@ -910,6 +910,47 @@ impl ShortcutAction for CancelAction {
     }
 }
 
+// Paste Last Transcript Action
+//
+// Pastes the newest completed transcription again, through the normal paste
+// path (clipboard save and restore, capture hook). One-shot on press.
+struct PasteLastTranscriptAction;
+
+impl ShortcutAction for PasteLastTranscriptAction {
+    fn start(&self, app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
+        let history_manager = app.state::<Arc<HistoryManager>>();
+        let entry = match history_manager.get_latest_completed_entry() {
+            Ok(Some(entry)) => entry,
+            Ok(None) => {
+                warn!("paste_last_transcript: no completed transcription to paste");
+                return;
+            }
+            Err(err) => {
+                error!("paste_last_transcript: could not read history: {}", err);
+                return;
+            }
+        };
+        let text = crate::tray::last_transcript_text(&entry).to_string();
+        if text.trim().is_empty() {
+            warn!("paste_last_transcript: last transcription is empty; nothing to paste");
+            return;
+        }
+
+        // Paste runs on the main thread, like the transcription pipeline.
+        let ah = app.clone();
+        let _ = app.run_on_main_thread(move || {
+            if let Err(e) = utils::paste(text, ah.clone()) {
+                error!("paste_last_transcript: paste failed: {}", e);
+                let _ = ah.emit("paste-error", ());
+            }
+        });
+    }
+
+    fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
+        // One-shot on press. Nothing to do on release.
+    }
+}
+
 // Test Action
 struct TestAction;
 
@@ -949,6 +990,10 @@ pub static ACTION_MAP: Lazy<HashMap<String, Arc<dyn ShortcutAction>>> = Lazy::ne
     map.insert(
         "cancel".to_string(),
         Arc::new(CancelAction) as Arc<dyn ShortcutAction>,
+    );
+    map.insert(
+        "paste_last_transcript".to_string(),
+        Arc::new(PasteLastTranscriptAction) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "test".to_string(),

@@ -201,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Raccourci de post-traitement",
             "description": "Facultatif : Un raccourci dédié qui applique toujours le post-traitement IA à votre transcription."
+          },
+          "paste_last_transcript": {
+            "name": "Coller la dernière transcription",
+            "description": "Colle à nouveau la dernière transcription là où se trouve le curseur."
           }
         },
         "errors": {

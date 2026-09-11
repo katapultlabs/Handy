@@ -181,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "קיצור לעיבוד משלים",
             "description": "אופציונלי: קיצור מקשים ייעודי שתמיד מפעיל עיבוד AI על התמלול."
+          },
+          "paste_last_transcript": {
+            "name": "הדבק תמלול אחרון",
+            "description": "מדביק שוב את התמלול האחרון במקום שבו נמצא הסמן."
           }
         },
         "errors": {

@@ -917,6 +917,26 @@ pub fn get_default_settings() -> AppSettings {
         },
     );
 
+    // Paste the last transcript again. The normal paste restores the
+    // clipboard, so the transcript is gone after it lands. This chord brings
+    // it back without a trip through the tray. Cmd+Option+V is avoided: Finder
+    // uses it for "Move Item Here".
+    #[cfg(target_os = "macos")]
+    let default_paste_last_shortcut = "ctrl+command+v";
+    #[cfg(not(target_os = "macos"))]
+    let default_paste_last_shortcut = "ctrl+alt+shift+v";
+
+    bindings.insert(
+        "paste_last_transcript".to_string(),
+        ShortcutBinding {
+            id: "paste_last_transcript".to_string(),
+            name: "Paste Last Transcript".to_string(),
+            description: "Pastes the most recent transcription again.".to_string(),
+            default_binding: default_paste_last_shortcut.to_string(),
+            current_binding: default_paste_last_shortcut.to_string(),
+        },
+    );
+
     AppSettings {
         settings_schema_version: default_settings_schema_version(),
         bindings,

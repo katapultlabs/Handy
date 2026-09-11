@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.6. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.7. It is a test build. It adds the Dictionary:
 
 - Handy learns your corrections. It then fixes the same mistake in every
   later transcription.
@@ -77,12 +77,21 @@ Settings -> Dictionary shows every entry with where it came from
 (Manual, History, Captured). Search the list, add a pair, or click the
 trash icon to delete one.
 
-## 6. Go back to the release version
+## 6. Paste the last transcript again
+
+Handy restores your clipboard after each paste, so the transcript is gone
+once it lands. Press Ctrl+Cmd+V to paste the most recent transcript again
+at the cursor. Use it when the text went to the wrong field, or when you
+want the same text in a second place.
+
+Change the chord in Settings -> General -> "Paste Last Transcript".
+
+## 7. Go back to the release version
 
 Download Handy from https://handy.computer and install it over this build.
 Your settings and history stay.
 
-## 7. Build it yourself (macOS, Apple Silicon)
+## 8. Build it yourself (macOS, Apple Silicon)
 
 The source is on the `feat/dictionary-mvp` branch of
 https://github.com/katapultlabs/Handy. A build takes about 5 minutes
@@ -128,7 +137,7 @@ the installed Handy first and run:
 CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri dev
 ```
 
-## 8. Report problems
+## 9. Report problems
 
 Tell us:
 
