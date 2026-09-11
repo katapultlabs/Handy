@@ -7,7 +7,8 @@
     "model": "Model",
     "quit": "Surt",
     "cancel": "Cancel·la",
-    "secureInputWarning": "⚠ Dreceres blocades per l'entrada segura"
+    "secureInputWarning": "⚠ Dreceres blocades per l'entrada segura",
+    "correctLastTranscript": "Corregeix l'última transcripció..."
   },
   "sidebar": {
     "general": "General",
@@ -16,7 +17,8 @@
     "postProcessing": "Postprocessament",
     "history": "Historial",
     "debug": "Depuració",
-    "about": "Quant a"
+    "about": "Quant a",
+    "dictionary": "Diccionari"
   },
   "onboarding": {
     "subtitle": "Per començar, trieu un model de transcripció",
@@ -398,6 +400,19 @@
       "fillerWordRemoval": {
         "title": "Elimina les falques",
         "description": "Elimina les expressions de vacil·lació habituals de les transcripcions. Desactiveu aquesta opció per conservar-les."
+      },
+      "dictionary": {
+        "toggleLabel": "Diccionari",
+        "toggleDescription": "Correccions deterministes: substitueix paraules o frases exactes que el model interpreta malament. Aprèn de les teves edicions a l'Historial.",
+        "title": "Entrades del diccionari",
+        "description": "Cada entrada substitueix el text mal interpretat per la teva correcció a totes les transcripcions.",
+        "wrongPlaceholder": "Mal interpretat",
+        "rightPlaceholder": "Correcte",
+        "add": "Afegeix",
+        "remove": "Elimina {{wrong}} → {{right}}",
+        "duplicate": "Ja existeix una entrada per a \"{{wrong}}\"",
+        "captureLabel": "Aprèn de les edicions (macOS)",
+        "captureDescription": "Després d'enganxar, Handy observa breument el text prop del que ha enganxat. Si corregeixes aquest text, la correcció s'afegeix automàticament al Diccionari. El text llegit només es manté en memòria i mai no s'emmagatzema ni s'envia enlloc."
       }
     },
     "postProcessing": {
@@ -467,7 +482,15 @@
       "retranscribe": "Torneu a transcriure",
       "retranscribeError": "No s'ha pogut tornar a transcriure. Torneu-ho a provar.",
       "transcribing": "S'està transcrivint...",
-      "transcriptionFailed": "La transcripció ha fallat. Podeu tornar a transcriure amb la icona de reintent."
+      "transcriptionFailed": "La transcripció ha fallat. Podeu tornar a transcriure amb la icona de reintent.",
+      "dictionary": {
+        "editTitle": "Corregeix la transcripció (ensenya el Diccionari)",
+        "saveEdit": "Aprèn de la correcció",
+        "cancelEdit": "Cancel·la",
+        "nothingLearned": "No s'ha après cap correcció d'aquesta edició",
+        "added": "Afegit al Diccionari: {{wrong}} → {{right}}",
+        "undo": "Desfés"
+      }
     },
     "debug": {
       "title": "Depuració",
@@ -635,6 +658,18 @@
           "details": "La transcripció local de veu a text del Handy es basa en el transcribe.cpp i el ggml. Gràcies a la gran feina de Georgi Gerganov i dels col·laboradors."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Aprenentatge",
+      "entriesGroup": "Entrades ({{count}})",
+      "search": "Cerca entrades",
+      "empty": "Encara no hi ha entrades. Corregeix una paraula on Handy l'ha enganxat, o afegeix un parell a dalt.",
+      "noMatch": "Cap entrada coincideix amb la cerca",
+      "source": {
+        "manual": "Manual",
+        "history": "Historial",
+        "capture": "Capturada"
+      }
     }
   },
   "footer": {
@@ -701,7 +736,9 @@
   },
   "overlay": {
     "transcribing": "S'està transcrivint...",
-    "processing": "S'està processant..."
+    "processing": "S'està processant...",
+    "learned": "Après: {{wrong}} → {{right}}",
+    "undo": "Desfés"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} pot estar blocant 1 drecera",
