@@ -327,6 +327,35 @@ fn changed_runs(original: &str, corrected: &str) -> Vec<ChangedRun> {
     runs
 }
 
+/// Common words (ISO stop-word list, English). A correction where every
+/// word on both sides is common is a grammar or style edit, not a misheard
+/// term. Example: "there" -> "their", "we are" -> "we're", "the" -> "The".
+fn is_common_word(word: &str) -> bool {
+    use std::collections::HashSet;
+    use std::sync::OnceLock;
+    static COMMON: OnceLock<HashSet<&'static str>> = OnceLock::new();
+    let set = COMMON.get_or_init(|| stop_words::get("en").iter().copied().collect());
+    let key = trim_edges(word).to_lowercase().replace('’', "'");
+    set.contains(key.as_str())
+}
+
+fn all_common_words(s: &str) -> bool {
+    s.split_whitespace().all(is_common_word)
+}
+
+fn has_apostrophe(s: &str) -> bool {
+    s.contains('\'') || s.contains('’')
+}
+
+/// Lowercase word tokens, split at every non-alphanumeric character.
+/// "hand-created" and "hand created" give the same tokens.
+fn alnum_tokens(s: &str) -> Vec<String> {
+    s.split(|c: char| !c.is_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .map(|t| t.to_lowercase())
+        .collect()
+}
+
 /// Decide whether one changed run is a learnable correction, and how.
 fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     let wrong = trim_edges(&run.wrong).trim();
@@ -336,6 +365,31 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     }
     let word_count = |s: &str| s.split_whitespace().count();
     if !(1..=3).contains(&word_count(wrong)) || !(1..=3).contains(&word_count(right)) {
+        return None;
+    }
+
+    // Style and grammar edits are not corrections of a misheard term. A
+    // dictionary entry applies to every later transcription, so these must
+    // never become entries.
+    //
+    // 1. Every word on both sides is a common word: "there" -> "their",
+    //    "were" -> "we're", "the" -> "The".
+    if all_common_words(wrong) && all_common_words(right) {
+        return None;
+    }
+    // 2. Contraction shape: two or more words become one with an apostrophe
+    //    (or the reverse): "we are" -> "we're", "Handy is" -> "Handy's".
+    let multi_word = |s: &str| word_count(s) > 1;
+    if (has_apostrophe(right) && !has_apostrophe(wrong) && multi_word(wrong))
+        || (has_apostrophe(wrong) && !has_apostrophe(right) && multi_word(right))
+    {
+        return None;
+    }
+    // 3. The same words on both sides, and only the punctuation or spacing
+    //    between them changed: "so there" -> "so, there", "hand created" ->
+    //    "hand-created". A merge into a new token ("char gebee" ->
+    //    "ChargeBee") or a split ("UXUI" -> "UX/UI") is not this case.
+    if (multi_word(wrong) || multi_word(right)) && alnum_tokens(wrong) == alnum_tokens(right) {
         return None;
     }
 
@@ -640,6 +694,67 @@ mod tests {
     }
 
     #[test]
+    fn rejects_contraction_of_common_words() {
+        // Real user case: a style edit that sounds identical.
+        let pairs = learn_pairs("we are going to ship", "we're going to ship");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+    }
+
+    #[test]
+    fn rejects_contraction_of_a_name() {
+        // Not common words, but the same contraction shape.
+        let pairs = learn_pairs("Handy is learning", "Handy's learning");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+    }
+
+    #[test]
+    fn rejects_grammar_fix_between_common_words() {
+        let pairs = learn_pairs("over there house", "over their house");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+        let pairs = learn_pairs("more then that", "more than that");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+    }
+
+    #[test]
+    fn rejects_sentence_case_of_common_word() {
+        // Capitalizing a sentence start must not learn "the -> The".
+        let pairs = learn_pairs("the plan works", "The plan works");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+    }
+
+    #[test]
+    fn rejects_punctuation_inside_multi_word_run() {
+        // Real user case: a comma added after a word, learned with its
+        // neighbor because both tokens changed.
+        let pairs = learn_pairs("I said so there we go", "I said so, their we go");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+        // Hyphenation is a style choice, not a misheard term.
+        let pairs = learn_pairs("a hand created thing", "a hand-created thing");
+        assert!(pairs.is_empty(), "got {pairs:?}");
+    }
+
+    #[test]
+    fn keeps_single_token_punctuation_fix() {
+        let pairs = learn_pairs("the UXUI team", "the UX/UI team");
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].right, "UX/UI");
+    }
+
+    #[test]
+    fn keeps_possessive_name_fix() {
+        let pairs = learn_pairs("Catapult's build", "Katapult's build");
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].right, "Katapult's");
+    }
+
+    #[test]
+    fn keeps_case_fix_of_uncommon_word() {
+        let pairs = learn_pairs("push to github now", "push to GitHub now");
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].case_mode, CaseMode::Exact);
+    }
+
+    #[test]
     fn learns_badly_misheard_proper_noun() {
         // Real user case: same first sound (B/P fold together), high but
         // passing edit distance, metaphone keys two apart.
@@ -674,11 +789,12 @@ mod tests {
     }
 
     #[test]
-    fn homophone_passes_gates() {
+    fn homophone_of_common_words_is_rejected() {
+        // Sounds identical and passes every similarity gate, but a global
+        // "their -> there" entry would break every later sentence. Common
+        // words are grammar, not vocabulary.
         let pairs = learn_pairs("over their by the door", "over there by the door");
-        assert_eq!(pairs.len(), 1);
-        assert_eq!(pairs[0].wrong, "their");
-        assert_eq!(pairs[0].right, "there");
+        assert!(pairs.is_empty(), "got {pairs:?}");
     }
 
     #[test]
