@@ -17,7 +17,8 @@
     "postProcessing": "Nachbearbeitung",
     "history": "Verlauf",
     "debug": "Debug",
-    "about": "Info"
+    "about": "Info",
+    "dictionary": "Wörterbuch"
   },
   "onboarding": {
     "subtitle": "Wähle ein Transkriptionsmodell, um loszulegen",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Neuerungen anzeigen",
         "description": "Versionshinweise nach Handy-Updates anzeigen"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Lernen",
+      "entriesGroup": "Einträge ({{count}})",
+      "search": "Einträge durchsuchen",
+      "empty": "Noch keine Einträge. Korrigiere ein Wort dort, wo Handy es eingefügt hat, oder füge oben ein Paar hinzu.",
+      "noMatch": "Keine Einträge entsprechen deiner Suche",
+      "source": {
+        "manual": "Manuell",
+        "history": "Verlauf",
+        "capture": "Erfasst"
       }
     }
   },

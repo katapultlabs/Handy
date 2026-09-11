@@ -17,7 +17,8 @@
     "postProcessing": "Efterbearbetning",
     "history": "Historik",
     "debug": "Felsökning",
-    "about": "Om"
+    "about": "Om",
+    "dictionary": "Ordbok"
   },
   "onboarding": {
     "subtitle": "För att komma igång, välj en transkriptionsmodell",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Visa nyheter",
         "description": "Visa versionsinformation efter Handy-uppdateringar"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Inlärning",
+      "entriesGroup": "Poster ({{count}})",
+      "search": "Sök poster",
+      "empty": "Inga poster ännu. Rätta ett ord där Handy klistrade in det, eller lägg till ett par ovan.",
+      "noMatch": "Inga poster matchar din sökning",
+      "source": {
+        "manual": "Manuell",
+        "history": "Historik",
+        "capture": "Fångad"
       }
     }
   },

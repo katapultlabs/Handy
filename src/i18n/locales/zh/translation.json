@@ -17,7 +17,8 @@
     "postProcessing": "后处理",
     "history": "历史记录",
     "debug": "调试",
-    "about": "关于"
+    "about": "关于",
+    "dictionary": "字典"
   },
   "onboarding": {
     "subtitle": "请选择一个转录模型以开始使用",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "显示新功能",
         "description": "Handy 更新后显示发行说明"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "学习",
+      "entriesGroup": "条目 ({{count}})",
+      "search": "搜索条目",
+      "empty": "暂无条目。在 Handy 粘贴的位置修正一个词，或在上方添加一组。",
+      "noMatch": "没有符合搜索的条目",
+      "source": {
+        "manual": "手动",
+        "history": "历史",
+        "capture": "已捕获"
       }
     }
   },

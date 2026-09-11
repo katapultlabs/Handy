@@ -17,7 +17,8 @@
     "postProcessing": "עיבוד משלים",
     "history": "היסטוריה",
     "debug": "ניפוי שגיאות",
-    "about": "אודות"
+    "about": "אודות",
+    "dictionary": "מילון"
   },
   "onboarding": {
     "subtitle": "כדי להתחיל, בחר מודל תמלול",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "הצג מה חדש",
         "description": "הצג הערות גרסה לאחר עדכוני Handy"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "למידה",
+      "entriesGroup": "ערכים ({{count}})",
+      "search": "חיפוש ערכים",
+      "empty": "אין ערכים עדיין. תקנו מילה במקום שבו Handy הדביק אותה, או הוסיפו זוג למעלה.",
+      "noMatch": "אין ערכים התואמים לחיפוש",
+      "source": {
+        "manual": "ידני",
+        "history": "היסטוריה",
+        "capture": "נלכד"
       }
     }
   },

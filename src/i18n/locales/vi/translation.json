@@ -17,7 +17,8 @@
     "postProcessing": "Xử lý sau",
     "history": "Lịch sử",
     "debug": "Gỡ lỗi",
-    "about": "Giới thiệu"
+    "about": "Giới thiệu",
+    "dictionary": "Từ điển"
   },
   "onboarding": {
     "subtitle": "Để bắt đầu, hãy chọn một mô hình chuyển đổi giọng nói",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Hiển thị điểm mới",
         "description": "Hiển thị ghi chú phát hành sau khi Handy cập nhật"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Học",
+      "entriesGroup": "Mục ({{count}})",
+      "search": "Tìm mục",
+      "empty": "Chưa có mục nào. Sửa một từ ở nơi Handy đã dán, hoặc thêm một cặp ở trên.",
+      "noMatch": "Không có mục nào khớp với tìm kiếm",
+      "source": {
+        "manual": "Thủ công",
+        "history": "Lịch sử",
+        "capture": "Đã ghi nhận"
       }
     }
   },

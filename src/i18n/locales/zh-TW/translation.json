@@ -17,7 +17,8 @@
     "postProcessing": "後處理",
     "history": "歷史紀錄",
     "debug": "偵錯",
-    "about": "關於"
+    "about": "關於",
+    "dictionary": "字典"
   },
   "onboarding": {
     "subtitle": "首先，請選擇一種模型",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "顯示新功能",
         "description": "Handy 更新後顯示版本資訊"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "學習",
+      "entriesGroup": "項目 ({{count}})",
+      "search": "搜尋項目",
+      "empty": "尚無項目。在 Handy 貼上的位置修正一個字，或在上方新增一組。",
+      "noMatch": "沒有符合搜尋的項目",
+      "source": {
+        "manual": "手動",
+        "history": "歷史",
+        "capture": "已擷取"
       }
     }
   },

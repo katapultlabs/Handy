@@ -17,7 +17,8 @@
     "postProcessing": "Následné zpracování",
     "history": "Historie",
     "debug": "Ladění",
-    "about": "O aplikaci"
+    "about": "O aplikaci",
+    "dictionary": "Slovník"
   },
   "onboarding": {
     "subtitle": "Pro začátek vyberte model pro přepis",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Zobrazovat novinky",
         "description": "Zobrazovat poznámky k vydání po aktualizacích Handy"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Učení",
+      "entriesGroup": "Položky ({{count}})",
+      "search": "Hledat položky",
+      "empty": "Zatím žádné položky. Opravte slovo tam, kam ho Handy vložil, nebo přidejte dvojici výše.",
+      "noMatch": "Žádné položky neodpovídají hledání",
+      "source": {
+        "manual": "Ručně",
+        "history": "Historie",
+        "capture": "Zachyceno"
       }
     }
   },

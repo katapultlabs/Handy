@@ -17,7 +17,8 @@
     "postProcessing": "Postproces",
     "history": "Historia",
     "debug": "Debugowanie",
-    "about": "O programie"
+    "about": "O programie",
+    "dictionary": "Słownik"
   },
   "onboarding": {
     "subtitle": "Aby rozpocząć, wybierz model transkrypcji",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Pokaż nowości",
         "description": "Pokazuj informacje o wydaniu po aktualizacjach Handy"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Uczenie",
+      "entriesGroup": "Wpisy ({{count}})",
+      "search": "Szukaj wpisów",
+      "empty": "Brak wpisów. Popraw słowo tam, gdzie Handy je wkleił, lub dodaj parę powyżej.",
+      "noMatch": "Żadne wpisy nie pasują do wyszukiwania",
+      "source": {
+        "manual": "Ręcznie",
+        "history": "Historia",
+        "capture": "Przechwycone"
       }
     }
   },

@@ -17,7 +17,8 @@
     "postProcessing": "後処理",
     "history": "履歴",
     "debug": "デバッグ",
-    "about": "概要"
+    "about": "概要",
+    "dictionary": "辞書"
   },
   "onboarding": {
     "subtitle": "開始するには、文字起こしのモデルを選択してください",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "新機能を表示",
         "description": "Handy のアップデート後にリリースノートを表示"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "学習",
+      "entriesGroup": "エントリ ({{count}})",
+      "search": "エントリを検索",
+      "empty": "まだエントリがありません。Handy が貼り付けた場所で単語を修正するか、上でペアを追加してください。",
+      "noMatch": "検索に一致するエントリがありません",
+      "source": {
+        "manual": "手動",
+        "history": "履歴",
+        "capture": "キャプチャ"
       }
     }
   },

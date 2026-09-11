@@ -17,7 +17,8 @@
     "postProcessing": "Son İşlem",
     "history": "Geçmiş",
     "debug": "Hata Ayıklama",
-    "about": "Hakkında"
+    "about": "Hakkında",
+    "dictionary": "Sözlük"
   },
   "onboarding": {
     "subtitle": "Başlamak için bir transkripsiyon modeli seçin",
@@ -649,6 +650,18 @@
       "whatsNewUpdates": {
         "label": "Yenilikleri Göster",
         "description": "Handy güncellemelerinden sonra sürüm notlarını göster"
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Öğrenme",
+      "entriesGroup": "Girdiler ({{count}})",
+      "search": "Girdilerde ara",
+      "empty": "Henüz girdi yok. Handy'nin yapıştırdığı yerde bir kelimeyi düzeltin veya yukarıya bir çift ekleyin.",
+      "noMatch": "Aramanızla eşleşen girdi yok",
+      "source": {
+        "manual": "Manuel",
+        "history": "Geçmiş",
+        "capture": "Yakalandı"
       }
     }
   },

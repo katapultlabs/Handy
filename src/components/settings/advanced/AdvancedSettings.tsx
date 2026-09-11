@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ShowOverlay } from "../ShowOverlay";
 import { ModelUnloadTimeoutSetting } from "../ModelUnloadTimeout";
 import { CustomWords } from "../CustomWords";
-import {
-  DictionaryToggle,
-  DictionaryCaptureToggle,
-  DictionaryEntries,
-} from "../Dictionary";
+import { DictionaryToggle } from "../Dictionary";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { StartHidden } from "../StartHidden";
 import { AutostartToggle } from "../AutostartToggle";
@@ -33,7 +29,6 @@ export const AdvancedSettings: React.FC = () => {
   const { t } = useTranslation();
   const { getSetting } = useSettings();
   const experimentalEnabled = getSetting("experimental_enabled") || false;
-  const dictionaryEnabled = getSetting("dictionary_enabled") || false;
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
@@ -71,16 +66,9 @@ export const AdvancedSettings: React.FC = () => {
       {experimentalEnabled && (
         <SettingsGroup title={t("settings.advanced.groups.experimental")}>
           <PostProcessingToggle descriptionMode="tooltip" grouped={true} />
+          {/* Entries and in-place learning live in the Dictionary section,
+              which the sidebar shows once this toggle is on. */}
           <DictionaryToggle descriptionMode="tooltip" grouped={true} />
-          {dictionaryEnabled && (
-            <>
-              <DictionaryCaptureToggle
-                descriptionMode="tooltip"
-                grouped={true}
-              />
-              <DictionaryEntries descriptionMode="tooltip" grouped={true} />
-            </>
-          )}
           <KeyboardImplementationSelector
             descriptionMode="tooltip"
             grouped={true}

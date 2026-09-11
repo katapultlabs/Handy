@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.4. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.5. It is a test build. It adds the Dictionary:
 
 - Handy learns your corrections. It then fixes the same mistake in every
   later transcription.
@@ -14,8 +14,7 @@ This is Handy 0.9.6+dict.4. It is a test build. It adds the Dictionary:
      most macOS applications). Handy sees the edit and learns it.
   2. Menu bar icon -> "Correct Last Transcript...", or the pencil on a
      History entry. Edit the text and click Save. Handy learns the fix.
-  3. Settings -> Advanced -> Experimental -> Dictionary. Add word pairs by
-     hand.
+  3. Settings -> Dictionary. Add word pairs by hand.
 
 The build is macOS (Apple Silicon) only. It is not signed with a developer
 certificate.
@@ -38,10 +37,12 @@ the release version.
 
 1. Open Handy Settings -> Advanced.
 2. Turn on "Enable experimental features".
-3. In the Experimental group, turn on "Dictionary".
-4. Turn on "Learn from edits (macOS)" for in-place learning.
-5. In the App group above, turn off "Check for updates". An upstream
-   release would otherwise offer to replace this test build.
+3. In the Experimental group, turn on "Dictionary". A Dictionary section
+   appears in the sidebar.
+4. In the Dictionary section, turn on "Learn from edits (macOS)" for
+   in-place learning.
+5. Back in Advanced, in the App group, turn off "Check for updates". An
+   upstream release would otherwise offer to replace this test build.
 
 ## 4. Test it
 
@@ -72,8 +73,9 @@ applies to every later transcription:
 
 ## 5. Control what it learned
 
-Settings -> Advanced -> Experimental -> Dictionary shows every entry.
-Click an entry to delete it.
+Settings -> Dictionary shows every entry with where it came from
+(Manual, History, Captured). Search the list, add a pair, or click the
+trash icon to delete one.
 
 ## 6. Go back to the release version
 
@@ -132,7 +134,7 @@ Tell us:
 
 - What you dictated and what you expected.
 - The application you pasted into.
-- A screenshot of Settings -> Advanced -> Experimental -> Dictionary if a
+- A screenshot of Settings -> Dictionary if a
   wrong entry was learned.
 
 Debug logs: press Cmd+Shift+D in the settings window, open the log viewer,

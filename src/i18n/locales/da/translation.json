@@ -17,7 +17,8 @@
     "postProcessing": "Efterbehandling",
     "history": "Historik",
     "debug": "Fejlfinding",
-    "about": "Om"
+    "about": "Om",
+    "dictionary": "Ordbog"
   },
   "onboarding": {
     "subtitle": "For at komme i gang skal du vælge en transskriptionsmodel",
@@ -649,6 +650,18 @@
           "description": "Højtydende tensor-bibliotek til maskinlæringsinferens på enheden",
           "details": "Handys lokale tale-til-tekst funktionalitet er bygget på transcribe.cpp og ggml. Tak for det fantastiske arbejde af Georgi Gerganov og bidragyderne."
         }
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Læring",
+      "entriesGroup": "Poster ({{count}})",
+      "search": "Søg i poster",
+      "empty": "Ingen poster endnu. Ret et ord der, hvor Handy indsatte det, eller tilføj et par ovenfor.",
+      "noMatch": "Ingen poster matcher din søgning",
+      "source": {
+        "manual": "Manuel",
+        "history": "Historik",
+        "capture": "Opfanget"
       }
     }
   },

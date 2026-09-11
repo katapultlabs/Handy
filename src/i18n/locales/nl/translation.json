@@ -17,7 +17,8 @@
     "postProcessing": "Naverwerking",
     "history": "Geschiedenis",
     "debug": "Probleemoplossing",
-    "about": "Over Handy"
+    "about": "Over Handy",
+    "dictionary": "Woordenboek"
   },
   "onboarding": {
     "subtitle": "Kies een transcriptiemodel om aan de slag te gaan",
@@ -649,6 +650,18 @@
           "description": "Krachtige tensorbibliotheek voor lokale AI-verwerking",
           "details": "Handy's lokale spraak-naar-tekst is gebouwd op transcribe.cpp en ggml. Met dank aan het geweldige werk van Georgi Gerganov en alle bijdragers."
         }
+      }
+    },
+    "dictionary": {
+      "learningGroup": "Leren",
+      "entriesGroup": "Items ({{count}})",
+      "search": "Items zoeken",
+      "empty": "Nog geen items. Corrigeer een woord waar Handy het heeft geplakt, of voeg hierboven een paar toe.",
+      "noMatch": "Geen items komen overeen met je zoekopdracht",
+      "source": {
+        "manual": "Handmatig",
+        "history": "Geschiedenis",
+        "capture": "Vastgelegd"
       }
     }
   },
