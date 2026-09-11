@@ -4,7 +4,6 @@ import { listen } from "@tauri-apps/api/event";
 import type {
   AppSettings as Settings,
   AudioDevice,
-  DictionaryEntry,
   TranscribeAcceleratorSetting,
   OrtAcceleratorSetting,
   ShortcutActivation,
@@ -141,8 +140,6 @@ const settingUpdaters: {
     commands.changeDictionaryEnabledSetting(value as boolean),
   dictionary_capture_enabled: (value) =>
     commands.changeDictionaryCaptureEnabledSetting(value as boolean),
-  dictionary_entries: (value) =>
-    commands.updateDictionaryEntries(value as DictionaryEntry[]),
   word_correction_threshold: (value) =>
     commands.changeWordCorrectionThresholdSetting(value as number),
   paste_delay_ms: (value) =>

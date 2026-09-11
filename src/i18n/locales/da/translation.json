@@ -493,7 +493,8 @@
         "cancelEdit": "Annuller",
         "nothingLearned": "Der blev ikke lært nogen rettelser af denne ændring",
         "added": "Føjet til ordbogen: {{wrong}} → {{right}}",
-        "undo": "Fortryd"
+        "undo": "Fortryd",
+        "alreadyKnown": "Findes allerede i ordbogen: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuel",
         "history": "Historik",
         "capture": "Opfanget"
-      }
+      },
+      "edit": "Rediger",
+      "save": "Gem",
+      "cancel": "Annuller",
+      "active": "Aktiv",
+      "seen": "set {{count}}×"
     }
   },
   "footer": {

@@ -493,7 +493,8 @@
         "cancelEdit": "ביטול",
         "nothingLearned": "לא נלמדו תיקונים מעריכה זו",
         "added": "נוסף למילון: {{wrong}} → {{right}}",
-        "undo": "בטל"
+        "undo": "בטל",
+        "alreadyKnown": "כבר במילון: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "ידני",
         "history": "היסטוריה",
         "capture": "נלכד"
-      }
+      },
+      "edit": "עריכה",
+      "save": "שמירה",
+      "cancel": "ביטול",
+      "active": "פעיל",
+      "seen": "נראה {{count}}×"
     }
   },
   "footer": {

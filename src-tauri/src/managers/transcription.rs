@@ -1787,11 +1787,15 @@ fn post_process_transcription_text(
         // fuzzy custom-words pass. An exact entry always has the last word,
         // so the fuzzy matcher can never undo a deterministic fix. Example:
         // Custom Word "Maine" vs Dictionary "Maine -> main".
-        let corrected = if settings.experimental_enabled
-            && settings.dictionary_enabled
-            && !settings.dictionary_entries.is_empty()
-        {
-            crate::dictionary::apply_dictionary(&corrected, &settings.dictionary_entries)
+        // Entries come from the in-memory snapshot the store keeps current.
+        // No database read on the paste path: one Arc clone.
+        let corrected = if settings.experimental_enabled && settings.dictionary_enabled {
+            let entries = crate::dictionary_store::active_entries();
+            if entries.is_empty() {
+                corrected
+            } else {
+                crate::dictionary::apply_dictionary(&corrected, &entries)
+            }
         } else {
             corrected
         };

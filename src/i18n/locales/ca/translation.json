@@ -493,7 +493,8 @@
         "cancelEdit": "Cancel·la",
         "nothingLearned": "No s'ha après cap correcció d'aquesta edició",
         "added": "Afegit al Diccionari: {{wrong}} → {{right}}",
-        "undo": "Desfés"
+        "undo": "Desfés",
+        "alreadyKnown": "Ja és al Diccionari: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manual",
         "history": "Historial",
         "capture": "Capturada"
-      }
+      },
+      "edit": "Edita",
+      "save": "Desa",
+      "cancel": "Cancel·la",
+      "active": "Actiu",
+      "seen": "vist {{count}}×"
     }
   },
   "footer": {

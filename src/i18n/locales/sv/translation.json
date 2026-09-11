@@ -493,7 +493,8 @@
         "cancelEdit": "Avbryt",
         "nothingLearned": "Inga korrigeringar lärdes in från den här ändringen",
         "added": "Tillagd i ordboken: {{wrong}} → {{right}}",
-        "undo": "Ångra"
+        "undo": "Ångra",
+        "alreadyKnown": "Finns redan i ordboken: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuell",
         "history": "Historik",
         "capture": "Fångad"
-      }
+      },
+      "edit": "Redigera",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "active": "Aktiv",
+      "seen": "sedd {{count}}×"
     }
   },
   "footer": {

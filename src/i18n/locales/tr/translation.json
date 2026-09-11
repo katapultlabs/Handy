@@ -493,7 +493,8 @@
         "cancelEdit": "İptal",
         "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
         "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
-        "undo": "Geri al"
+        "undo": "Geri al",
+        "alreadyKnown": "Zaten sözlükte: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuel",
         "history": "Geçmiş",
         "capture": "Yakalandı"
-      }
+      },
+      "edit": "Düzenle",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "active": "Etkin",
+      "seen": "{{count}}× görüldü"
     }
   },
   "footer": {

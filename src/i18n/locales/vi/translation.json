@@ -493,7 +493,8 @@
         "cancelEdit": "Hủy",
         "nothingLearned": "Không học được bản sửa nào từ lần chỉnh sửa này",
         "added": "Đã thêm vào từ điển: {{wrong}} → {{right}}",
-        "undo": "Hoàn tác"
+        "undo": "Hoàn tác",
+        "alreadyKnown": "Đã có trong từ điển: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Thủ công",
         "history": "Lịch sử",
         "capture": "Đã ghi nhận"
-      }
+      },
+      "edit": "Sửa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "active": "Đang bật",
+      "seen": "gặp {{count}}×"
     }
   },
   "footer": {

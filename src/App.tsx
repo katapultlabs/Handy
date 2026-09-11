@@ -120,8 +120,7 @@ function App() {
           {
             action: {
               label: t("settings.history.dictionary.undo"),
-              onClick: () =>
-                commands.removeDictionaryEntry(entry.wrong, entry.right),
+              onClick: () => commands.deleteDictionaryEntry(entry.id),
             },
           },
         );

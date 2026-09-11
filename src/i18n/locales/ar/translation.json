@@ -470,7 +470,8 @@
         "cancelEdit": "إلغاء",
         "nothingLearned": "لم يتم تعلّم أي تصحيحات من هذا التعديل",
         "added": "تمت الإضافة إلى القاموس: {{wrong}} → {{right}}",
-        "undo": "تراجع"
+        "undo": "تراجع",
+        "alreadyKnown": "موجود بالفعل في القاموس: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "يدوي",
         "history": "السجل",
         "capture": "ملتقط"
-      }
+      },
+      "edit": "تعديل",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "active": "نشط",
+      "seen": "شوهد {{count}} مرة"
     }
   },
   "footer": {

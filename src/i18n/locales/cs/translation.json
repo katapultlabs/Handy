@@ -493,7 +493,8 @@
         "cancelEdit": "Zrušit",
         "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
         "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
-        "undo": "Zpět"
+        "undo": "Zpět",
+        "alreadyKnown": "Už je ve slovníku: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Ručně",
         "history": "Historie",
         "capture": "Zachyceno"
-      }
+      },
+      "edit": "Upravit",
+      "save": "Uložit",
+      "cancel": "Zrušit",
+      "active": "Aktivní",
+      "seen": "viděno {{count}}×"
     }
   },
   "footer": {

@@ -328,30 +328,45 @@ async changeDictionaryCaptureEnabledSetting(enabled: boolean) : Promise<Result<n
     else return { status: "error", error: e  as any };
 }
 },
-async updateDictionaryEntries(entries: DictionaryEntry[]) : Promise<Result<null, string>> {
+async listDictionaryEntries() : Promise<Result<DictionaryRow[], string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("update_dictionary_entries", { entries }) };
+    return { status: "ok", data: await TAURI_INVOKE("list_dictionary_entries") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async addDictionaryEntry(wrong: string, right: string) : Promise<Result<DictionaryRow, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("add_dictionary_entry", { wrong, right }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateDictionaryEntry(id: number, wrong: string, right: string, caseMode: CaseMode, active: boolean) : Promise<Result<DictionaryRow, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_dictionary_entry", { id, wrong, right, caseMode, active }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteDictionaryEntry(id: number) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_dictionary_entry", { id }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Pure learning step: diff an original transcription against the user's
- * edit and propose dictionary entries. This stores nothing. The frontend
- * confirms which proposals become entries.
+ * Diff the text Handy pasted against the user's edit (History screen),
+ * then store what the learn gates accept.
  */
-async learnDictionaryPairs(original: string, corrected: string) : Promise<DictionaryEntry[]> {
-    return await TAURI_INVOKE("learn_dictionary_pairs", { original, corrected });
-},
-/**
- * Remove one dictionary entry. The "Undo" on the overlay notice and on the
- * learned toast call this. Emits `dictionary-entries-changed` so every
- * window reloads its settings copy.
- */
-async removeDictionaryEntry(wrong: string, right: string) : Promise<Result<null, string>> {
+async learnDictionaryFromEdit(original: string, corrected: string) : Promise<Result<LearnReport, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("remove_dictionary_entry", { wrong, right }) };
+    return { status: "ok", data: await TAURI_INVOKE("learn_dictionary_from_edit", { original, corrected }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -1090,7 +1105,23 @@ export type DictionaryEntry = { wrong: string; right: string; case_mode: CaseMod
  * Where the entry came from: "manual" or "history".
  */
 source: string }
-export type DictionaryLearnedEvent = { entries: DictionaryEntry[] }
+export type DictionaryLearnedEvent = { 
+/**
+ * Rows the capture created. Each carries its id so Undo can delete it.
+ */
+entries: DictionaryRow[] }
+/**
+ * One row of the `dictionary` table, as the frontend sees it.
+ */
+export type DictionaryRow = { id: number; wrong: string; right: string; case_mode: CaseMode; 
+/**
+ * "manual", "history", or "capture".
+ */
+source: string; 
+/**
+ * "active", "proposed", or "rejected".
+ */
+state: string; enabled: boolean; seen_count: number; created_at: number; updated_at: number }
 export type EngineType = 
 /**
  * Any GGML/GGUF model loaded through transcribe-cpp (Whisper, Parakeet,
@@ -1116,6 +1147,18 @@ export type KeyboardDiagnosticReport = { secure_input_enabled: boolean; culprit_
 key_down: number; key_up: number; flags_changed: number; mouse: number; duration_ms: number }
 export type KeyboardImplementation = "tauri" | "handy_keys"
 export type LLMPrompt = { id: string; name: string; prompt: string }
+/**
+ * Result of learning from one edit.
+ */
+export type LearnReport = { 
+/**
+ * Rows this edit created.
+ */
+added: DictionaryRow[]; 
+/**
+ * Rows that already existed; their `seen_count` went up.
+ */
+known: DictionaryRow[] }
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error"
 export type ModelInfo = { id: string; name: string; description: string; filename: string; source: ModelSource; size_mb: number; is_downloaded: boolean; is_downloading: boolean; partial_size: number; is_directory: boolean; engine_type: EngineType; accuracy_score: number; speed_score: number; supports_translation: boolean; is_recommended: boolean; supported_languages: string[]; supports_language_selection: boolean; is_custom: boolean; supports_streaming: boolean; supports_language_detection: boolean }
 export type ModelLoadStatus = { is_loaded: boolean; current_model: string | null }

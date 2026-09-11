@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.7. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.8. It is a test build. It adds the Dictionary:
 
 - Handy learns your corrections. It then fixes the same mistake in every
   later transcription.
@@ -74,8 +74,14 @@ applies to every later transcription:
 ## 5. Control what it learned
 
 Settings -> Dictionary shows every entry with where it came from
-(Manual, History, Captured). Search the list, add a pair, or click the
-trash icon to delete one.
+(Manual, History, Captured). Search the list, add a pair, click the pencil
+to edit one in place, or click the trash icon to delete one. The checkbox
+turns an entry off without deleting it. "seen 3x" means Handy learned the
+same pair three times.
+
+Entries now live in the same database as History. The first start of this
+build moves your existing entries there. Two corrections for the same
+wrong word: the newest one applies, the older one turns off.
 
 ## 6. Paste the last transcript again
 

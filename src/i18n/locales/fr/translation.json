@@ -493,7 +493,8 @@
         "cancelEdit": "Annuler",
         "nothingLearned": "Aucune correction n'a été apprise à partir de cette modification",
         "added": "Ajouté au dictionnaire : {{wrong}} → {{right}}",
-        "undo": "Annuler"
+        "undo": "Annuler",
+        "alreadyKnown": "Déjà dans le dictionnaire : {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuel",
         "history": "Historique",
         "capture": "Capturée"
-      }
+      },
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "active": "Active",
+      "seen": "vu {{count}}×"
     }
   },
   "footer": {

@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import {
   commands,
   events,
-  type DictionaryEntry,
   type HistoryEntry,
   type HistoryUpdatePayload,
 } from "@/bindings";
@@ -345,7 +344,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   onAutoEditDone,
 }) => {
   const { t, i18n } = useTranslation();
-  const { getSetting, updateSetting } = useSettings();
+  const { getSetting } = useSettings();
   const [showCopied, setShowCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
@@ -378,38 +377,39 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       return;
     }
     try {
-      const learned = await commands.learnDictionaryPairs(pastedText, draft);
-      if (learned.length === 0) {
+      // The backend diffs, applies the learn gates, and stores what passes.
+      // An edit made in Handy's own editor is a clear correction, so it
+      // needs no second confirmation. Undo removes the row by id.
+      const result = await commands.learnDictionaryFromEdit(pastedText, draft);
+      if (result.status !== "ok") {
+        console.error("Failed to learn from edit:", result.error);
+        return;
+      }
+      const { added, known } = result.data;
+      if (added.length === 0 && known.length === 0) {
         toast.info(t("settings.history.dictionary.nothingLearned"));
         return;
       }
-      // Add every learned pair at once. An edit made in Handy's own editor
-      // is a clear correction, so it does not need a second confirmation.
-      // This matches in-place capture; the Dictionary panel can delete it.
-      const entries: DictionaryEntry[] = getSetting("dictionary_entries") || [];
-      const fresh = learned.filter(
-        (p) =>
-          !entries.some(
-            (e) =>
-              e.wrong.toLowerCase() === p.wrong.toLowerCase() &&
-              e.right === p.right,
-          ),
-      );
-      if (fresh.length > 0) {
-        updateSetting("dictionary_entries", [...entries, ...fresh]);
-      }
-      for (const p of learned) {
+      for (const row of added) {
         toast.success(
           t("settings.history.dictionary.added", {
-            wrong: p.wrong,
-            right: p.right,
+            wrong: row.wrong,
+            right: row.right,
           }),
           {
             action: {
               label: t("settings.history.dictionary.undo"),
-              onClick: () => commands.removeDictionaryEntry(p.wrong, p.right),
+              onClick: () => commands.deleteDictionaryEntry(row.id),
             },
           },
+        );
+      }
+      for (const row of known) {
+        toast.info(
+          t("settings.history.dictionary.alreadyKnown", {
+            wrong: row.wrong,
+            right: row.right,
+          }),
         );
       }
     } catch (error) {

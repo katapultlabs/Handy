@@ -493,7 +493,8 @@
         "cancelEdit": "Cancel",
         "nothingLearned": "No corrections learned from this edit",
         "added": "Added to Dictionary: {{wrong}} → {{right}}",
-        "undo": "Undo"
+        "undo": "Undo",
+        "alreadyKnown": "Already in the Dictionary: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manual",
         "history": "History",
         "capture": "Captured"
-      }
+      },
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "active": "Active",
+      "seen": "seen {{count}}×"
     }
   },
   "footer": {

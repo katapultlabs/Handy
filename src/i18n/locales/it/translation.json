@@ -493,7 +493,8 @@
         "cancelEdit": "Annulla",
         "nothingLearned": "Nessuna correzione appresa da questa modifica",
         "added": "Aggiunto al dizionario: {{wrong}} → {{right}}",
-        "undo": "Annulla"
+        "undo": "Annulla",
+        "alreadyKnown": "Già nel dizionario: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuale",
         "history": "Cronologia",
         "capture": "Acquisita"
-      }
+      },
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "active": "Attiva",
+      "seen": "vista {{count}}×"
     }
   },
   "footer": {

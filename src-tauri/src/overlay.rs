@@ -1,4 +1,4 @@
-use crate::dictionary::DictionaryEntry;
+use crate::dictionary_store::DictionaryRow;
 use crate::input;
 use crate::settings;
 use crate::settings::{OverlayPosition, OverlayStyle};
@@ -699,7 +699,7 @@ static OVERLAY_SESSION_ACTIVE: AtomicBool = AtomicBool::new(false);
 
 /// Dictionary pairs learned while a session was on screen. Shown when that
 /// session hides (see `hide_recording_overlay`).
-static PENDING_LEARNED: Mutex<Option<Vec<DictionaryEntry>>> = Mutex::new(None);
+static PENDING_LEARNED: Mutex<Option<Vec<DictionaryRow>>> = Mutex::new(None);
 
 /// How long the "learned" notice stays on screen. Long enough to read the
 /// pair and click Undo.
@@ -712,7 +712,7 @@ const LEARNED_OVERLAY_MS: u64 = 4000;
 /// Capture most often learns at the start of the next dictation, while the
 /// recording overlay is up. The notice is then queued and shown the moment
 /// that session hides, so it never covers the recording state.
-pub fn show_learned_overlay(app_handle: &AppHandle, entries: Vec<DictionaryEntry>) {
+pub fn show_learned_overlay(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
     if entries.is_empty() || !OVERLAY_ENABLED.load(Ordering::Relaxed) {
         return;
     }
@@ -725,7 +725,7 @@ pub fn show_learned_overlay(app_handle: &AppHandle, entries: Vec<DictionaryEntry
     present_learned(app_handle, entries);
 }
 
-fn present_learned(app_handle: &AppHandle, entries: Vec<DictionaryEntry>) {
+fn present_learned(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
     // Payload first, then the state change, so the card renders with its text.
     let _ = app_handle.emit_to("recording_overlay", "overlay-learned", &entries);
     show_overlay_state(app_handle, "learned");

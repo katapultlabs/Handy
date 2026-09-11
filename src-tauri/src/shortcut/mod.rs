@@ -859,48 +859,6 @@ pub fn change_dictionary_enabled_setting(app: AppHandle, enabled: bool) -> Resul
 
 #[tauri::command]
 #[specta::specta]
-pub fn update_dictionary_entries(
-    app: AppHandle,
-    entries: Vec<crate::dictionary::DictionaryEntry>,
-) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.dictionary_entries = entries;
-    settings::write_settings(&app, settings);
-    Ok(())
-}
-
-/// Pure learning step: diff an original transcription against the user's
-/// edit and propose dictionary entries. This stores nothing. The frontend
-/// confirms which proposals become entries.
-#[tauri::command]
-#[specta::specta]
-pub fn learn_dictionary_pairs(
-    original: String,
-    corrected: String,
-) -> Vec<crate::dictionary::DictionaryEntry> {
-    crate::dictionary::learn_pairs(&original, &corrected)
-}
-
-/// Remove one dictionary entry. The "Undo" on the overlay notice and on the
-/// learned toast call this. Emits `dictionary-entries-changed` so every
-/// window reloads its settings copy.
-#[tauri::command]
-#[specta::specta]
-pub fn remove_dictionary_entry(app: AppHandle, wrong: String, right: String) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    let before = settings.dictionary_entries.len();
-    settings
-        .dictionary_entries
-        .retain(|e| !(e.wrong.eq_ignore_ascii_case(&wrong) && e.right == right));
-    if settings.dictionary_entries.len() != before {
-        settings::write_settings(&app, settings);
-        let _ = app.emit("dictionary-entries-changed", ());
-    }
-    Ok(())
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn change_word_correction_threshold_setting(
     app: AppHandle,
     threshold: f64,

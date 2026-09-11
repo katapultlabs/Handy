@@ -493,7 +493,8 @@
         "cancelEdit": "Anuluj",
         "nothingLearned": "Z tej zmiany nie nauczono się żadnych poprawek",
         "added": "Dodano do słownika: {{wrong}} → {{right}}",
-        "undo": "Cofnij"
+        "undo": "Cofnij",
+        "alreadyKnown": "Już jest w słowniku: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Ręcznie",
         "history": "Historia",
         "capture": "Przechwycone"
-      }
+      },
+      "edit": "Edytuj",
+      "save": "Zapisz",
+      "cancel": "Anuluj",
+      "active": "Aktywny",
+      "seen": "widziano {{count}}×"
     }
   },
   "footer": {

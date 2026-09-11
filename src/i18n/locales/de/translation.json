@@ -493,7 +493,8 @@
         "cancelEdit": "Abbrechen",
         "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
         "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
-        "undo": "Rückgängig"
+        "undo": "Rückgängig",
+        "alreadyKnown": "Bereits im Wörterbuch: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Manuell",
         "history": "Verlauf",
         "capture": "Erfasst"
-      }
+      },
+      "edit": "Bearbeiten",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "active": "Aktiv",
+      "seen": "{{count}}× gesehen"
     }
   },
   "footer": {

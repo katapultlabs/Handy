@@ -493,7 +493,8 @@
         "cancelEdit": "Annuleren",
         "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
         "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
-        "undo": "Ongedaan maken"
+        "undo": "Ongedaan maken",
+        "alreadyKnown": "Staat al in het woordenboek: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Handmatig",
         "history": "Geschiedenis",
         "capture": "Vastgelegd"
-      }
+      },
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "active": "Actief",
+      "seen": "{{count}}× gezien"
     }
   },
   "footer": {

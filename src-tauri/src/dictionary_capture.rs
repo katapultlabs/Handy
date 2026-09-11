@@ -44,7 +44,8 @@ const MAX_LEARNED_PER_CHECK: usize = 3;
 
 #[derive(Clone, serde::Serialize, serde::Deserialize, Debug, specta::Type, tauri_specta::Event)]
 pub struct DictionaryLearnedEvent {
-    pub entries: Vec<crate::dictionary::DictionaryEntry>,
+    /// Rows the capture created. Each carries its id so Undo can delete it.
+    pub entries: Vec<crate::dictionary_store::DictionaryRow>,
 }
 
 pub struct CaptureManager {
@@ -124,7 +125,9 @@ mod macos_impl {
     use core_foundation::string::{CFString, CFStringRef};
     use log::{debug, info, warn};
     use std::sync::mpsc::{Receiver, Sender};
+    use std::sync::Arc;
     use std::time::{Duration, Instant};
+    use tauri::Manager;
     use tauri_specta::Event as _;
 
     /// kAXValueCFRangeType (AXValue.h). accessibility-sys spells it as an enum
@@ -454,7 +457,7 @@ mod macos_impl {
     }
 
     fn store_learned(app: &AppHandle, learned: Vec<DictionaryEntry>) {
-        let mut settings = crate::settings::get_settings(app);
+        let settings = crate::settings::get_settings(app);
         // Authoritative runtime gate: the user may have turned the feature (or
         // Experimental as a whole) off while this anchor was live.
         if !settings.experimental_enabled
@@ -464,26 +467,38 @@ mod macos_impl {
             debug!("capture: learning disabled since anchor was taken; discarding");
             return;
         }
-        let mut added: Vec<DictionaryEntry> = Vec::new();
-        for entry in learned {
-            let dup = settings.dictionary_entries.iter().any(|e| {
-                e.wrong.to_lowercase() == entry.wrong.to_lowercase() && e.right == entry.right
-            });
-            if !dup {
-                settings.dictionary_entries.push(entry.clone());
-                added.push(entry);
+        let Some(manager) = app.try_state::<Arc<crate::dictionary_store::DictionaryManager>>()
+        else {
+            warn!("capture: dictionary store not ready; discarding");
+            return;
+        };
+        let report = match manager.learn(&learned, "capture") {
+            Ok(report) => report,
+            Err(err) => {
+                warn!("capture: could not store learned pairs: {err}");
+                return;
             }
-        }
-        if added.is_empty() {
+        };
+        if report.added.is_empty() {
+            debug!(
+                "capture: {} pair(s) already known; nothing new",
+                report.known.len()
+            );
             return;
         }
         // Log counts only. Learned pairs can contain confidential names, and
         // the log file must never hold field content (design doc section 12).
-        info!("capture: learned {} new dictionary entries", added.len());
-        crate::settings::write_settings(app, settings);
+        info!(
+            "capture: learned {} new dictionary entries",
+            report.added.len()
+        );
         // The overlay is visible even when the settings window is closed.
-        crate::overlay::show_learned_overlay(app, added.clone());
-        if let Err(err) = (DictionaryLearnedEvent { entries: added }).emit(app) {
+        crate::overlay::show_learned_overlay(app, report.added.clone());
+        if let Err(err) = (DictionaryLearnedEvent {
+            entries: report.added,
+        })
+        .emit(app)
+        {
             warn!("capture: failed to emit learned event: {err}");
         }
     }

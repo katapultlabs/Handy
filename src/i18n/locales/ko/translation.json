@@ -493,7 +493,8 @@
         "cancelEdit": "취소",
         "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
         "added": "사전에 추가됨: {{wrong}} → {{right}}",
-        "undo": "실행 취소"
+        "undo": "실행 취소",
+        "alreadyKnown": "이미 사전에 있음: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "수동",
         "history": "기록",
         "capture": "캡처됨"
-      }
+      },
+      "edit": "편집",
+      "save": "저장",
+      "cancel": "취소",
+      "active": "활성",
+      "seen": "{{count}}회 감지"
     }
   },
   "footer": {

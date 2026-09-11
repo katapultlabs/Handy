@@ -493,7 +493,8 @@
         "cancelEdit": "Отказ",
         "nothingLearned": "От тази редакция не са научени корекции",
         "added": "Добавено в речника: {{wrong}} → {{right}}",
-        "undo": "Отмени"
+        "undo": "Отмени",
+        "alreadyKnown": "Вече е в речника: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "Ръчно",
         "history": "История",
         "capture": "Уловено"
-      }
+      },
+      "edit": "Редактиране",
+      "save": "Запази",
+      "cancel": "Отказ",
+      "active": "Активно",
+      "seen": "видяно {{count}}×"
     }
   },
   "footer": {

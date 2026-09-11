@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { commands, events } from "@/bindings";
 import type {
-  DictionaryEntry,
+  DictionaryRow,
   StreamPhase,
   StreamPhaseEvent,
   StreamTextEvent,
@@ -52,7 +52,7 @@ const RecordingOverlay: React.FC = () => {
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
   // Pairs to show in the "learned" notice; sent just before that state.
-  const [learned, setLearned] = useState<DictionaryEntry[]>([]);
+  const [learned, setLearned] = useState<DictionaryRow[]>([]);
 
   const smoothedLevelsRef = useRef<number[]>(Array(16).fill(0));
   // Live-text scroll-back: the text region "sticks" to the newest line while the
@@ -121,7 +121,7 @@ const RecordingOverlay: React.FC = () => {
         setLevels(smoothed.slice(0, WAVE_BARS));
       });
 
-      const unlistenLearned = await listen<DictionaryEntry[]>(
+      const unlistenLearned = await listen<DictionaryRow[]>(
         "overlay-learned",
         (event) => {
           setLearned(event.payload);
@@ -332,7 +332,7 @@ const RecordingOverlay: React.FC = () => {
                 <button
                   className="sundo"
                   onClick={() => {
-                    commands.removeDictionaryEntry(first.wrong, first.right);
+                    commands.deleteDictionaryEntry(first.id);
                     setIsVisible(false);
                   }}
                 >

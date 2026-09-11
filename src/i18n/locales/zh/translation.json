@@ -493,7 +493,8 @@
         "cancelEdit": "取消",
         "nothingLearned": "本次修改未学到任何更正",
         "added": "已添加到词典：{{wrong}} → {{right}}",
-        "undo": "撤销"
+        "undo": "撤销",
+        "alreadyKnown": "已在字典中：{{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "手动",
         "history": "历史",
         "capture": "已捕获"
-      }
+      },
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "active": "启用",
+      "seen": "出现 {{count}} 次"
     }
   },
   "footer": {

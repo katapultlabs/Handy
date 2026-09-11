@@ -493,7 +493,8 @@
         "cancelEdit": "キャンセル",
         "nothingLearned": "この編集からは修正を学習できませんでした",
         "added": "辞書に追加しました：{{wrong}} → {{right}}",
-        "undo": "元に戻す"
+        "undo": "元に戻す",
+        "alreadyKnown": "すでに辞書にあります: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -673,7 +674,12 @@
         "manual": "手動",
         "history": "履歴",
         "capture": "キャプチャ"
-      }
+      },
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "active": "有効",
+      "seen": "{{count}}回検出"
     }
   },
   "footer": {
