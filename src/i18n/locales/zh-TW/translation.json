@@ -3,6 +3,7 @@
     "settings": "設定...",
     "checkUpdates": "檢查更新...",
     "copyLastTranscript": "複製最新轉錄",
+    "correctLastTranscript": "修正最新轉錄...",
     "unloadModel": "卸載模型",
     "model": "模型",
     "quit": "結束",
@@ -16,7 +17,8 @@
     "postProcessing": "後處理",
     "history": "歷史紀錄",
     "debug": "偵錯",
-    "about": "關於"
+    "about": "關於",
+    "dictionary": "字典"
   },
   "onboarding": {
     "subtitle": "首先，請選擇一種模型",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "後處理快捷鍵",
             "description": "可選：專用快捷鍵，使用時一律對轉錄結果套用 AI 後處理"
+          },
+          "paste_last_transcript": {
+            "name": "貼上最新的逐字稿",
+            "description": "在游標位置再次貼上最新的逐字稿。"
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "移除語助詞",
         "description": "從轉錄中移除常見的語助詞。關閉此選項即可保留這些詞。"
+      },
+      "dictionary": {
+        "toggleLabel": "詞典",
+        "toggleDescription": "確定性修正：直接替換模型辨識錯誤的字詞或片語。會從你在歷史記錄中的編輯學習。",
+        "title": "詞典項目",
+        "description": "每個項目都會在所有轉錄中，將聽錯的文字替換為你的修正。",
+        "wrongPlaceholder": "聽錯的文字",
+        "rightPlaceholder": "正確文字",
+        "add": "新增",
+        "remove": "刪除 {{wrong}} → {{right}}",
+        "duplicate": "「{{wrong}}」的項目已存在",
+        "captureLabel": "從編輯中學習（macOS）",
+        "captureDescription": "Handy 貼上文字後，會短暫留意所貼上內容附近的文字。若你修正了那段文字，修正內容會自動加入詞典。讀取到的文字僅保留在記憶體中，絕不會儲存或傳送到任何地方。"
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "重新轉錄",
       "retranscribeError": "重新轉錄失敗，請重試。",
       "transcribing": "轉錄中...",
-      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。"
+      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。",
+      "dictionary": {
+        "editTitle": "修正轉錄（用於訓練詞典）",
+        "saveEdit": "從修正中學習",
+        "cancelEdit": "取消",
+        "nothingLearned": "本次編輯未學到任何修正",
+        "added": "已加入詞典：{{wrong}} → {{right}}",
+        "undo": "復原",
+        "alreadyKnown": "已在字典中：{{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "偵錯",
@@ -635,6 +663,23 @@
         "label": "顯示新功能",
         "description": "Handy 更新後顯示版本資訊"
       }
+    },
+    "dictionary": {
+      "learningGroup": "學習",
+      "entriesGroup": "項目 ({{count}})",
+      "search": "搜尋項目",
+      "empty": "尚無項目。在 Handy 貼上的位置修正一個字，或在上方新增一組。",
+      "noMatch": "沒有符合搜尋的項目",
+      "source": {
+        "manual": "手動",
+        "history": "歷史",
+        "capture": "已擷取"
+      },
+      "edit": "編輯",
+      "save": "儲存",
+      "cancel": "取消",
+      "active": "啟用",
+      "seen": "出現 {{count}} 次"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "正在轉錄...",
-    "processing": "處理中..."
+    "processing": "處理中...",
+    "learned": "已學習：{{wrong}} → {{right}}",
+    "undo": "復原"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

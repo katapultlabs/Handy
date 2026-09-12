@@ -3,6 +3,7 @@
     "settings": "Ayarlar...",
     "checkUpdates": "Güncellemeleri Kontrol Et...",
     "copyLastTranscript": "Son Transkripti Kopyala",
+    "correctLastTranscript": "Son Transkripti Düzelt...",
     "unloadModel": "Modeli Boşalt",
     "model": "Model",
     "quit": "Çıkış",
@@ -16,7 +17,8 @@
     "postProcessing": "Son İşlem",
     "history": "Geçmiş",
     "debug": "Hata Ayıklama",
-    "about": "Hakkında"
+    "about": "Hakkında",
+    "dictionary": "Sözlük"
   },
   "onboarding": {
     "subtitle": "Başlamak için bir transkripsiyon modeli seçin",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Son İşlem Kısayolu",
             "description": "İsteğe bağlı: Transkripsiyonunuza her zaman yapay zekâ ile son işlem uygulayan özel bir kısayol tuşu."
+          },
+          "paste_last_transcript": {
+            "name": "Son transkripti yapıştır",
+            "description": "En son transkripti imlecin olduğu yere yeniden yapıştırır."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Dolgu Sözcüklerini Kaldır",
         "description": "Transkripsiyonlardaki yaygın duraksama sözcüklerini kaldırır. Bunları korumak için kapatın."
+      },
+      "dictionary": {
+        "toggleLabel": "Sözlük",
+        "toggleDescription": "Kesin düzeltmeler: modelin yanlış algıladığı kelimeleri veya ifadeleri birebir değiştirin. Geçmiş'teki düzenlemelerinizden öğrenir.",
+        "title": "Sözlük girdileri",
+        "description": "Her girdi, yanlış duyulan metni her transkripsiyonda sizin düzeltmenizle değiştirir.",
+        "wrongPlaceholder": "Yanlış duyulan",
+        "rightPlaceholder": "Doğrusu",
+        "add": "Ekle",
+        "remove": "{{wrong}} → {{right}} kaydını kaldır",
+        "duplicate": "\"{{wrong}}\" için bir girdi zaten var",
+        "captureLabel": "Düzenlemelerden öğren (macOS)",
+        "captureDescription": "Handy metni yapıştırdıktan sonra, yapıştırdığı metnin çevresini kısa bir süre izler. O metni düzeltirseniz, düzeltme otomatik olarak sözlüğe eklenir. Okunan metin yalnızca bellekte kalır; hiçbir zaman saklanmaz veya hiçbir yere gönderilmez."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Yeniden transkribe et",
       "retranscribeError": "Yeniden transkripsiyon başarısız oldu. Lütfen tekrar deneyin.",
       "transcribing": "Transkribe ediliyor...",
-      "transcriptionFailed": "Transkripsiyon başarısız oldu. Yeniden deneme simgesini kullanarak tekrar transkribe edebilirsiniz."
+      "transcriptionFailed": "Transkripsiyon başarısız oldu. Yeniden deneme simgesini kullanarak tekrar transkribe edebilirsiniz.",
+      "dictionary": {
+        "editTitle": "Transkripsiyonu düzelt (sözlüğe öğretir)",
+        "saveEdit": "Düzeltmeden öğren",
+        "cancelEdit": "İptal",
+        "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
+        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
+        "undo": "Geri al",
+        "alreadyKnown": "Zaten sözlükte: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Hata Ayıklama",
@@ -635,6 +663,23 @@
         "label": "Yenilikleri Göster",
         "description": "Handy güncellemelerinden sonra sürüm notlarını göster"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Öğrenme",
+      "entriesGroup": "Girdiler ({{count}})",
+      "search": "Girdilerde ara",
+      "empty": "Henüz girdi yok. Handy'nin yapıştırdığı yerde bir kelimeyi düzeltin veya yukarıya bir çift ekleyin.",
+      "noMatch": "Aramanızla eşleşen girdi yok",
+      "source": {
+        "manual": "Manuel",
+        "history": "Geçmiş",
+        "capture": "Yakalandı"
+      },
+      "edit": "Düzenle",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "active": "Etkin",
+      "seen": "{{count}}× görüldü"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Transkribe ediliyor...",
-    "processing": "İşleniyor..."
+    "processing": "İşleniyor...",
+    "learned": "Öğrenildi: {{wrong}} → {{right}}",
+    "undo": "Geri al"
   },
   "whatsNew": {
     "title": "Handy v{{version}} yenilikleri"

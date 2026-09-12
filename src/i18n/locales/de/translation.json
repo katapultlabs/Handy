@@ -3,6 +3,7 @@
     "settings": "Einstellungen...",
     "checkUpdates": "Nach Updates suchen...",
     "copyLastTranscript": "Letzte Transkription kopieren",
+    "correctLastTranscript": "Letzte Transkription korrigieren...",
     "unloadModel": "Modell entladen",
     "model": "Modell",
     "quit": "Beenden",
@@ -16,7 +17,8 @@
     "postProcessing": "Nachbearbeitung",
     "history": "Verlauf",
     "debug": "Debug",
-    "about": "Info"
+    "about": "Info",
+    "dictionary": "Wörterbuch"
   },
   "onboarding": {
     "subtitle": "Wähle ein Transkriptionsmodell, um loszulegen",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Nachbearbeitungs-Tastenkürzel",
             "description": "Optional: Ein dediziertes Tastenkürzel, das immer die KI-Nachbearbeitung auf deine Transkription anwendet."
+          },
+          "paste_last_transcript": {
+            "name": "Letzte Transkription einfügen",
+            "description": "Fügt die letzte Transkription erneut an der Cursorposition ein."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Füllwörter entfernen",
         "description": "Entfernt häufige Verzögerungslaute aus Transkriptionen. Deaktivieren Sie diese Option, um sie beizubehalten."
+      },
+      "dictionary": {
+        "toggleLabel": "Wörterbuch",
+        "toggleDescription": "Deterministische Korrekturen: Ersetze exakte Wörter oder Wendungen, die das Modell falsch erkennt. Lernt aus deinen Bearbeitungen im Verlauf.",
+        "title": "Wörterbucheinträge",
+        "description": "Jeder Eintrag ersetzt den falsch verstandenen Text in jeder Transkription durch deine Korrektur.",
+        "wrongPlaceholder": "Falsch verstanden",
+        "rightPlaceholder": "Korrekt",
+        "add": "Hinzufügen",
+        "remove": "{{wrong}} → {{right}} entfernen",
+        "duplicate": "Ein Eintrag für \"{{wrong}}\" existiert bereits",
+        "captureLabel": "Aus Bearbeitungen lernen (macOS)",
+        "captureDescription": "Nachdem Handy den Text eingefügt hat, beobachtet es kurz den Text rund um das Eingefügte. Wenn du diesen Text korrigierst, wird die Korrektur automatisch zum Wörterbuch hinzugefügt. Der gelesene Text bleibt nur im Arbeitsspeicher und wird nie gespeichert oder irgendwohin gesendet."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Erneut transkribieren",
       "retranscribeError": "Erneute Transkription fehlgeschlagen. Bitte versuche es erneut.",
       "transcribing": "Transkribiere...",
-      "transcriptionFailed": "Transkription fehlgeschlagen. Du kannst über das Wiederholen-Symbol erneut transkribieren."
+      "transcriptionFailed": "Transkription fehlgeschlagen. Du kannst über das Wiederholen-Symbol erneut transkribieren.",
+      "dictionary": {
+        "editTitle": "Transkription korrigieren (bringt es dem Wörterbuch bei)",
+        "saveEdit": "Aus Korrektur lernen",
+        "cancelEdit": "Abbrechen",
+        "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
+        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
+        "undo": "Rückgängig",
+        "alreadyKnown": "Bereits im Wörterbuch: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Debug",
@@ -635,6 +663,23 @@
         "label": "Neuerungen anzeigen",
         "description": "Versionshinweise nach Handy-Updates anzeigen"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Lernen",
+      "entriesGroup": "Einträge ({{count}})",
+      "search": "Einträge durchsuchen",
+      "empty": "Noch keine Einträge. Korrigiere ein Wort dort, wo Handy es eingefügt hat, oder füge oben ein Paar hinzu.",
+      "noMatch": "Keine Einträge entsprechen deiner Suche",
+      "source": {
+        "manual": "Manuell",
+        "history": "Verlauf",
+        "capture": "Erfasst"
+      },
+      "edit": "Bearbeiten",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "active": "Aktiv",
+      "seen": "{{count}}× gesehen"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Transkribiere...",
-    "processing": "Verarbeite..."
+    "processing": "Verarbeite...",
+    "learned": "Gelernt: {{wrong}} → {{right}}",
+    "undo": "Rückgängig"
   },
   "whatsNew": {
     "title": "Neu in Handy v{{version}}"

@@ -3,6 +3,7 @@
     "settings": "Instellingen...",
     "checkUpdates": "Controleren op updates...",
     "copyLastTranscript": "Laatste transcriptie kopiëren",
+    "correctLastTranscript": "Laatste transcriptie corrigeren...",
     "unloadModel": "Model ontladen",
     "model": "Model",
     "quit": "Afsluiten",
@@ -16,7 +17,8 @@
     "postProcessing": "Naverwerking",
     "history": "Geschiedenis",
     "debug": "Probleemoplossing",
-    "about": "Over Handy"
+    "about": "Over Handy",
+    "dictionary": "Woordenboek"
   },
   "onboarding": {
     "subtitle": "Kies een transcriptiemodel om aan de slag te gaan",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Sneltoets voor naverwerking",
             "description": "Optioneel: Een specifieke sneltoets die altijd AI-naverwerking toepast op je transcriptie."
+          },
+          "paste_last_transcript": {
+            "name": "Laatste transcriptie plakken",
+            "description": "Plakt de meest recente transcriptie opnieuw waar de cursor staat."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Opvulwoorden verwijderen",
         "description": "Verwijdert veelvoorkomende aarzelwoorden uit transcripties. Schakel dit uit om ze te behouden."
+      },
+      "dictionary": {
+        "toggleLabel": "Woordenboek",
+        "toggleDescription": "Deterministische correcties: vervang exacte woorden of zinnen die het model verkeerd verstaat. Leert van je bewerkingen in Geschiedenis.",
+        "title": "Woordenboekvermeldingen",
+        "description": "Elke vermelding vervangt de verkeerd verstane tekst door jouw correctie in elke transcriptie.",
+        "wrongPlaceholder": "Verkeerd verstaan",
+        "rightPlaceholder": "Correct",
+        "add": "Toevoegen",
+        "remove": "{{wrong}} → {{right}} verwijderen",
+        "duplicate": "Er bestaat al een vermelding voor \"{{wrong}}\"",
+        "captureLabel": "Leren van bewerkingen (macOS)",
+        "captureDescription": "Nadat Handy tekst heeft geplakt, kijkt het kort naar de tekst rond het geplakte fragment. Als je die tekst corrigeert, wordt de correctie automatisch aan het woordenboek toegevoegd. De gelezen tekst blijft alleen in het geheugen en wordt nooit opgeslagen of ergens naartoe verzonden."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Opnieuw transcriberen",
       "retranscribeError": "Opnieuw transcriberen mislukt. Probeer het opnieuw.",
       "transcribing": "Transcriberen...",
-      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram."
+      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram.",
+      "dictionary": {
+        "editTitle": "Transcriptie corrigeren (leert het woordenboek bij)",
+        "saveEdit": "Leren van correctie",
+        "cancelEdit": "Annuleren",
+        "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
+        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
+        "undo": "Ongedaan maken",
+        "alreadyKnown": "Staat al in het woordenboek: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Probleemoplossing",
@@ -635,6 +663,23 @@
           "details": "Handy's lokale spraak-naar-tekst is gebouwd op transcribe.cpp en ggml. Met dank aan het geweldige werk van Georgi Gerganov en alle bijdragers."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Leren",
+      "entriesGroup": "Items ({{count}})",
+      "search": "Items zoeken",
+      "empty": "Nog geen items. Corrigeer een woord waar Handy het heeft geplakt, of voeg hierboven een paar toe.",
+      "noMatch": "Geen items komen overeen met je zoekopdracht",
+      "source": {
+        "manual": "Handmatig",
+        "history": "Geschiedenis",
+        "capture": "Vastgelegd"
+      },
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "active": "Actief",
+      "seen": "{{count}}× gezien"
     }
   },
   "footer": {
@@ -701,7 +746,9 @@
   },
   "overlay": {
     "transcribing": "Transcriberen...",
-    "processing": "Verwerken..."
+    "processing": "Verwerken...",
+    "learned": "Geleerd: {{wrong}} → {{right}}",
+    "undo": "Ongedaan maken"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokkeert mogelijk 1 sneltoets",

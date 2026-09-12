@@ -3,6 +3,7 @@
     "settings": "설정...",
     "checkUpdates": "업데이트 확인...",
     "copyLastTranscript": "마지막 녹음 내용 복사",
+    "correctLastTranscript": "마지막 녹음 내용 수정...",
     "unloadModel": "모델 언로드",
     "model": "모델",
     "quit": "종료",
@@ -16,7 +17,8 @@
     "postProcessing": "후처리",
     "history": "히스토리",
     "debug": "디버그",
-    "about": "정보"
+    "about": "정보",
+    "dictionary": "사전"
   },
   "onboarding": {
     "subtitle": "시작하려면 음성 인식 모델을 선택하세요",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "후처리 단축키",
             "description": "선택 사항: 항상 AI 후처리를 적용하는 전용 단축키입니다."
+          },
+          "paste_last_transcript": {
+            "name": "마지막 전사 붙여넣기",
+            "description": "가장 최근 전사를 커서 위치에 다시 붙여넣습니다."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "군더더기 표현 제거",
         "description": "전사에서 흔한 머뭇거림 표현을 제거합니다. 그대로 두려면 이 옵션을 끄세요."
+      },
+      "dictionary": {
+        "toggleLabel": "사전",
+        "toggleDescription": "결정적 교정: 모델이 잘못 인식하는 단어나 구를 그대로 교체합니다. 기록에서의 편집 내용을 학습합니다.",
+        "title": "사전 항목",
+        "description": "각 항목은 모든 변환 결과에서 잘못 인식된 텍스트를 사용자의 교정으로 바꿉니다.",
+        "wrongPlaceholder": "잘못 인식된 표현",
+        "rightPlaceholder": "올바른 표현",
+        "add": "추가",
+        "remove": "{{wrong}} → {{right}} 제거",
+        "duplicate": "\"{{wrong}}\"에 대한 항목이 이미 있습니다",
+        "captureLabel": "편집에서 학습 (macOS)",
+        "captureDescription": "Handy가 텍스트를 붙여넣은 뒤, 붙여넣은 위치 주변의 텍스트를 잠시 확인합니다. 해당 텍스트를 수정하면 그 수정 내용이 자동으로 사전에 추가됩니다. 읽어들인 텍스트는 메모리에만 남으며 저장되거나 어디로도 전송되지 않습니다."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "다시 전사",
       "retranscribeError": "다시 전사에 실패했습니다. 다시 시도해주세요.",
       "transcribing": "전사 중...",
-      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다."
+      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다.",
+      "dictionary": {
+        "editTitle": "변환된 텍스트 교정 (사전을 학습시킵니다)",
+        "saveEdit": "교정 내용 학습",
+        "cancelEdit": "취소",
+        "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
+        "added": "사전에 추가됨: {{wrong}} → {{right}}",
+        "undo": "실행 취소",
+        "alreadyKnown": "이미 사전에 있음: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "디버그",
@@ -635,6 +663,23 @@
         "label": "새 소식 표시",
         "description": "Handy 업데이트 후 릴리스 노트를 표시합니다"
       }
+    },
+    "dictionary": {
+      "learningGroup": "학습",
+      "entriesGroup": "항목 ({{count}})",
+      "search": "항목 검색",
+      "empty": "아직 항목이 없습니다. Handy가 붙여넣은 곳에서 단어를 수정하거나 위에서 쌍을 추가하세요.",
+      "noMatch": "검색과 일치하는 항목이 없습니다",
+      "source": {
+        "manual": "수동",
+        "history": "기록",
+        "capture": "캡처됨"
+      },
+      "edit": "편집",
+      "save": "저장",
+      "cancel": "취소",
+      "active": "활성",
+      "seen": "{{count}}회 감지"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "텍스트로 변환 중...",
-    "processing": "처리 중..."
+    "processing": "처리 중...",
+    "learned": "학습됨: {{wrong}} → {{right}}",
+    "undo": "실행 취소"
   },
   "whatsNew": {
     "title": "Handy v{{version}}의 새 소식"

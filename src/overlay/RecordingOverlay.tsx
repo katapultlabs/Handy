@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { commands, events } from "@/bindings";
 import type {
+  DictionaryRow,
   StreamPhase,
   StreamPhaseEvent,
   StreamTextEvent,
@@ -12,7 +13,14 @@ import type {
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
-type OverlayState = "recording" | "streaming" | "transcribing" | "processing";
+// "learned" is a short notice from Dictionary in-place capture, not a
+// dictation session (see overlay.rs `show_learned_overlay`).
+type OverlayState =
+  | "recording"
+  | "streaming"
+  | "transcribing"
+  | "processing"
+  | "learned";
 
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
@@ -43,6 +51,8 @@ const RecordingOverlay: React.FC = () => {
   // True once live text overflows the cap. A top overlay fades its top edge only
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
+  // Pairs to show in the "learned" notice; sent just before that state.
+  const [learned, setLearned] = useState<DictionaryRow[]>([]);
 
   const smoothedLevelsRef = useRef<number[]>(Array(16).fill(0));
   // Live-text scroll-back: the text region "sticks" to the newest line while the
@@ -111,6 +121,13 @@ const RecordingOverlay: React.FC = () => {
         setLevels(smoothed.slice(0, WAVE_BARS));
       });
 
+      const unlistenLearned = await listen<DictionaryRow[]>(
+        "overlay-learned",
+        (event) => {
+          setLearned(event.payload);
+        },
+      );
+
       const unlistenStream = await events.streamTextEvent.listen((event) => {
         setStreamText(event.payload);
       });
@@ -126,6 +143,7 @@ const RecordingOverlay: React.FC = () => {
         unlistenHide();
         unlistenReady();
         unlistenLevel();
+        unlistenLearned();
         unlistenStream();
         unlistenPhase();
       };
@@ -274,6 +292,55 @@ const RecordingOverlay: React.FC = () => {
                 true,
               )
             : listeningRow(open, true)}
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Learned notice: check (left) | "Learned: wrong → right" (center). Same
+  // 3-zone grid as the working row. The backend hides it after a short delay.
+  if (state === "learned") {
+    const first = learned[0];
+    const extra = learned.length - 1;
+    const label = first
+      ? t("overlay.learned", { wrong: first.wrong, right: first.right }) +
+        (extra > 0 ? ` +${extra}` : "")
+      : "";
+    return (
+      <div dir={direction} className={`ov-stage ${position} ov-fade show`}>
+        <div className="scard compact cworking">
+          <div className="sbase">
+            <div className="sbase-l">
+              <span className="scheck" aria-hidden="true">
+                <svg viewBox="0 0 16 16">
+                  <path
+                    d="M3.5 8.5 L6.5 11.5 L12.5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+            <span className="swork-label slearned" title={label}>
+              {label}
+            </span>
+            <div className="sbase-r">
+              {first && (
+                <button
+                  className="sundo"
+                  onClick={() => {
+                    commands.deleteDictionaryEntry(first.id);
+                    setIsVisible(false);
+                  }}
+                >
+                  {t("overlay.undo")}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );

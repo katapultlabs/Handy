@@ -3,6 +3,7 @@
     "settings": "設定…",
     "checkUpdates": "アップデートを確認…",
     "copyLastTranscript": "最新の文字起こしをコピー",
+    "correctLastTranscript": "最新の文字起こしを修正...",
     "unloadModel": "モデルをアンロード",
     "model": "モデル",
     "quit": "終了",
@@ -16,7 +17,8 @@
     "postProcessing": "後処理",
     "history": "履歴",
     "debug": "デバッグ",
-    "about": "概要"
+    "about": "概要",
+    "dictionary": "辞書"
   },
   "onboarding": {
     "subtitle": "開始するには、文字起こしのモデルを選択してください",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "後処理のショートカット",
             "description": "文字起こしに常に AI 後処理を適用するキーボードショートカット。 (任意)"
+          },
+          "paste_last_transcript": {
+            "name": "最新の文字起こしを貼り付け",
+            "description": "最新の文字起こしをカーソル位置にもう一度貼り付けます。"
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "フィラー語を削除",
         "description": "文字起こしから一般的なフィラー語を削除します。残すにはオフにしてください。"
+      },
+      "dictionary": {
+        "toggleLabel": "辞書",
+        "toggleDescription": "確定的な置換：モデルが誤認識する単語やフレーズをそのまま置き換えます。履歴での編集内容から学習します。",
+        "title": "辞書エントリ",
+        "description": "各エントリは、すべての文字起こしで聞き間違えられたテキストをあなたの修正に置き換えます。",
+        "wrongPlaceholder": "誤認識",
+        "rightPlaceholder": "正しい表記",
+        "add": "追加",
+        "remove": "{{wrong}} → {{right}} を削除",
+        "duplicate": "「{{wrong}}」のエントリは既に存在します",
+        "captureLabel": "編集から学習（macOS）",
+        "captureDescription": "Handy が貼り付けた後、貼り付けたテキストの周辺を短時間だけ監視します。そのテキストを修正すると、修正内容が自動的に辞書へ追加されます。読み取ったテキストはメモリ上にのみ保持され、保存も送信もされません。"
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "再文字起こし",
       "retranscribeError": "再文字起こしに失敗しました。もう一度お試しください。",
       "transcribing": "文字起こし中…",
-      "transcriptionFailed": "文字起こしに失敗しました。リトライアイコンを使用して再文字起こしできます。"
+      "transcriptionFailed": "文字起こしに失敗しました。リトライアイコンを使用して再文字起こしできます。",
+      "dictionary": {
+        "editTitle": "文字起こしを修正（辞書に学習させます）",
+        "saveEdit": "修正から学習",
+        "cancelEdit": "キャンセル",
+        "nothingLearned": "この編集からは修正を学習できませんでした",
+        "added": "辞書に追加しました：{{wrong}} → {{right}}",
+        "undo": "元に戻す",
+        "alreadyKnown": "すでに辞書にあります: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "デバッグ",
@@ -635,6 +663,23 @@
         "label": "新機能を表示",
         "description": "Handy のアップデート後にリリースノートを表示"
       }
+    },
+    "dictionary": {
+      "learningGroup": "学習",
+      "entriesGroup": "エントリ ({{count}})",
+      "search": "エントリを検索",
+      "empty": "まだエントリがありません。Handy が貼り付けた場所で単語を修正するか、上でペアを追加してください。",
+      "noMatch": "検索に一致するエントリがありません",
+      "source": {
+        "manual": "手動",
+        "history": "履歴",
+        "capture": "キャプチャ"
+      },
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "active": "有効",
+      "seen": "{{count}}回検出"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "文字起こし中…",
-    "processing": "処理中…"
+    "processing": "処理中…",
+    "learned": "学習済み: {{wrong}} → {{right}}",
+    "undo": "元に戻す"
   },
   "whatsNew": {
     "title": "Handy v{{version}} の新機能"

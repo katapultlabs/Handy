@@ -3,6 +3,7 @@
     "settings": "设置...",
     "checkUpdates": "检查更新...",
     "copyLastTranscript": "复制最新转录",
+    "correctLastTranscript": "修正最新转录...",
     "unloadModel": "卸载模型",
     "model": "模型",
     "quit": "退出",
@@ -16,7 +17,8 @@
     "postProcessing": "后处理",
     "history": "历史记录",
     "debug": "调试",
-    "about": "关于"
+    "about": "关于",
+    "dictionary": "字典"
   },
   "onboarding": {
     "subtitle": "请选择一个转录模型以开始使用",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "后处理快捷键",
             "description": "可选：一个专用快捷键，始终对您的转录应用 AI 后处理。"
+          },
+          "paste_last_transcript": {
+            "name": "粘贴最新的转录",
+            "description": "在光标位置再次粘贴最新的转录。"
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "移除语气词",
         "description": "从转录中移除常见的语气词。关闭此选项即可保留这些词。"
+      },
+      "dictionary": {
+        "toggleLabel": "词典",
+        "toggleDescription": "确定性纠错：直接替换模型识别错误的词或短语。会从你在历史记录中的修改中学习。",
+        "title": "词典条目",
+        "description": "每个条目都会在所有转录中把听错的文本替换为你的更正。",
+        "wrongPlaceholder": "听错的文本",
+        "rightPlaceholder": "正确文本",
+        "add": "添加",
+        "remove": "删除 {{wrong}} → {{right}}",
+        "duplicate": "\"{{wrong}}\" 的条目已存在",
+        "captureLabel": "从修改中学习（macOS）",
+        "captureDescription": "Handy 粘贴文本后，会短暂关注所粘贴内容附近的文字。如果你更正了这段文字，该更正会自动添加到词典中。读取到的文字仅保存在内存中，绝不会被存储或发送到任何地方。"
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "重新转录",
       "retranscribeError": "重新转录失败。请重试。",
       "transcribing": "转录中...",
-      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。"
+      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。",
+      "dictionary": {
+        "editTitle": "更正转录（用于训练词典）",
+        "saveEdit": "从更正中学习",
+        "cancelEdit": "取消",
+        "nothingLearned": "本次修改未学到任何更正",
+        "added": "已添加到词典：{{wrong}} → {{right}}",
+        "undo": "撤销",
+        "alreadyKnown": "已在字典中：{{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "调试",
@@ -635,6 +663,23 @@
         "label": "显示新功能",
         "description": "Handy 更新后显示发行说明"
       }
+    },
+    "dictionary": {
+      "learningGroup": "学习",
+      "entriesGroup": "条目 ({{count}})",
+      "search": "搜索条目",
+      "empty": "暂无条目。在 Handy 粘贴的位置修正一个词，或在上方添加一组。",
+      "noMatch": "没有符合搜索的条目",
+      "source": {
+        "manual": "手动",
+        "history": "历史",
+        "capture": "已捕获"
+      },
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "active": "启用",
+      "seen": "出现 {{count}} 次"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "正在转录...",
-    "processing": "处理中..."
+    "processing": "处理中...",
+    "learned": "已学习：{{wrong}} → {{right}}",
+    "undo": "撤销"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

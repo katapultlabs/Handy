@@ -3,6 +3,7 @@
     "settings": "Configuración...",
     "checkUpdates": "Buscar actualizaciones...",
     "copyLastTranscript": "Copiar la última transcripción",
+    "correctLastTranscript": "Corregir la última transcripción...",
     "unloadModel": "Descargar modelo",
     "model": "Modelo",
     "quit": "Salir",
@@ -16,7 +17,8 @@
     "postProcessing": "Post proceso",
     "history": "Historial",
     "debug": "Depuración",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "dictionary": "Diccionario"
   },
   "onboarding": {
     "subtitle": "Para comenzar, elige un modelo de transcripción",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Tecla de post procesamiento",
             "description": "Opcional: Una tecla de acceso rápido dedicada que siempre aplica post procesamiento con IA a tu transcripción."
+          },
+          "paste_last_transcript": {
+            "name": "Pegar última transcripción",
+            "description": "Vuelve a pegar la transcripción más reciente donde esté el cursor."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Eliminar muletillas",
         "description": "Elimina las muletillas más comunes de las transcripciones. Desactívalo para conservarlas."
+      },
+      "dictionary": {
+        "toggleLabel": "Diccionario",
+        "toggleDescription": "Correcciones deterministas: reemplaza palabras o frases exactas que el modelo transcribe mal. Aprende de tus ediciones en el Historial.",
+        "title": "Entradas del diccionario",
+        "description": "Cada entrada reemplaza el texto mal escuchado por tu corrección en todas las transcripciones.",
+        "wrongPlaceholder": "Mal escuchado",
+        "rightPlaceholder": "Correcto",
+        "add": "Agregar",
+        "remove": "Eliminar {{wrong}} → {{right}}",
+        "duplicate": "Ya existe una entrada para \"{{wrong}}\"",
+        "captureLabel": "Aprender de las ediciones (macOS)",
+        "captureDescription": "Después de que Handy pega el texto, observa brevemente el texto cercano a lo que pegó. Si corriges ese texto, la corrección se agrega automáticamente al diccionario. El texto que lee permanece solo en memoria y nunca se guarda ni se envía a ningún sitio."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Re-transcribir",
       "retranscribeError": "No se pudo re-transcribir. Por favor, inténtalo de nuevo.",
       "transcribing": "Transcribiendo...",
-      "transcriptionFailed": "La transcripción falló. Puedes re-transcribir usando el icono de reintentar."
+      "transcriptionFailed": "La transcripción falló. Puedes re-transcribir usando el icono de reintentar.",
+      "dictionary": {
+        "editTitle": "Corregir la transcripción (enseña al diccionario)",
+        "saveEdit": "Aprender de la corrección",
+        "cancelEdit": "Cancelar",
+        "nothingLearned": "No se aprendió ninguna corrección de esta edición",
+        "added": "Agregado al diccionario: {{wrong}} → {{right}}",
+        "undo": "Deshacer",
+        "alreadyKnown": "Ya está en el diccionario: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Depuración",
@@ -635,6 +663,23 @@
         "label": "Mostrar novedades",
         "description": "Mostrar notas de la versión después de las actualizaciones de Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Aprendizaje",
+      "entriesGroup": "Entradas ({{count}})",
+      "search": "Buscar entradas",
+      "empty": "Aún no hay entradas. Corrige una palabra donde Handy la pegó, o añade un par arriba.",
+      "noMatch": "Ninguna entrada coincide con tu búsqueda",
+      "source": {
+        "manual": "Manual",
+        "history": "Historial",
+        "capture": "Capturada"
+      },
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "active": "Activa",
+      "seen": "vista {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Transcribiendo...",
-    "processing": "Procesando..."
+    "processing": "Procesando...",
+    "learned": "Aprendido: {{wrong}} → {{right}}",
+    "undo": "Deshacer"
   },
   "whatsNew": {
     "title": "Nuevo en Handy v{{version}}"

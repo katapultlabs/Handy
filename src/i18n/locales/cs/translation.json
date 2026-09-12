@@ -3,6 +3,7 @@
     "settings": "Nastavení...",
     "checkUpdates": "Zkontrolovat aktualizace...",
     "copyLastTranscript": "Zkopírovat poslední přepis",
+    "correctLastTranscript": "Opravit poslední přepis...",
     "unloadModel": "Uvolnit model",
     "model": "Model",
     "quit": "Ukončit",
@@ -16,7 +17,8 @@
     "postProcessing": "Následné zpracování",
     "history": "Historie",
     "debug": "Ladění",
-    "about": "O aplikaci"
+    "about": "O aplikaci",
+    "dictionary": "Slovník"
   },
   "onboarding": {
     "subtitle": "Pro začátek vyberte model pro přepis",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Klávesa pro následné zpracování",
             "description": "Volitelné: Vyhrazená klávesová zkratka, která vždy použije AI následné zpracování na váš přepis."
+          },
+          "paste_last_transcript": {
+            "name": "Vložit poslední přepis",
+            "description": "Znovu vloží poslední přepis tam, kde je kurzor."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Odstranit výplňová slova",
         "description": "Odstraňuje běžná slova vyjadřující váhání z přepisů. Vypnutím je zachováte."
+      },
+      "dictionary": {
+        "toggleLabel": "Slovník",
+        "toggleDescription": "Deterministické opravy: nahraďte přesná slova nebo fráze, které model chybně rozpozná. Učí se z vašich úprav v Historii.",
+        "title": "Položky slovníku",
+        "description": "Každá položka nahradí špatně rozpoznaný text vaší opravou v každém přepisu.",
+        "wrongPlaceholder": "Špatně rozpoznáno",
+        "rightPlaceholder": "Správně",
+        "add": "Přidat",
+        "remove": "Odebrat {{wrong}} → {{right}}",
+        "duplicate": "Položka pro \"{{wrong}}\" již existuje",
+        "captureLabel": "Učit se z úprav (macOS)",
+        "captureDescription": "Poté, co Handy vloží text, krátce sleduje text v okolí vloženého. Pokud tento text opravíte, oprava se automaticky přidá do slovníku. Přečtený text zůstává pouze v paměti a nikdy se neukládá ani nikam neodesílá."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Přepsat znovu",
       "retranscribeError": "Opětovný přepis se nezdařil. Zkuste to prosím znovu.",
       "transcribing": "Přepisuji...",
-      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování."
+      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování.",
+      "dictionary": {
+        "editTitle": "Opravit přepis (učí slovník)",
+        "saveEdit": "Naučit se z opravy",
+        "cancelEdit": "Zrušit",
+        "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
+        "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
+        "undo": "Zpět",
+        "alreadyKnown": "Už je ve slovníku: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Ladění",
@@ -635,6 +663,23 @@
         "label": "Zobrazovat novinky",
         "description": "Zobrazovat poznámky k vydání po aktualizacích Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Učení",
+      "entriesGroup": "Položky ({{count}})",
+      "search": "Hledat položky",
+      "empty": "Zatím žádné položky. Opravte slovo tam, kam ho Handy vložil, nebo přidejte dvojici výše.",
+      "noMatch": "Žádné položky neodpovídají hledání",
+      "source": {
+        "manual": "Ručně",
+        "history": "Historie",
+        "capture": "Zachyceno"
+      },
+      "edit": "Upravit",
+      "save": "Uložit",
+      "cancel": "Zrušit",
+      "active": "Aktivní",
+      "seen": "viděno {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Přepisuji...",
-    "processing": "Zpracovávám..."
+    "processing": "Zpracovávám...",
+    "learned": "Naučeno: {{wrong}} → {{right}}",
+    "undo": "Zpět"
   },
   "whatsNew": {
     "title": "Novinky v Handy v{{version}}"

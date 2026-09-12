@@ -3,6 +3,7 @@
     "settings": "Inställningar...",
     "checkUpdates": "Sök efter uppdateringar...",
     "copyLastTranscript": "Kopiera senaste transkriptionen",
+    "correctLastTranscript": "Korrigera senaste transkriptionen...",
     "unloadModel": "Avlasta modell",
     "model": "Modell",
     "quit": "Avsluta",
@@ -16,7 +17,8 @@
     "postProcessing": "Efterbearbetning",
     "history": "Historik",
     "debug": "Felsökning",
-    "about": "Om"
+    "about": "Om",
+    "dictionary": "Ordbok"
   },
   "onboarding": {
     "subtitle": "För att komma igång, välj en transkriptionsmodell",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Snabbkommando för efterbearbetning",
             "description": "Valfritt: En dedikerad snabbknapp som alltid tillämpar AI-efterbearbetning på din transkription."
+          },
+          "paste_last_transcript": {
+            "name": "Klistra in senaste transkription",
+            "description": "Klistrar in den senaste transkriptionen igen där markören är."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Ta bort utfyllnadsord",
         "description": "Tar bort vanliga tvekljud från transkriberingar. Stäng av för att behålla dem."
+      },
+      "dictionary": {
+        "toggleLabel": "Ordbok",
+        "toggleDescription": "Deterministiska korrigeringar: ersätt exakta ord eller fraser som modellen hör fel. Lär sig av dina ändringar i Historik.",
+        "title": "Ordboksposter",
+        "description": "Varje post ersätter den felhörda texten med din korrigering i alla transkriptioner.",
+        "wrongPlaceholder": "Felhört",
+        "rightPlaceholder": "Korrekt",
+        "add": "Lägg till",
+        "remove": "Ta bort {{wrong}} → {{right}}",
+        "duplicate": "Det finns redan en post för \"{{wrong}}\"",
+        "captureLabel": "Lär av ändringar (macOS)",
+        "captureDescription": "När Handy har klistrat in text bevakar appen kort texten runt det inklistrade. Om du korrigerar den texten läggs korrigeringen automatiskt till i ordboken. Texten som läses stannar bara i minnet och lagras eller skickas aldrig någonstans."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Transkribera igen",
       "retranscribeError": "Misslyckades med att transkribera igen. Försök igen.",
       "transcribing": "Transkriberar...",
-      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök."
+      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök.",
+      "dictionary": {
+        "editTitle": "Korrigera transkription (lär upp ordboken)",
+        "saveEdit": "Lär av korrigeringen",
+        "cancelEdit": "Avbryt",
+        "nothingLearned": "Inga korrigeringar lärdes in från den här ändringen",
+        "added": "Tillagd i ordboken: {{wrong}} → {{right}}",
+        "undo": "Ångra",
+        "alreadyKnown": "Finns redan i ordboken: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Felsökning",
@@ -635,6 +663,23 @@
         "label": "Visa nyheter",
         "description": "Visa versionsinformation efter Handy-uppdateringar"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Inlärning",
+      "entriesGroup": "Poster ({{count}})",
+      "search": "Sök poster",
+      "empty": "Inga poster ännu. Rätta ett ord där Handy klistrade in det, eller lägg till ett par ovan.",
+      "noMatch": "Inga poster matchar din sökning",
+      "source": {
+        "manual": "Manuell",
+        "history": "Historik",
+        "capture": "Fångad"
+      },
+      "edit": "Redigera",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "active": "Aktiv",
+      "seen": "sedd {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Transkriberar...",
-    "processing": "Bearbetar..."
+    "processing": "Bearbetar...",
+    "learned": "Inlärt: {{wrong}} → {{right}}",
+    "undo": "Ångra"
   },
   "whatsNew": {
     "title": "Nytt i Handy v{{version}}"

@@ -3,6 +3,7 @@
     "settings": "Impostazioni...",
     "checkUpdates": "Verifica aggiornamenti...",
     "copyLastTranscript": "Copia l'ultima trascrizione",
+    "correctLastTranscript": "Correggi l'ultima trascrizione...",
     "unloadModel": "Rilascia modello",
     "model": "Modello",
     "quit": "Esci",
@@ -16,7 +17,8 @@
     "postProcessing": "Post-Elaborazione",
     "history": "Cronologia",
     "debug": "Debug",
-    "about": "Informazioni"
+    "about": "Informazioni",
+    "dictionary": "Dizionario"
   },
   "onboarding": {
     "subtitle": "Per cominciare, scegli un modello di riconoscimento vocale",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Tasto di post-elaborazione",
             "description": "Facoltativo: Un tasto di scelta rapida dedicato che applica sempre la post-elaborazione IA alla trascrizione."
+          },
+          "paste_last_transcript": {
+            "name": "Incolla ultima trascrizione",
+            "description": "Incolla di nuovo la trascrizione più recente dove si trova il cursore."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Rimuovi le parole riempitive",
         "description": "Rimuove le parole di esitazione più comuni dalle trascrizioni. Disattiva per mantenerle."
+      },
+      "dictionary": {
+        "toggleLabel": "Dizionario",
+        "toggleDescription": "Correzioni deterministiche: sostituisci parole o frasi esatte che il modello sbaglia. Impara dalle tue modifiche nella Cronologia.",
+        "title": "Voci del dizionario",
+        "description": "Ogni voce sostituisce il testo trascritto male con la tua correzione in ogni trascrizione.",
+        "wrongPlaceholder": "Trascritto male",
+        "rightPlaceholder": "Corretto",
+        "add": "Aggiungi",
+        "remove": "Rimuovi {{wrong}} → {{right}}",
+        "duplicate": "Esiste già una voce per \"{{wrong}}\"",
+        "captureLabel": "Impara dalle modifiche (macOS)",
+        "captureDescription": "Dopo che Handy ha incollato il testo, osserva brevemente il testo vicino a quello incollato. Se correggi quel testo, la correzione viene aggiunta automaticamente al dizionario. Il testo letto rimane solo in memoria e non viene mai salvato né inviato da nessuna parte."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Ri-trascrivere",
       "retranscribeError": "Impossibile ri-trascrivere. Riprova.",
       "transcribing": "Trascrizione in corso...",
-      "transcriptionFailed": "Trascrizione fallita. Puoi ri-trascrivere usando l'icona di ripetizione."
+      "transcriptionFailed": "Trascrizione fallita. Puoi ri-trascrivere usando l'icona di ripetizione.",
+      "dictionary": {
+        "editTitle": "Correggi la trascrizione (insegna al dizionario)",
+        "saveEdit": "Impara dalla correzione",
+        "cancelEdit": "Annulla",
+        "nothingLearned": "Nessuna correzione appresa da questa modifica",
+        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}",
+        "undo": "Annulla",
+        "alreadyKnown": "Già nel dizionario: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Debug",
@@ -635,6 +663,23 @@
         "label": "Mostra novità",
         "description": "Mostra le note di rilascio dopo gli aggiornamenti di Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Apprendimento",
+      "entriesGroup": "Voci ({{count}})",
+      "search": "Cerca voci",
+      "empty": "Nessuna voce ancora. Correggi una parola dove Handy l'ha incollata, o aggiungi una coppia sopra.",
+      "noMatch": "Nessuna voce corrisponde alla ricerca",
+      "source": {
+        "manual": "Manuale",
+        "history": "Cronologia",
+        "capture": "Acquisita"
+      },
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "active": "Attiva",
+      "seen": "vista {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Trascrizione...",
-    "processing": "Elaborazione..."
+    "processing": "Elaborazione...",
+    "learned": "Imparato: {{wrong}} → {{right}}",
+    "undo": "Annulla"
   },
   "whatsNew": {
     "title": "Novità in Handy v{{version}}"

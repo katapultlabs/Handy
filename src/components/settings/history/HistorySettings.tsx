@@ -1,7 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { readFile } from "@tauri-apps/plugin-fs";
-import { Check, Copy, FolderOpen, RotateCcw, Star, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  FolderOpen,
+  Pencil,
+  RotateCcw,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
@@ -11,6 +19,8 @@ import {
   type HistoryUpdatePayload,
 } from "@/bindings";
 import { useOsType } from "@/hooks/useOsType";
+import { useSettings } from "@/hooks/useSettings";
+import { useUiStore } from "@/stores/uiStore";
 import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
@@ -64,6 +74,17 @@ export const HistorySettings: React.FC = () => {
   const osType = useOsType();
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [autoEditId, setAutoEditId] = useState<number | null>(null);
+  const correctLatestPending = useUiStore((s) => s.correctLatestPending);
+
+  // The tray's "Correct Last Transcript" sets this flag. Open the newest
+  // entry in edit mode once the list has loaded.
+  useEffect(() => {
+    if (correctLatestPending && !loading && entries.length > 0) {
+      useUiStore.getState().clearCorrectLatest();
+      setAutoEditId(entries[0].id);
+    }
+  }, [correctLatestPending, loading, entries]);
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const entriesRef = useRef<HistoryEntry[]>([]);
@@ -258,7 +279,13 @@ export const HistorySettings: React.FC = () => {
                 key={entry.id}
                 entry={entry}
                 onToggleSaved={() => toggleSaved(entry.id)}
-                onCopyText={() => copyToClipboard(entry.transcription_text)}
+                onCopyText={() =>
+                  copyToClipboard(
+                    entry.post_processed_text ?? entry.transcription_text,
+                  )
+                }
+                autoEdit={entry.id === autoEditId}
+                onAutoEditDone={() => setAutoEditId(null)}
                 getAudioUrl={getAudioUrl}
                 deleteAudio={deleteAudioEntry}
                 retryTranscription={retryHistoryEntry}
@@ -301,6 +328,9 @@ interface HistoryEntryProps {
   getAudioUrl: (fileName: string) => Promise<string | null>;
   deleteAudio: (id: number) => Promise<void>;
   retryTranscription: (id: number) => Promise<void>;
+  /** Open this entry's correction editor as soon as it renders. */
+  autoEdit?: boolean;
+  onAutoEditDone?: () => void;
 }
 
 const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
@@ -310,12 +340,82 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   getAudioUrl,
   deleteAudio,
   retryTranscription,
+  autoEdit,
+  onAutoEditDone,
 }) => {
   const { t, i18n } = useTranslation();
+  const { getSetting } = useSettings();
   const [showCopied, setShowCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
   const hasTranscription = entry.transcription_text.trim().length > 0;
+
+  // --- Dictionary: edit this entry and learn corrections from the edit ---
+  const dictionaryEnabled = getSetting("dictionary_enabled") || false;
+  // Diff against what Handy actually pasted (post-processed when it exists),
+  // not the raw transcription — otherwise applied corrections re-learn.
+  const pastedText = entry.post_processed_text ?? entry.transcription_text;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const startEdit = () => {
+    setDraft(pastedText);
+    setEditing(true);
+  };
+
+  // Tray-initiated: open the editor for this entry once.
+  useEffect(() => {
+    if (autoEdit && dictionaryEnabled && hasTranscription && !editing) {
+      startEdit();
+      onAutoEditDone?.();
+    }
+  }, [autoEdit]);
+
+  const saveEdit = async () => {
+    setEditing(false);
+    if (draft.trim() === pastedText.trim()) {
+      return;
+    }
+    try {
+      // The backend diffs, applies the learn gates, and stores what passes.
+      // An edit made in Handy's own editor is a clear correction, so it
+      // needs no second confirmation. Undo removes the row by id.
+      const result = await commands.learnDictionaryFromEdit(pastedText, draft);
+      if (result.status !== "ok") {
+        console.error("Failed to learn from edit:", result.error);
+        return;
+      }
+      const { added, known } = result.data;
+      if (added.length === 0 && known.length === 0) {
+        toast.info(t("settings.history.dictionary.nothingLearned"));
+        return;
+      }
+      for (const row of added) {
+        toast.success(
+          t("settings.history.dictionary.added", {
+            wrong: row.wrong,
+            right: row.right,
+          }),
+          {
+            action: {
+              label: t("settings.history.dictionary.undo"),
+              onClick: () => commands.deleteDictionaryEntry(row.id),
+            },
+          },
+        );
+      }
+      for (const row of known) {
+        toast.info(
+          t("settings.history.dictionary.alreadyKnown", {
+            wrong: row.wrong,
+            right: row.right,
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to learn from edit:", error);
+    }
+  };
 
   const handleLoadAudio = useCallback(
     () => getAudioUrl(entry.file_name),
@@ -387,6 +487,16 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
               fill={entry.saved ? "currentColor" : "none"}
             />
           </IconButton>
+          {dictionaryEnabled && (
+            <IconButton
+              onClick={editing ? saveEdit : startEdit}
+              disabled={!hasTranscription || retrying}
+              active={editing}
+              title={t("settings.history.dictionary.editTitle")}
+            >
+              <Pencil width={16} height={16} />
+            </IconButton>
+          )}
           <IconButton
             onClick={handleRetranscribe}
             disabled={retrying}
@@ -412,34 +522,59 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
         </div>
       </div>
 
-      <p
-        className={`italic text-sm pb-2 ${
-          retrying
-            ? ""
-            : hasTranscription
-              ? "text-text/90 select-text cursor-text whitespace-pre-wrap break-words"
-              : "text-text/40"
-        }`}
-        style={
-          retrying
-            ? { animation: "transcribe-pulse 3s ease-in-out infinite" }
-            : undefined
-        }
-      >
-        {retrying && (
-          <style>{`
+      {editing && (
+        <div className="flex flex-col gap-2">
+          <textarea
+            className="text-sm w-full min-h-24 p-2 rounded-md border border-mid-gray/30 bg-transparent text-text/90"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <Button onClick={saveEdit} variant="primary" size="sm">
+              {t("settings.history.dictionary.saveEdit")}
+            </Button>
+            <Button
+              onClick={() => setEditing(false)}
+              variant="secondary"
+              size="sm"
+            >
+              {t("settings.history.dictionary.cancelEdit")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!editing && (
+        <p
+          className={`italic text-sm pb-2 ${
+            retrying
+              ? ""
+              : hasTranscription
+                ? "text-text/90 select-text cursor-text whitespace-pre-wrap break-words"
+                : "text-text/40"
+          }`}
+          style={
+            retrying
+              ? { animation: "transcribe-pulse 3s ease-in-out infinite" }
+              : undefined
+          }
+        >
+          {retrying && (
+            <style>{`
             @keyframes transcribe-pulse {
               0%, 100% { color: color-mix(in srgb, var(--color-text) 40%, transparent); }
               50% { color: color-mix(in srgb, var(--color-text) 90%, transparent); }
             }
           `}</style>
-        )}
-        {retrying
-          ? t("settings.history.transcribing")
-          : hasTranscription
-            ? entry.transcription_text
-            : t("settings.history.transcriptionFailed")}
-      </p>
+          )}
+          {retrying
+            ? t("settings.history.transcribing")
+            : hasTranscription
+              ? pastedText
+              : t("settings.history.transcriptionFailed")}
+        </p>
+      )}
 
       <AudioPlayer onLoadRequest={handleLoadAudio} className="w-full" />
     </div>

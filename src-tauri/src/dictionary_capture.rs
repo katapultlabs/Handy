@@ -1,0 +1,505 @@
+//! In-place dictionary capture (macOS). Handy learns corrections from edits
+//! the user makes to pasted text in the target application.
+//!
+//! This implements `docs/DICTIONARY_DESIGN.md` sections 7.3 and 16.3:
+//!
+//! - **Snapshot**, just before the paste. Read the focused AX element and the
+//!   caret position. This runs on a dedicated AX thread with a 100 ms budget.
+//!   The paste never waits longer. On timeout, capture skips this dictation.
+//!   The snapshot never reads field content.
+//! - **Check**, later. Read a bounded window around the anchor with
+//!   `AXStringForRange`, or a truncated `AXValue` read when the application
+//!   does not support it. Compare the window with the pasted text. Feed the
+//!   differences through the same [`crate::dictionary::learn_pairs`] gates as
+//!   History edits.
+//! - **Triggers**: the next dictation start, a focused-app change (polled
+//!   from the AX thread, so no main-thread observer is needed), and a 20 s
+//!   timer. Anchors expire after 180 s.
+//!
+//! Every AX call happens on the dedicated thread with per-element messaging
+//! timeouts. An unresponsive target application can never stall dictation.
+//! All other platforms get a no-op manager.
+
+// The manager's methods are called only from macOS-gated code paths, so the
+// other platforms see them as dead code.
+#![cfg_attr(not(target_os = "macos"), allow(dead_code))]
+
+use tauri::AppHandle;
+
+const SNAPSHOT_BUDGET_MS: u64 = 100;
+const CHECK_INTERVAL_SECS: u64 = 20;
+/// Focus changes are polled at this cadence, so it bounds how quickly an
+/// app-switch triggers a check. Each tick costs one cheap AX pid read.
+const POLL_TICK_SECS: u64 = 2;
+const ANCHOR_TTL_SECS: u64 = 180;
+/// UTF-16 units read before the anchor and slack after the pasted length,
+/// bounding how much target text is ever read on the AXStringForRange path.
+const PRE_MARGIN: usize = 8;
+const POST_MARGIN: usize = 96;
+/// Fallback full-value reads are truncated to this many UTF-16 units around
+/// the anchor before anything else looks at them (design doc section 16.4).
+const FALLBACK_WINDOW: usize = 16 * 1024;
+/// At most this many entries are auto-added per check.
+const MAX_LEARNED_PER_CHECK: usize = 3;
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Debug, specta::Type, tauri_specta::Event)]
+pub struct DictionaryLearnedEvent {
+    /// Rows the capture created. Each carries its id so Undo can delete it.
+    pub entries: Vec<crate::dictionary_store::DictionaryRow>,
+}
+
+pub struct CaptureManager {
+    #[cfg(target_os = "macos")]
+    tx: std::sync::mpsc::Sender<macos_impl::Msg>,
+}
+
+impl CaptureManager {
+    pub fn new(app: AppHandle) -> Self {
+        #[cfg(target_os = "macos")]
+        {
+            Self {
+                tx: macos_impl::spawn(app),
+            }
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            let _ = app;
+            Self {}
+        }
+    }
+
+    /// Called just before a paste. Blocks for at most [`SNAPSHOT_BUDGET_MS`];
+    /// on timeout the paste proceeds and this dictation is not captured.
+    pub fn snapshot_before_paste(&self, pasted_text: String) {
+        #[cfg(target_os = "macos")]
+        {
+            let deadline =
+                std::time::Instant::now() + std::time::Duration::from_millis(SNAPSHOT_BUDGET_MS);
+            let (ack_tx, ack_rx) = std::sync::mpsc::channel();
+            if self
+                .tx
+                .send(macos_impl::Msg::Snapshot {
+                    pasted: pasted_text,
+                    deadline,
+                    ack: ack_tx,
+                })
+                .is_ok()
+            {
+                let _ = ack_rx.recv_timeout(std::time::Duration::from_millis(SNAPSHOT_BUDGET_MS));
+            }
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            let _ = pasted_text;
+        }
+    }
+
+    /// Ask the AX thread to check the anchored text now (non-blocking).
+    pub fn check_now(&self) {
+        #[cfg(target_os = "macos")]
+        {
+            let _ = self.tx.send(macos_impl::Msg::Check);
+        }
+    }
+
+    /// Drop any pending anchor. The paste it belonged to did not happen.
+    pub fn cancel(&self) {
+        #[cfg(target_os = "macos")]
+        {
+            let _ = self.tx.send(macos_impl::Msg::Cancel);
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+mod macos_impl {
+    use super::*;
+    use crate::dictionary::{learn_pairs, DictionaryEntry};
+    use accessibility_sys::{
+        kAXErrorSuccess, AXError, AXUIElementCopyAttributeValue,
+        AXUIElementCopyParameterizedAttributeValue, AXUIElementCreateSystemWide, AXUIElementGetPid,
+        AXUIElementRef, AXUIElementSetMessagingTimeout, AXValueCreate, AXValueGetValue, AXValueRef,
+    };
+    use core_foundation::base::{CFRange, CFRelease, CFTypeRef, TCFType};
+    use core_foundation::number::CFNumber;
+    use core_foundation::string::{CFString, CFStringRef};
+    use log::{debug, info, warn};
+    use std::sync::mpsc::{Receiver, Sender};
+    use std::sync::Arc;
+    use std::time::{Duration, Instant};
+    use tauri::Manager;
+    use tauri_specta::Event as _;
+
+    /// kAXValueCFRangeType (AXValue.h). accessibility-sys spells it as an enum
+    /// constant; the numeric value is stable ABI.
+    const AX_VALUE_CFRANGE_TYPE: u32 = 4;
+
+    pub enum Msg {
+        Snapshot {
+            pasted: String,
+            /// Discard the request past this point: the caller stopped
+            /// waiting, the paste went ahead, and a late snapshot would
+            /// anchor the wrong caret or application.
+            deadline: Instant,
+            ack: Sender<()>,
+        },
+        Check,
+        Cancel,
+    }
+
+    /// RAII wrapper so every AX/CF object gets released exactly once.
+    struct Retained(CFTypeRef);
+    impl Drop for Retained {
+        fn drop(&mut self) {
+            if !self.0.is_null() {
+                unsafe { CFRelease(self.0) };
+            }
+        }
+    }
+
+    struct Anchor {
+        element: Retained,
+        pid: i32,
+        /// Caret position (UTF-16 units) just before the paste keystroke.
+        caret: usize,
+        pasted: String,
+        pasted_u16: usize,
+        created: Instant,
+        last_check: Instant,
+        /// Last focused pid seen by the poll, to edge-trigger on transitions.
+        last_seen_pid: Option<i32>,
+    }
+
+    pub fn spawn(app: AppHandle) -> Sender<Msg> {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::Builder::new()
+            .name("dictionary-capture-ax".into())
+            .spawn(move || run(app, rx))
+            .expect("spawn dictionary capture thread");
+        tx
+    }
+
+    fn run(app: AppHandle, rx: Receiver<Msg>) {
+        let mut anchor: Option<Anchor> = None;
+        loop {
+            match rx.recv_timeout(Duration::from_secs(POLL_TICK_SECS)) {
+                Ok(Msg::Snapshot {
+                    pasted,
+                    deadline,
+                    ack,
+                }) => {
+                    if Instant::now() > deadline {
+                        debug!("capture: discarding stale snapshot request");
+                    } else {
+                        let taken = take_snapshot(pasted);
+                        // The AX calls above carry their own messaging
+                        // timeouts and can outlive the caller's budget. In
+                        // that case the paste already went ahead, and the
+                        // caret we read can be post-paste. Discard the result.
+                        if Instant::now() > deadline {
+                            debug!("capture: snapshot finished late; discarding");
+                        } else {
+                            anchor = taken;
+                            let _ = ack.send(());
+                        }
+                    }
+                }
+                Ok(Msg::Check) => {
+                    anchor = run_check(&app, anchor);
+                }
+                Ok(Msg::Cancel) => {
+                    if anchor.is_some() {
+                        debug!("capture: anchor cancelled (paste failed)");
+                    }
+                    anchor = None;
+                }
+                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                    anchor = on_tick(&app, anchor);
+                }
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => return,
+            }
+        }
+    }
+
+    fn on_tick(app: &AppHandle, anchor: Option<Anchor>) -> Option<Anchor> {
+        let mut a = anchor?;
+        if a.created.elapsed() > Duration::from_secs(ANCHOR_TTL_SECS) {
+            debug!("capture: anchor expired");
+            return None;
+        }
+        // Edge-trigger on a focus transition away from the target app; between
+        // transitions, fall back to the periodic interval.
+        let current = focused_pid();
+        let focus_transition = current.is_some() && current != a.last_seen_pid;
+        a.last_seen_pid = current.or(a.last_seen_pid);
+        let moved_away = focus_transition && current != Some(a.pid);
+        if moved_away || a.last_check.elapsed() > Duration::from_secs(CHECK_INTERVAL_SECS) {
+            return run_check(app, Some(a));
+        }
+        Some(a)
+    }
+
+    // ------------------------------------------------------------------
+    // AX helpers (all called on this thread only)
+    // ------------------------------------------------------------------
+
+    fn ax_attr(element: AXUIElementRef, name: &str) -> Option<Retained> {
+        let attr = CFString::new(name);
+        let mut out: CFTypeRef = std::ptr::null();
+        let err: AXError =
+            unsafe { AXUIElementCopyAttributeValue(element, attr.as_concrete_TypeRef(), &mut out) };
+        if err == kAXErrorSuccess && !out.is_null() {
+            Some(Retained(out))
+        } else {
+            None
+        }
+    }
+
+    fn cf_to_string(v: &Retained) -> Option<String> {
+        if v.0.is_null() {
+            return None;
+        }
+        let s = unsafe { CFString::wrap_under_get_rule(v.0 as CFStringRef) };
+        Some(s.to_string())
+    }
+
+    fn focused_element() -> Option<(Retained, i32)> {
+        unsafe {
+            let system = AXUIElementCreateSystemWide();
+            if system.is_null() {
+                return None;
+            }
+            AXUIElementSetMessagingTimeout(system, 0.1);
+            let system = Retained(system as CFTypeRef);
+            let elem = ax_attr(system.0 as AXUIElementRef, "AXFocusedUIElement")?;
+            AXUIElementSetMessagingTimeout(elem.0 as AXUIElementRef, 0.1);
+            let mut pid: i32 = 0;
+            if AXUIElementGetPid(elem.0 as AXUIElementRef, &mut pid) != kAXErrorSuccess {
+                return None;
+            }
+            Some((elem, pid))
+        }
+    }
+
+    fn focused_pid() -> Option<i32> {
+        focused_element().map(|(_, pid)| pid)
+    }
+
+    /// True when the element is a password field (role or subrole
+    /// `AXSecureTextField`). Both attributes are CFStrings.
+    fn is_secure_text_field(element: AXUIElementRef) -> bool {
+        const SECURE: &str = "AXSecureTextField";
+        ["AXRole", "AXSubrole"].iter().any(|attr| {
+            ax_attr(element, attr)
+                .and_then(|v| cf_to_string(&v))
+                .is_some_and(|s| s == SECURE)
+        })
+    }
+
+    fn selected_range(element: AXUIElementRef) -> Option<CFRange> {
+        let v = ax_attr(element, "AXSelectedTextRange")?;
+        let mut range = CFRange {
+            location: 0,
+            length: 0,
+        };
+        let ok = unsafe {
+            AXValueGetValue(
+                v.0 as AXValueRef,
+                AX_VALUE_CFRANGE_TYPE,
+                &mut range as *mut CFRange as *mut _,
+            )
+        };
+        if ok {
+            Some(range)
+        } else {
+            None
+        }
+    }
+
+    fn char_count(element: AXUIElementRef) -> Option<i64> {
+        let v = ax_attr(element, "AXNumberOfCharacters")?;
+        let n = unsafe { CFNumber::wrap_under_get_rule(v.0 as _) };
+        n.to_i64()
+    }
+
+    /// Bounded window read: AXStringForRange first, truncated AXValue second.
+    fn read_window(element: AXUIElementRef, start: usize, len: usize) -> Option<String> {
+        // Clamp to the field's length when the app reports one.
+        let (start, len) = match char_count(element) {
+            Some(total) if total >= 0 => {
+                let total = total as usize;
+                let start = start.min(total);
+                (start, len.min(total.saturating_sub(start)))
+            }
+            _ => (start, len),
+        };
+        if len == 0 {
+            return Some(String::new());
+        }
+
+        let range = CFRange {
+            location: start as isize,
+            length: len as isize,
+        };
+        let param =
+            unsafe { AXValueCreate(AX_VALUE_CFRANGE_TYPE, &range as *const CFRange as *const _) };
+        if !param.is_null() {
+            let param = Retained(param as CFTypeRef);
+            let attr = CFString::new("AXStringForRange");
+            let mut out: CFTypeRef = std::ptr::null();
+            let err = unsafe {
+                AXUIElementCopyParameterizedAttributeValue(
+                    element,
+                    attr.as_concrete_TypeRef(),
+                    param.0,
+                    &mut out,
+                )
+            };
+            if err == kAXErrorSuccess && !out.is_null() {
+                return cf_to_string(&Retained(out));
+            }
+        }
+
+        // Fallback: full value read, truncated to a window at once. The rest
+        // of the value is dropped here and never leaves this function.
+        let v = ax_attr(element, "AXValue")?;
+        let full = cf_to_string(&v)?;
+        let units: Vec<u16> = full.encode_utf16().collect();
+        drop(full);
+        let end = (start + len).min(units.len()).min(start + FALLBACK_WINDOW);
+        let start = start.min(units.len());
+        Some(String::from_utf16_lossy(&units[start..end]))
+    }
+
+    // ------------------------------------------------------------------
+    // Snapshot and check
+    // ------------------------------------------------------------------
+
+    fn take_snapshot(pasted: String) -> Option<Anchor> {
+        let Some((element, pid)) = focused_element() else {
+            info!("capture: no focused AX element; skipping this dictation");
+            return None;
+        };
+        // Never read a password field. This is checked on the element itself.
+        // A global "secure input is on" check is too wide: loginwindow or a
+        // chat app can hold secure input for hours and block every capture.
+        if is_secure_text_field(element.0 as AXUIElementRef) {
+            info!("capture: focused element is a secure text field; skipping");
+            return None;
+        }
+        let Some(range) = selected_range(element.0 as AXUIElementRef) else {
+            info!("capture: focused element reports no selected-text range (app may not expose AX text); skipping");
+            return None;
+        };
+        if range.location < 0 {
+            return None;
+        }
+        let pasted_u16 = pasted.encode_utf16().count();
+        debug!("capture: anchored at {} in pid {}", range.location, pid);
+        Some(Anchor {
+            element,
+            pid,
+            caret: range.location as usize,
+            pasted,
+            pasted_u16,
+            created: Instant::now(),
+            last_check: Instant::now(),
+            last_seen_pid: Some(pid),
+        })
+    }
+
+    fn run_check(app: &AppHandle, anchor: Option<Anchor>) -> Option<Anchor> {
+        let mut a = anchor?;
+        a.last_check = Instant::now();
+
+        let start = a.caret.saturating_sub(PRE_MARGIN);
+        let len = a.pasted_u16 + PRE_MARGIN + POST_MARGIN;
+        let window = match read_window(a.element.0 as AXUIElementRef, start, len) {
+            Some(w) => w,
+            None => {
+                info!("capture: window read failed (app closed or AX text unsupported); dropping anchor");
+                return None;
+            }
+        };
+
+        if window.trim().is_empty() {
+            // The field was cleared: the message was sent or the document
+            // closed. There is nothing left to learn from. Stop watching.
+            debug!("capture: field is empty; dropping anchor");
+            return None;
+        }
+
+        if window.contains(a.pasted.trim_end()) {
+            // Unchanged so far; keep watching until the anchor expires.
+            debug!("capture: pasted text unchanged; watching");
+            return Some(a);
+        }
+
+        let mut learned = learn_pairs(a.pasted.trim_end(), window.trim());
+        if learned.is_empty() {
+            // The text changed but nothing passed the gates. The user may be
+            // mid-edit, or this is a rewrite. Keep the anchor; a later check
+            // may see a settled edit. Log counts only, never field content.
+            info!(
+                "capture: edit detected but no pair passed the learn gates (window {} chars vs pasted {} chars); keeping anchor",
+                window.chars().count(),
+                a.pasted.chars().count()
+            );
+            return Some(a);
+        }
+        learned.truncate(MAX_LEARNED_PER_CHECK);
+        for e in &mut learned {
+            e.source = "capture".to_string();
+        }
+
+        store_learned(app, learned);
+        None // learned once; this dictation's anchor is done
+    }
+
+    fn store_learned(app: &AppHandle, learned: Vec<DictionaryEntry>) {
+        let settings = crate::settings::get_settings(app);
+        // Authoritative runtime gate: the user may have turned the feature (or
+        // Experimental as a whole) off while this anchor was live.
+        if !settings.experimental_enabled
+            || !settings.dictionary_enabled
+            || !settings.dictionary_capture_enabled
+        {
+            debug!("capture: learning disabled since anchor was taken; discarding");
+            return;
+        }
+        let Some(manager) = app.try_state::<Arc<crate::dictionary_store::DictionaryManager>>()
+        else {
+            warn!("capture: dictionary store not ready; discarding");
+            return;
+        };
+        let report = match manager.learn(&learned, "capture") {
+            Ok(report) => report,
+            Err(err) => {
+                warn!("capture: could not store learned pairs: {err}");
+                return;
+            }
+        };
+        if report.added.is_empty() {
+            debug!(
+                "capture: {} pair(s) already known; nothing new",
+                report.known.len()
+            );
+            return;
+        }
+        // Log counts only. Learned pairs can contain confidential names, and
+        // the log file must never hold field content (design doc section 12).
+        info!(
+            "capture: learned {} new dictionary entries",
+            report.added.len()
+        );
+        // The overlay is visible even when the settings window is closed.
+        crate::overlay::show_learned_overlay(app, report.added.clone());
+        if let Err(err) = (DictionaryLearnedEvent {
+            entries: report.added,
+        })
+        .emit(app)
+        {
+            warn!("capture: failed to emit learned event: {err}");
+        }
+    }
+}

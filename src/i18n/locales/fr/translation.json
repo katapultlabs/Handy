@@ -3,6 +3,7 @@
     "settings": "Paramètres...",
     "checkUpdates": "Rechercher des mises à jour...",
     "copyLastTranscript": "Copier la dernière transcription",
+    "correctLastTranscript": "Corriger la dernière transcription...",
     "unloadModel": "Décharger le modèle",
     "model": "Modèle",
     "quit": "Quitter",
@@ -16,7 +17,8 @@
     "postProcessing": "Post-traitement",
     "history": "Historique",
     "debug": "Débogage",
-    "about": "À propos"
+    "about": "À propos",
+    "dictionary": "Dictionnaire"
   },
   "onboarding": {
     "subtitle": "Pour commencer, choisissez un modèle de transcription",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Raccourci de post-traitement",
             "description": "Facultatif : Un raccourci dédié qui applique toujours le post-traitement IA à votre transcription."
+          },
+          "paste_last_transcript": {
+            "name": "Coller la dernière transcription",
+            "description": "Colle à nouveau la dernière transcription là où se trouve le curseur."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Supprimer les mots de remplissage",
         "description": "Supprime les hésitations courantes des transcriptions. Désactivez cette option pour les conserver."
+      },
+      "dictionary": {
+        "toggleLabel": "Dictionnaire",
+        "toggleDescription": "Corrections déterministes : remplacez les mots ou expressions exacts que le modèle transcrit mal. Apprend de vos modifications dans l'Historique.",
+        "title": "Entrées du dictionnaire",
+        "description": "Chaque entrée remplace le texte mal entendu par votre correction dans toutes les transcriptions.",
+        "wrongPlaceholder": "Mal entendu",
+        "rightPlaceholder": "Correct",
+        "add": "Ajouter",
+        "remove": "Supprimer {{wrong}} → {{right}}",
+        "duplicate": "Une entrée pour \"{{wrong}}\" existe déjà",
+        "captureLabel": "Apprendre des modifications (macOS)",
+        "captureDescription": "Après que Handy a collé le texte, il surveille brièvement le texte à proximité de ce qu'il a collé. Si vous corrigez ce texte, la correction est ajoutée automatiquement au dictionnaire. Le texte lu reste uniquement en mémoire et n'est jamais enregistré ni envoyé où que ce soit."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "Re-transcrire",
       "retranscribeError": "Impossible de re-transcrire. Veuillez réessayer.",
       "transcribing": "Transcription en cours...",
-      "transcriptionFailed": "La transcription a échoué. Vous pouvez re-transcrire en utilisant l'icône de réessai."
+      "transcriptionFailed": "La transcription a échoué. Vous pouvez re-transcrire en utilisant l'icône de réessai.",
+      "dictionary": {
+        "editTitle": "Corriger la transcription (enrichit le dictionnaire)",
+        "saveEdit": "Apprendre de la correction",
+        "cancelEdit": "Annuler",
+        "nothingLearned": "Aucune correction n'a été apprise à partir de cette modification",
+        "added": "Ajouté au dictionnaire : {{wrong}} → {{right}}",
+        "undo": "Annuler",
+        "alreadyKnown": "Déjà dans le dictionnaire : {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Débogage",
@@ -635,6 +663,23 @@
         "label": "Afficher les nouveautés",
         "description": "Afficher les notes de version après les mises à jour de Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Apprentissage",
+      "entriesGroup": "Entrées ({{count}})",
+      "search": "Rechercher des entrées",
+      "empty": "Aucune entrée pour l'instant. Corrigez un mot là où Handy l'a collé, ou ajoutez une paire ci-dessus.",
+      "noMatch": "Aucune entrée ne correspond à votre recherche",
+      "source": {
+        "manual": "Manuel",
+        "history": "Historique",
+        "capture": "Capturée"
+      },
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "active": "Active",
+      "seen": "vu {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "Transcription...",
-    "processing": "Traitement..."
+    "processing": "Traitement...",
+    "learned": "Appris : {{wrong}} → {{right}}",
+    "undo": "Annuler"
   },
   "whatsNew": {
     "title": "Nouveautés de Handy v{{version}}"

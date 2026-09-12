@@ -3,6 +3,7 @@
     "settings": "הגדרות...",
     "checkUpdates": "בדוק עדכונים...",
     "copyLastTranscript": "העתק את התמלול האחרון",
+    "correctLastTranscript": "תקן את התמלול האחרון...",
     "unloadModel": "פרוק מודל",
     "model": "מודל",
     "quit": "יציאה",
@@ -16,7 +17,8 @@
     "postProcessing": "עיבוד משלים",
     "history": "היסטוריה",
     "debug": "ניפוי שגיאות",
-    "about": "אודות"
+    "about": "אודות",
+    "dictionary": "מילון"
   },
   "onboarding": {
     "subtitle": "כדי להתחיל, בחר מודל תמלול",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "קיצור לעיבוד משלים",
             "description": "אופציונלי: קיצור מקשים ייעודי שתמיד מפעיל עיבוד AI על התמלול."
+          },
+          "paste_last_transcript": {
+            "name": "הדבק תמלול אחרון",
+            "description": "מדביק שוב את התמלול האחרון במקום שבו נמצא הסמן."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "הסרת מילות מילוי",
         "description": "מסיר מילות היסוס נפוצות מתמלולים. השבת כדי להשאיר אותן."
+      },
+      "dictionary": {
+        "toggleLabel": "מילון",
+        "toggleDescription": "תיקונים דטרמיניסטיים: החליפו מילים או ביטויים מדויקים שהמודל טועה בהם. לומד מהעריכות שלכם בהיסטוריה.",
+        "title": "רשומות במילון",
+        "description": "כל רשומה מחליפה את הטקסט שנשמע שגוי בתיקון שלכם בכל תמלול.",
+        "wrongPlaceholder": "נשמע שגוי",
+        "rightPlaceholder": "נכון",
+        "add": "הוסף",
+        "remove": "הסר {{wrong}} → {{right}}",
+        "duplicate": "כבר קיימת רשומה עבור \"{{wrong}}\"",
+        "captureLabel": "למידה מעריכות (macOS)",
+        "captureDescription": "לאחר ש-Handy מדביק טקסט, הוא עוקב לזמן קצר אחר הטקסט שסביב מה שהודבק. אם תתקנו את הטקסט הזה, התיקון יתווסף למילון באופן אוטומטי. הטקסט הנקרא נשאר בזיכרון בלבד ולעולם אינו נשמר או נשלח לשום מקום."
       }
     },
     "postProcessing": {
@@ -467,7 +486,16 @@
       "retranscribe": "תמלל מחדש",
       "retranscribeError": "תמלול מחדש נכשל. נסה שוב.",
       "transcribing": "מתמלל...",
-      "transcriptionFailed": "התמלול נכשל. אפשר לתמלל מחדש באמצעות אייקון הניסיון החוזר."
+      "transcriptionFailed": "התמלול נכשל. אפשר לתמלל מחדש באמצעות אייקון הניסיון החוזר.",
+      "dictionary": {
+        "editTitle": "תיקון התמלול (מלמד את המילון)",
+        "saveEdit": "למד מהתיקון",
+        "cancelEdit": "ביטול",
+        "nothingLearned": "לא נלמדו תיקונים מעריכה זו",
+        "added": "נוסף למילון: {{wrong}} → {{right}}",
+        "undo": "בטל",
+        "alreadyKnown": "כבר במילון: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "ניפוי שגיאות",
@@ -635,6 +663,23 @@
         "label": "הצג מה חדש",
         "description": "הצג הערות גרסה לאחר עדכוני Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "למידה",
+      "entriesGroup": "ערכים ({{count}})",
+      "search": "חיפוש ערכים",
+      "empty": "אין ערכים עדיין. תקנו מילה במקום שבו Handy הדביק אותה, או הוסיפו זוג למעלה.",
+      "noMatch": "אין ערכים התואמים לחיפוש",
+      "source": {
+        "manual": "ידני",
+        "history": "היסטוריה",
+        "capture": "נלכד"
+      },
+      "edit": "עריכה",
+      "save": "שמירה",
+      "cancel": "ביטול",
+      "active": "פעיל",
+      "seen": "נראה {{count}}×"
     }
   },
   "footer": {
@@ -698,7 +743,9 @@
   },
   "overlay": {
     "transcribing": "מתמלל...",
-    "processing": "מעבד..."
+    "processing": "מעבד...",
+    "learned": "נלמד: {{wrong}} → {{right}}",
+    "undo": "בטל"
   },
   "whatsNew": {
     "title": "חדש ב-Handy v{{version}}"

@@ -31,6 +31,34 @@ static MIGRATIONS: &[M] = &[
     M::up("ALTER TABLE transcription_history ADD COLUMN post_processed_text TEXT;"),
     M::up("ALTER TABLE transcription_history ADD COLUMN post_process_prompt TEXT;"),
     M::up("ALTER TABLE transcription_history ADD COLUMN post_process_requested BOOLEAN NOT NULL DEFAULT 0;"),
+    // Dictionary entries (see docs/DICTIONARY_DESIGN.md section 5). Keys are
+    // normalized copies for uniqueness; `''` sentinels, never NULL, so the
+    // unique index and the UPSERT behave. `dictionary_active_wrong` enforces
+    // one active replacement per wrong text. Owned by dictionary_store.rs.
+    M::up(
+        "CREATE TABLE IF NOT EXISTS dictionary (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            wrong         TEXT NOT NULL DEFAULT '',
+            right         TEXT NOT NULL,
+            match_mode    TEXT NOT NULL DEFAULT 'word',
+            case_mode     TEXT NOT NULL DEFAULT 'smart',
+            source        TEXT NOT NULL,
+            state         TEXT NOT NULL DEFAULT 'active',
+            enabled       INTEGER NOT NULL DEFAULT 1,
+            seen_count    INTEGER NOT NULL DEFAULT 1,
+            applied_count INTEGER NOT NULL DEFAULT 0,
+            app_id        TEXT NOT NULL DEFAULT '',
+            wrong_key     TEXT NOT NULL,
+            right_key     TEXT NOT NULL,
+            created_at    INTEGER NOT NULL,
+            updated_at    INTEGER NOT NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS dictionary_pair
+            ON dictionary (wrong_key, right_key, app_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS dictionary_active_wrong
+            ON dictionary (wrong_key, app_id)
+            WHERE state = 'active' AND wrong_key != '';",
+    ),
 ];
 
 #[derive(Clone, Debug, Serialize, Deserialize, Type)]

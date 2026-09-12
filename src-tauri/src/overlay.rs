@@ -1,7 +1,9 @@
+use crate::dictionary_store::DictionaryRow;
 use crate::input;
 use crate::settings;
 use crate::settings::{OverlayPosition, OverlayStyle};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize};
 
@@ -494,6 +496,12 @@ fn show_overlay_state(app_handle: &AppHandle, state: &str) {
         return;
     }
 
+    // A dictation session owns the overlay until `hide_recording_overlay`.
+    // The "learned" card is a notice, not a session, and must not block one.
+    if state != "learned" {
+        OVERLAY_SESSION_ACTIVE.store(true, Ordering::SeqCst);
+    }
+
     // The rest queries monitors and the cursor and mutates window geometry. On
     // Linux the monitor/cursor lookups hit GDK/Xlib on the process's shared X11
     // connection, which is only safe from the GTK main thread — running them on
@@ -685,8 +693,67 @@ fn update_overlay_position_on_main(app_handle: &AppHandle) {
 /// the instant it drained, well inside the 300 ms hide delay.
 static OVERLAY_SHOW_GENERATION: AtomicU64 = AtomicU64::new(0);
 
+/// True from the first show of a dictation session until its hide. Lets the
+/// "learned" notice wait for a session instead of replacing it.
+static OVERLAY_SESSION_ACTIVE: AtomicBool = AtomicBool::new(false);
+
+/// Dictionary pairs learned while a session was on screen. Shown when that
+/// session hides (see `hide_recording_overlay`).
+static PENDING_LEARNED: Mutex<Option<Vec<DictionaryRow>>> = Mutex::new(None);
+
+/// How long the "learned" notice stays on screen. Long enough to read the
+/// pair and click Undo.
+const LEARNED_OVERLAY_MS: u64 = 4000;
+
+/// Show a short "Learned: wrong -> right" notice in the overlay. In-place
+/// capture calls this when it adds pairs to the Dictionary. The settings
+/// window is usually closed at that moment, so its toast is not enough.
+///
+/// Capture most often learns at the start of the next dictation, while the
+/// recording overlay is up. The notice is then queued and shown the moment
+/// that session hides, so it never covers the recording state.
+pub fn show_learned_overlay(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
+    if entries.is_empty() || !OVERLAY_ENABLED.load(Ordering::Relaxed) {
+        return;
+    }
+    if OVERLAY_SESSION_ACTIVE.load(Ordering::SeqCst) {
+        if let Ok(mut pending) = PENDING_LEARNED.lock() {
+            *pending = Some(entries);
+        }
+        return;
+    }
+    present_learned(app_handle, entries);
+}
+
+fn present_learned(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
+    // Payload first, then the state change, so the card renders with its text.
+    let _ = app_handle.emit_to("recording_overlay", "overlay-learned", &entries);
+    show_overlay_state(app_handle, "learned");
+
+    let handle = app_handle.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(LEARNED_OVERLAY_MS));
+        // A dictation that started meanwhile now owns the overlay; its own
+        // hide will take the window down.
+        if OVERLAY_SESSION_ACTIVE.load(Ordering::SeqCst) {
+            return;
+        }
+        hide_recording_overlay(&handle);
+    });
+}
+
 /// Hides the recording overlay window with fade-out animation
 pub fn hide_recording_overlay(app_handle: &AppHandle) {
+    OVERLAY_SESSION_ACTIVE.store(false, Ordering::SeqCst);
+
+    // A notice learned during this session takes the overlay over instead of
+    // letting it hide. Its own timer hides the window afterwards.
+    let pending = PENDING_LEARNED.lock().ok().and_then(|mut p| p.take());
+    if let Some(entries) = pending {
+        present_learned(app_handle, entries);
+        return;
+    }
+
     // Always hide the overlay regardless of settings - if setting was changed while recording,
     // we still want to hide it properly
     if let Some(overlay_window) = app_handle.get_webview_window("recording_overlay") {

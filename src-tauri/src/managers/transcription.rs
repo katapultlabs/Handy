@@ -1783,6 +1783,22 @@ fn post_process_transcription_text(
         } else {
             raw
         };
+        // Deterministic dictionary replacements (experimental) run AFTER the
+        // fuzzy custom-words pass. An exact entry always has the last word,
+        // so the fuzzy matcher can never undo a deterministic fix. Example:
+        // Custom Word "Maine" vs Dictionary "Maine -> main".
+        // Entries come from the in-memory snapshot the store keeps current.
+        // No database read on the paste path: one Arc clone.
+        let corrected = if settings.experimental_enabled && settings.dictionary_enabled {
+            let entries = crate::dictionary_store::active_entries();
+            if entries.is_empty() {
+                corrected
+            } else {
+                crate::dictionary::apply_dictionary(&corrected, &entries)
+            }
+        } else {
+            corrected
+        };
 
         // Last-resort language evidence: confidence-gated detection from the
         // transcribed text itself, constrained to the model's languages. Only

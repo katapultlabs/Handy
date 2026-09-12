@@ -28,7 +28,8 @@ import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
-import { commands } from "@/bindings";
+import { useUiStore } from "./stores/uiStore";
+import { commands, events } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
 type OnboardingStep = "accessibility" | "model" | "done";
@@ -69,6 +70,7 @@ function App() {
   const refreshOutputDevices = useSettingsStore(
     (state) => state.refreshOutputDevices,
   );
+  const refreshSettings = useSettingsStore((state) => state.refreshSettings);
   const hasCompletedPostOnboardingInit = useRef(false);
   const isShowingOnboarding =
     onboardingPreview !== null ||
@@ -92,6 +94,57 @@ function App() {
   useEffect(() => {
     initializeRTL(i18n.language);
   }, [i18n.language]);
+
+  // Tray: "Correct Last Transcript" navigates to History and opens the
+  // newest entry in edit mode (HistorySettings consumes the flag).
+  useEffect(() => {
+    const unlisten = listen("correct-last-transcript", () => {
+      useUiStore.getState().requestCorrectLatest();
+      setCurrentSection("history");
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
+
+  // Dictionary in-place capture: surface entries learned from the user's
+  // edits in the target application.
+  useEffect(() => {
+    const unlisten = events.dictionaryLearnedEvent.listen((event) => {
+      for (const entry of event.payload.entries) {
+        toast.success(
+          t("settings.history.dictionary.added", {
+            wrong: entry.wrong,
+            right: entry.right,
+          }),
+          {
+            action: {
+              label: t("settings.history.dictionary.undo"),
+              onClick: () => commands.deleteDictionaryEntry(entry.id),
+            },
+          },
+        );
+      }
+      // The entries were written backend-side; pull them into the store so
+      // the Dictionary panel shows them immediately.
+      refreshSettings();
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [t, refreshSettings]);
+
+  // An entry was removed from another window (overlay Undo) or by the
+  // backend. Reload so no window keeps a stale copy that a later save
+  // would write back.
+  useEffect(() => {
+    const unlisten = listen("dictionary-entries-changed", () => {
+      refreshSettings();
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [refreshSettings]);
 
   // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
   useEffect(() => {
