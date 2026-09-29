@@ -7,7 +7,8 @@
     "model": "Model",
     "quit": "Keluar",
     "cancel": "Batal",
-    "secureInputWarning": "⚠ Pintasan diblokir oleh Secure Input"
+    "secureInputWarning": "⚠ Pintasan diblokir oleh Secure Input",
+    "correctLastTranscript": "Koreksi Transkrip Terakhir..."
   },
   "sidebar": {
     "general": "Umum",
@@ -16,7 +17,8 @@
     "postProcessing": "Pascaproses",
     "history": "Riwayat",
     "debug": "Debug",
-    "about": "Tentang"
+    "about": "Tentang",
+    "dictionary": "Kamus"
   },
   "onboarding": {
     "subtitle": "Untuk memulai, pilih model transkripsi",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Pintasan Pascaproses",
             "description": "Opsional: pintasan khusus yang selalu menerapkan pascaproses AI pada transkripsi Anda."
+          },
+          "paste_last_transcript": {
+            "name": "Tempel Transkrip Terakhir",
+            "description": "Menempelkan kembali transkripsi terbaru di posisi kursor."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Hapus Kata Pengisi",
         "description": "Menghapus kata pengisi umum dari transkripsi. Nonaktifkan untuk mempertahankannya."
+      },
+      "dictionary": {
+        "toggleLabel": "Kamus",
+        "toggleDescription": "Pelajari kecocokan dekat dengan kosakata yang Anda kenal secara otomatis. Tinjau koreksi yang belum pasti sebelum diterapkan.",
+        "title": "Entri kamus",
+        "description": "Koreksi otomatis berlaku dalam konteks yang cocok. Koreksi yang Anda setujui berlaku setiap saat.",
+        "wrongPlaceholder": "Salah dengar",
+        "rightPlaceholder": "Benar",
+        "add": "Tambah",
+        "remove": "Hapus {{wrong}} → {{right}}",
+        "duplicate": "Entri untuk \"{{wrong}}\" sudah ada",
+        "captureLabel": "Pelajari dari suntingan (macOS)",
+        "captureDescription": "Setelah Handy menempel, Handy mengamati teks di sekitarnya sebentar. Kecocokan jelas dengan kosakata yang Anda ajarkan dipelajari otomatis dengan Urungkan; pasangan yang belum pasti menunggu persetujuan Anda. Hanya pasangan koreksi dan beberapa kata konteks yang disimpan secara lokal."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Transkripsikan ulang",
       "retranscribeError": "Gagal mentranskripsikan ulang. Silakan coba lagi.",
       "transcribing": "Mentranskripsikan...",
-      "transcriptionFailed": "Transkripsi gagal. Anda dapat mentranskripsikan ulang menggunakan ikon coba lagi."
+      "transcriptionFailed": "Transkripsi gagal. Anda dapat mentranskripsikan ulang menggunakan ikon coba lagi.",
+      "dictionary": {
+        "editTitle": "Koreksi transkripsi",
+        "saveEdit": "Pelajari dari koreksi",
+        "cancelEdit": "Batal",
+        "nothingLearned": "Tidak ada saran baru dari suntingan ini",
+        "added": "Disarankan: {{wrong}} → {{right}}",
+        "undo": "Abaikan",
+        "alreadyKnown": "Sudah ditinjau atau disarankan: {{wrong}} → {{right}}",
+        "autoAdded": "Dipelajari: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Debug",
@@ -636,6 +665,36 @@
           "details": "Fitur ucapan-ke-teks lokal Handy dibangun menggunakan transcribe.cpp dan ggml. Terima kasih kepada Georgi Gerganov dan para kontributor atas karya luar biasa mereka."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Pembelajaran",
+      "entriesGroup": "Koreksi Anda ({{count}})",
+      "search": "Cari entri",
+      "empty": "Belum ada koreksi. Ajarkan sebuah kata ke Handy, tinjau saran, atau tambahkan sendiri.",
+      "noMatch": "Tidak ada entri yang cocok dengan pencarian Anda",
+      "source": {
+        "manual": "Manual",
+        "history": "Riwayat",
+        "capture": "Ditangkap"
+      },
+      "edit": "Sunting",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "active": "Aktif",
+      "seen": "terlihat {{count}}×",
+      "addTitle": "Tambah koreksi",
+      "suggestedGroup": "Disarankan ({{count}})",
+      "suggestedDescription": "Suntingan ini kurang pasti. Pilih Selalu ganti hanya jika koreksi ini harus berlaku setiap saat.",
+      "noSuggestions": "Tidak ada saran untuk ditinjau.",
+      "approve": "Selalu ganti",
+      "ignore": "Abaikan",
+      "ignoredGroup": "Diabaikan ({{count}})",
+      "ignoredDescription": "Pasangan ini tetap nonaktif dan tidak akan disarankan lagi. Anda masih dapat memilih Selalu ganti.",
+      "actionError": "Tidak dapat memperbarui Kamus. Silakan coba lagi.",
+      "review": "Tinjau",
+      "automatic": "Otomatis",
+      "automaticHint": "Dipelajari dari kosakata yang dikenal. Hanya berlaku di dekat konteks yang cocok.",
+      "autoUndo": "Urungkan"
     }
   },
   "footer": {
@@ -702,7 +761,14 @@
   },
   "overlay": {
     "transcribing": "Mentranskripsikan...",
-    "processing": "Memproses..."
+    "processing": "Memproses...",
+    "correctionQuestion": "Selalu ganti {{wrong}} dengan {{right}}?",
+    "correctionNext": "Berikutnya",
+    "correctionRemaining": "{{count}} lagi",
+    "learned": "Disarankan: {{wrong}} → {{right}}",
+    "undo": "Abaikan",
+    "autoLearned": "Dipelajari: {{wrong}} → {{right}}",
+    "autoUndo": "Urungkan"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} mungkin memblokir 1 pintasan",

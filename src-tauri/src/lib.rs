@@ -8,6 +8,12 @@ mod catalog;
 pub mod cli;
 mod clipboard;
 mod commands;
+mod correction_notices;
+mod dictionary;
+mod dictionary_capture;
+mod dictionary_learning;
+mod dictionary_matcher;
+mod dictionary_store;
 mod helpers;
 mod input;
 mod llm_client;
@@ -204,6 +210,11 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     );
     let history_manager =
         Arc::new(HistoryManager::new(app_handle).expect("Failed to initialize history manager"));
+    // After HistoryManager: it runs the migrations that create the table.
+    let dictionary_manager = Arc::new(
+        dictionary_store::DictionaryManager::new(app_handle)
+            .expect("Failed to initialize dictionary manager"),
+    );
 
     // Initialize the transcribe-cpp native backend (logging + backend module
     // registration) once, before any whisper model is loaded.
@@ -217,6 +228,7 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     app_handle.manage(model_manager.clone());
     app_handle.manage(transcription_manager.clone());
     app_handle.manage(history_manager.clone());
+    app_handle.manage(dictionary_manager.clone());
     app_handle.manage(tray::TrayState::new());
 
     // Note: Shortcuts are NOT initialized here.
@@ -301,6 +313,12 @@ fn initialize_core_logic(app_handle: &AppHandle) {
             }
             "copy_last_transcript" => {
                 tray::copy_last_transcript(app);
+            }
+            "correct_last_transcript" => {
+                // Open the settings window on History with the latest entry
+                // in edit mode. The frontend handles the navigation.
+                show_main_window(app);
+                let _ = app.emit("correct-last-transcript", ());
             }
             "unload_model" => {
                 let transcription_manager = app.state::<Arc<TranscriptionManager>>();
@@ -687,6 +705,20 @@ pub fn run(cli_args: CliArgs) {
             shortcut::delete_post_process_prompt,
             shortcut::set_post_process_selected_prompt,
             shortcut::update_custom_words,
+            shortcut::change_dictionary_enabled_setting,
+            shortcut::change_dictionary_capture_enabled_setting,
+            commands::dictionary::list_dictionary_entries,
+            commands::dictionary::add_dictionary_entry,
+            commands::dictionary::update_dictionary_entry,
+            commands::dictionary::delete_dictionary_entry,
+            commands::dictionary::confirm_dictionary_entry,
+            commands::dictionary::reject_dictionary_entry,
+            commands::dictionary::learn_dictionary_from_edit,
+            correction_notices::get_correction_notice,
+            correction_notices::acknowledge_correction_notice,
+            correction_notices::pause_correction_notice,
+            correction_notices::dismiss_correction_notice,
+            correction_notices::act_on_correction_notice,
             shortcut::suspend_all_bindings,
             shortcut::resume_all_bindings,
             shortcut::change_mute_while_recording_setting,
@@ -1007,6 +1039,7 @@ pub fn run(cli_args: CliArgs) {
             WEBVIEW_LOG_STREAMING.store(settings.debug_mode, Ordering::Relaxed);
             let app_handle = app.handle().clone();
             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
+            app.manage(dictionary_capture::CaptureManager::new(app_handle.clone()));
 
             initialize_core_logic(&app_handle);
 

@@ -28,6 +28,7 @@ import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
+import { useUiStore } from "./stores/uiStore";
 import { commands } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
@@ -69,6 +70,7 @@ function App() {
   const refreshOutputDevices = useSettingsStore(
     (state) => state.refreshOutputDevices,
   );
+  const refreshSettings = useSettingsStore((state) => state.refreshSettings);
   const hasCompletedPostOnboardingInit = useRef(false);
   const settingsScrollRef = useRef<HTMLDivElement>(null);
   const isShowingOnboarding =
@@ -98,6 +100,30 @@ function App() {
   useEffect(() => {
     initializeRTL(i18n.language);
   }, [i18n.language]);
+
+  // Tray: "Correct Last Transcript" navigates to History and opens the
+  // newest entry in edit mode (HistorySettings consumes the flag).
+  useEffect(() => {
+    const unlisten = listen("correct-last-transcript", () => {
+      useUiStore.getState().requestCorrectLatest();
+      setCurrentSection("history");
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
+
+  // An entry was removed from another window (overlay Undo) or by the
+  // backend. Reload so no window keeps a stale copy that a later save
+  // would write back.
+  useEffect(() => {
+    const unlisten = listen("dictionary-entries-changed", () => {
+      refreshSettings();
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [refreshSettings]);
 
   // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
   useEffect(() => {

@@ -3,6 +3,7 @@
     "settings": "Instellingen...",
     "checkUpdates": "Controleren op updates...",
     "copyLastTranscript": "Laatste transcriptie kopiëren",
+    "correctLastTranscript": "Laatste transcriptie corrigeren...",
     "unloadModel": "Model ontladen",
     "model": "Model",
     "quit": "Afsluiten",
@@ -16,7 +17,8 @@
     "postProcessing": "Naverwerking",
     "history": "Geschiedenis",
     "debug": "Probleemoplossing",
-    "about": "Over Handy"
+    "about": "Over Handy",
+    "dictionary": "Woordenboek"
   },
   "onboarding": {
     "subtitle": "Kies een transcriptiemodel om aan de slag te gaan",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Sneltoets voor naverwerking",
             "description": "Optioneel: Een specifieke sneltoets die altijd AI-naverwerking toepast op je transcriptie."
+          },
+          "paste_last_transcript": {
+            "name": "Laatste transcriptie plakken",
+            "description": "Plakt de meest recente transcriptie opnieuw waar de cursor staat."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Opvulwoorden verwijderen",
         "description": "Verwijdert veelvoorkomende aarzelwoorden uit transcripties. Schakel dit uit om ze te behouden."
+      },
+      "dictionary": {
+        "toggleLabel": "Woordenboek",
+        "toggleDescription": "Leer duidelijke klankovereenkomsten met je bekende woordenschat automatisch. Beoordeel onzekere correcties voordat ze worden toegepast.",
+        "title": "Woordenboekvermeldingen",
+        "description": "Automatische correcties worden in een overeenkomende context toegepast. Correcties die je goedkeurt, worden altijd toegepast.",
+        "wrongPlaceholder": "Verkeerd verstaan",
+        "rightPlaceholder": "Correct",
+        "add": "Toevoegen",
+        "remove": "{{wrong}} → {{right}} verwijderen",
+        "duplicate": "Er bestaat al een vermelding voor \"{{wrong}}\"",
+        "captureLabel": "Leren van bewerkingen (macOS)",
+        "captureDescription": "Nadat Handy tekst heeft geplakt, bekijkt het kort de tekst in de buurt. Duidelijke overeenkomsten met woordenschat die je Handy hebt geleerd, worden automatisch aangeleerd met een optie om dit ongedaan te maken; onzekere paren wachten op je goedkeuring. Alleen correctieparen en enkele contextwoorden worden lokaal opgeslagen."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Opnieuw transcriberen",
       "retranscribeError": "Opnieuw transcriberen mislukt. Probeer het opnieuw.",
       "transcribing": "Transcriberen...",
-      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram."
+      "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram.",
+      "dictionary": {
+        "editTitle": "Transcriptie corrigeren",
+        "saveEdit": "Leren van correctie",
+        "cancelEdit": "Annuleren",
+        "nothingLearned": "Geen nieuwe suggesties uit deze bewerking",
+        "added": "Voorgesteld: {{wrong}} → {{right}}",
+        "undo": "Negeren",
+        "alreadyKnown": "Al beoordeeld of voorgesteld: {{wrong}} → {{right}}",
+        "autoAdded": "Aangeleerd: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Probleemoplossing",
@@ -636,6 +665,36 @@
           "details": "Handy's lokale spraak-naar-tekst is gebouwd op transcribe.cpp en ggml. Met dank aan het geweldige werk van Georgi Gerganov en alle bijdragers."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Leren",
+      "entriesGroup": "Jouw correcties ({{count}})",
+      "search": "Items zoeken",
+      "empty": "Nog geen correcties. Leer Handy een woord, beoordeel een suggestie of voeg er zelf een toe.",
+      "noMatch": "Geen items komen overeen met je zoekopdracht",
+      "source": {
+        "manual": "Handmatig",
+        "history": "Geschiedenis",
+        "capture": "Vastgelegd"
+      },
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "active": "Actief",
+      "seen": "{{count}}× gezien",
+      "addTitle": "Een correctie toevoegen",
+      "suggestedGroup": "Voorgesteld ({{count}})",
+      "suggestedDescription": "Deze bewerkingen zijn minder zeker. Kies alleen ‘Altijd vervangen’ als deze correctie elke keer moet worden toegepast.",
+      "noSuggestions": "Geen suggesties om te beoordelen.",
+      "approve": "Altijd vervangen",
+      "ignore": "Negeren",
+      "ignoredGroup": "Genegeerd ({{count}})",
+      "ignoredDescription": "Deze paren blijven uitgeschakeld en worden niet opnieuw voorgesteld. Je kunt nog steeds ‘Altijd vervangen’ kiezen.",
+      "actionError": "Het Woordenboek kon niet worden bijgewerkt. Probeer het opnieuw.",
+      "review": "Beoordelen",
+      "automatic": "Automatisch",
+      "automaticHint": "Aangeleerd vanuit bekende woordenschat. Wordt alleen bij een overeenkomende context toegepast.",
+      "autoUndo": "Ongedaan maken"
     }
   },
   "footer": {
@@ -702,7 +761,14 @@
   },
   "overlay": {
     "transcribing": "Transcriberen...",
-    "processing": "Verwerken..."
+    "autoLearned": "Aangeleerd: {{wrong}} → {{right}}",
+    "autoUndo": "Ongedaan maken",
+    "processing": "Verwerken...",
+    "learned": "Voorgesteld: {{wrong}} → {{right}}",
+    "undo": "Negeren",
+    "correctionQuestion": "{{wrong}} altijd vervangen door {{right}}?",
+    "correctionNext": "Volgende",
+    "correctionRemaining": "Nog {{count}}"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokkeert mogelijk 1 sneltoets",

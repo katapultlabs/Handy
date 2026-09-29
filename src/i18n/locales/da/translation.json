@@ -3,6 +3,7 @@
     "settings": "Indstillinger...",
     "checkUpdates": "Tjek for opdateringer...",
     "copyLastTranscript": "Kopiér seneste transskription",
+    "correctLastTranscript": "Ret seneste transskription...",
     "unloadModel": "Frigør model",
     "model": "Model",
     "quit": "Afslut",
@@ -16,7 +17,8 @@
     "postProcessing": "Efterbehandling",
     "history": "Historik",
     "debug": "Fejlfinding",
-    "about": "Om"
+    "about": "Om",
+    "dictionary": "Ordbog"
   },
   "onboarding": {
     "subtitle": "For at komme i gang skal du vælge en transskriptionsmodel",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Genvej til efterbehandling",
             "description": "Valgfrit: En dedikeret genvej, der altid anvender AI-efterbehandling på din transskription."
+          },
+          "paste_last_transcript": {
+            "name": "Indsæt seneste transskription",
+            "description": "Indsætter den seneste transskription igen, hvor markøren er."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Fjern fyldord",
         "description": "Fjerner almindelige tøveord fra transskriptioner. Slå fra for at beholde dem."
+      },
+      "dictionary": {
+        "toggleLabel": "Ordbog",
+        "toggleDescription": "Lær automatisk tydelige lydmæssige match til dit kendte ordforråd. Gennemgå usikre rettelser, før de anvendes.",
+        "title": "Ordbogsposter",
+        "description": "Automatiske rettelser anvendes i en matchende kontekst. Rettelser, du godkender, anvendes hver gang.",
+        "wrongPlaceholder": "Hørt forkert",
+        "rightPlaceholder": "Korrekt",
+        "add": "Tilføj",
+        "remove": "Fjern {{wrong}} → {{right}}",
+        "duplicate": "Der findes allerede en post for \"{{wrong}}\"",
+        "captureLabel": "Lær af ændringer (macOS)",
+        "captureDescription": "Når Handy har indsat tekst, holder appen kort øje med tekst i nærheden. Tydelige match til ordforråd, du har lært Handy, læres automatisk med mulighed for at fortryde; usikre par venter på din godkendelse. Kun rettelsespar og nogle få kontekstord gemmes lokalt."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Transskribér igen",
       "retranscribeError": "Kunne ikke transskribere igen. Prøv igen.",
       "transcribing": "Transskriberer...",
-      "transcriptionFailed": "Transskription mislykkedes. Du kan transskribere igen ved hjælp af genforsøgsikonet."
+      "transcriptionFailed": "Transskription mislykkedes. Du kan transskribere igen ved hjælp af genforsøgsikonet.",
+      "dictionary": {
+        "editTitle": "Ret transskription",
+        "saveEdit": "Lær af rettelsen",
+        "cancelEdit": "Annuller",
+        "nothingLearned": "Ingen nye forslag fra denne ændring",
+        "added": "Foreslået: {{wrong}} → {{right}}",
+        "undo": "Ignorer",
+        "alreadyKnown": "Allerede gennemgået eller foreslået: {{wrong}} → {{right}}",
+        "autoAdded": "Lært: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Fejlfinding",
@@ -636,6 +665,36 @@
           "details": "Handys lokale tale-til-tekst funktionalitet er bygget på transcribe.cpp og ggml. Tak for det fantastiske arbejde af Georgi Gerganov og bidragyderne."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Læring",
+      "entriesGroup": "Dine rettelser ({{count}})",
+      "search": "Søg i poster",
+      "empty": "Der er endnu ingen rettelser. Lær Handy et ord, gennemgå et forslag, eller tilføj din egen.",
+      "noMatch": "Ingen poster matcher din søgning",
+      "source": {
+        "manual": "Manuel",
+        "history": "Historik",
+        "capture": "Opfanget"
+      },
+      "edit": "Rediger",
+      "save": "Gem",
+      "cancel": "Annuller",
+      "active": "Aktiv",
+      "seen": "set {{count}}×",
+      "addTitle": "Tilføj en rettelse",
+      "suggestedGroup": "Foreslåede ({{count}})",
+      "suggestedDescription": "Disse ændringer er mindre sikre. Vælg kun »Erstat altid«, hvis denne rettelse skal anvendes hver gang.",
+      "noSuggestions": "Ingen forslag at gennemgå.",
+      "approve": "Erstat altid",
+      "ignore": "Ignorer",
+      "ignoredGroup": "Ignorerede ({{count}})",
+      "ignoredDescription": "Disse par forbliver deaktiveret og bliver ikke foreslået igen. Du kan stadig vælge »Erstat altid«.",
+      "actionError": "Ordbogen kunne ikke opdateres. Prøv igen.",
+      "review": "Gennemgå",
+      "automatic": "Automatisk",
+      "automaticHint": "Lært fra kendt ordforråd. Anvendes kun i nærheden af en matchende kontekst.",
+      "autoUndo": "Fortryd"
     }
   },
   "footer": {
@@ -702,7 +761,14 @@
   },
   "overlay": {
     "transcribing": "Transskriberer...",
-    "processing": "Behandler..."
+    "autoLearned": "Lært: {{wrong}} → {{right}}",
+    "autoUndo": "Fortryd",
+    "processing": "Behandler...",
+    "learned": "Foreslået: {{wrong}} → {{right}}",
+    "undo": "Ignorer",
+    "correctionQuestion": "Erstat altid {{wrong}} med {{right}}?",
+    "correctionNext": "Næste",
+    "correctionRemaining": "{{count}} mere"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokerer muligvis 1 genvej",

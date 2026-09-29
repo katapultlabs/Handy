@@ -789,6 +789,44 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         paste_method, paste_delay_ms, paste_delay_after_ms
     );
 
+    // Dictionary in-place capture: anchor the focused field just before the
+    // paste (bounded 100 ms wait; see dictionary_capture.rs). Skipped when the
+    // paste target is unknowable (external script / none). Password fields
+    // are refused by the capture thread from the element's AX role; a global
+    // secure-input check is not used, because another process (loginwindow,
+    // a chat app) can hold secure input for hours and block every capture.
+    #[cfg(target_os = "macos")]
+    if settings.experimental_enabled
+        && settings.dictionary_enabled
+        && settings.dictionary_capture_enabled
+    {
+        if matches!(
+            paste_method,
+            PasteMethod::ExternalScript | PasteMethod::None
+        ) {
+            log::debug!(
+                "capture: skipped, paste method {:?} has no known target",
+                paste_method
+            );
+        } else if let Some(capture) =
+            app_handle.try_state::<crate::dictionary_capture::CaptureManager>()
+        {
+            capture.snapshot_before_paste(text.clone());
+        }
+    }
+
+    // If the paste itself fails, the capture anchor must not outlive it.
+    // Otherwise capture would compare pre-existing field content against text
+    // that never arrived.
+    #[cfg(target_os = "macos")]
+    let cancel_capture = || {
+        if let Some(capture) = app_handle.try_state::<crate::dictionary_capture::CaptureManager>() {
+            capture.cancel();
+        }
+    };
+    #[cfg(not(target_os = "macos"))]
+    let cancel_capture = || {};
+
     // Perform the paste operation
     match paste_method {
         PasteMethod::None => {
@@ -800,7 +838,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                 &app_handle,
                 #[cfg(target_os = "linux")]
                 settings.typing_tool,
-            )?;
+            )
+            .inspect_err(|_| cancel_capture())?;
         }
         PasteMethod::CtrlV | PasteMethod::CtrlShiftV | PasteMethod::ShiftInsert => {
             // Debug-gated receipt-sequenced paste (#502): restore the clipboard
@@ -834,7 +873,8 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                 &paste_method,
                 paste_delay_ms,
                 paste_delay_after_ms,
-            )?
+            )
+            .inspect_err(|_| cancel_capture())?
         }
         PasteMethod::ExternalScript => {
             let script_path = settings

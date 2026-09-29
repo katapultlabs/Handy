@@ -7,7 +7,8 @@
     "model": "Model",
     "quit": "Surt",
     "cancel": "Cancel·la",
-    "secureInputWarning": "⚠ Dreceres blocades per l'entrada segura"
+    "secureInputWarning": "⚠ Dreceres blocades per l'entrada segura",
+    "correctLastTranscript": "Corregeix l'última transcripció..."
   },
   "sidebar": {
     "general": "General",
@@ -16,7 +17,8 @@
     "postProcessing": "Postprocessament",
     "history": "Historial",
     "debug": "Depuració",
-    "about": "Quant a"
+    "about": "Quant a",
+    "dictionary": "Diccionari"
   },
   "onboarding": {
     "subtitle": "Per començar, trieu un model de transcripció",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Drecera de postprocessament",
             "description": "Opcional: una drecera específica que sempre aplica postprocessament amb IA a la transcripció."
+          },
+          "paste_last_transcript": {
+            "name": "Enganxa l'última transcripció",
+            "description": "Torna a enganxar la transcripció més recent allà on hi hagi el cursor."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Elimina les falques",
         "description": "Elimina les expressions de vacil·lació habituals de les transcripcions. Desactiveu aquesta opció per conservar-les."
+      },
+      "dictionary": {
+        "toggleLabel": "Diccionari",
+        "toggleDescription": "Aprèn automàticament coincidències fonètiques clares amb el teu vocabulari conegut. Revisa les correccions incertes abans que s'apliquin.",
+        "title": "Entrades del diccionari",
+        "description": "Les correccions automàtiques s'apliquen quan el context coincideix. Les correccions que aprovis s'apliquen sempre.",
+        "wrongPlaceholder": "Mal interpretat",
+        "rightPlaceholder": "Correcte",
+        "add": "Afegeix",
+        "remove": "Elimina {{wrong}} → {{right}}",
+        "duplicate": "Ja existeix una entrada per a \"{{wrong}}\"",
+        "captureLabel": "Aprèn de les edicions (macOS)",
+        "captureDescription": "Després que Handy enganxi el text, observa breument el text proper. Les coincidències clares amb el vocabulari que has ensenyat a Handy s'aprenen automàticament amb l'opció de desfer; les parelles incertes esperen la teva aprovació. Només es desen localment les parelles de correcció i unes quantes paraules de context."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Torneu a transcriure",
       "retranscribeError": "No s'ha pogut tornar a transcriure. Torneu-ho a provar.",
       "transcribing": "S'està transcrivint...",
-      "transcriptionFailed": "La transcripció ha fallat. Podeu tornar a transcriure amb la icona de reintent."
+      "transcriptionFailed": "La transcripció ha fallat. Podeu tornar a transcriure amb la icona de reintent.",
+      "dictionary": {
+        "editTitle": "Corregeix la transcripció",
+        "saveEdit": "Aprèn de la correcció",
+        "cancelEdit": "Cancel·la",
+        "nothingLearned": "Aquesta edició no ha generat suggeriments nous",
+        "added": "Suggeriment: {{wrong}} → {{right}}",
+        "undo": "Ignora",
+        "alreadyKnown": "Ja s'ha revisat o suggerit: {{wrong}} → {{right}}",
+        "autoAdded": "Apresa: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Depuració",
@@ -636,6 +665,36 @@
           "details": "La transcripció local de veu a text del Handy es basa en el transcribe.cpp i el ggml. Gràcies a la gran feina de Georgi Gerganov i dels col·laboradors."
         }
       }
+    },
+    "dictionary": {
+      "learningGroup": "Aprenentatge",
+      "entriesGroup": "Les teves correccions ({{count}})",
+      "search": "Cerca entrades",
+      "empty": "Encara no hi ha correccions. Ensenya una paraula a Handy, revisa un suggeriment o afegeix-ne una.",
+      "noMatch": "Cap entrada coincideix amb la cerca",
+      "source": {
+        "manual": "Manual",
+        "history": "Historial",
+        "capture": "Capturada"
+      },
+      "edit": "Edita",
+      "save": "Desa",
+      "cancel": "Cancel·la",
+      "active": "Actiu",
+      "seen": "vist {{count}}×",
+      "addTitle": "Afegeix una correcció",
+      "suggestedGroup": "Suggerides ({{count}})",
+      "suggestedDescription": "Aquestes edicions són menys segures. Tria «Substitueix sempre» només si aquesta correcció s'ha d'aplicar cada vegada.",
+      "noSuggestions": "No hi ha suggeriments per revisar.",
+      "approve": "Substitueix sempre",
+      "ignore": "Ignora",
+      "ignoredGroup": "Ignorades ({{count}})",
+      "ignoredDescription": "Aquestes parelles es mantenen desactivades i no es tornaran a suggerir. Encara pots triar «Substitueix sempre».",
+      "actionError": "No s'ha pogut actualitzar el Diccionari. Torna-ho a provar.",
+      "review": "Revisa",
+      "automatic": "Automàtic",
+      "automaticHint": "Apresa del vocabulari conegut. Només s'aplica a prop d'un context coincident.",
+      "autoUndo": "Desfés"
     }
   },
   "footer": {
@@ -702,7 +761,14 @@
   },
   "overlay": {
     "transcribing": "S'està transcrivint...",
-    "processing": "S'està processant..."
+    "autoLearned": "Apresa: {{wrong}} → {{right}}",
+    "autoUndo": "Desfés",
+    "processing": "S'està processant...",
+    "learned": "Suggeriment: {{wrong}} → {{right}}",
+    "undo": "Ignora",
+    "correctionQuestion": "Vols substituir sempre {{wrong}} per {{right}}?",
+    "correctionNext": "Següent",
+    "correctionRemaining": "{{count}} més"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} pot estar blocant 1 drecera",

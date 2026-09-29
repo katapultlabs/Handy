@@ -3,6 +3,7 @@
     "settings": "Inställningar...",
     "checkUpdates": "Sök efter uppdateringar...",
     "copyLastTranscript": "Kopiera senaste transkriptionen",
+    "correctLastTranscript": "Korrigera senaste transkriptionen...",
     "unloadModel": "Avlasta modell",
     "model": "Modell",
     "quit": "Avsluta",
@@ -16,7 +17,8 @@
     "postProcessing": "Efterbearbetning",
     "history": "Historik",
     "debug": "Felsökning",
-    "about": "Om"
+    "about": "Om",
+    "dictionary": "Ordbok"
   },
   "onboarding": {
     "subtitle": "För att komma igång, välj en transkriptionsmodell",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "Snabbkommando för efterbearbetning",
             "description": "Valfritt: En dedikerad snabbknapp som alltid tillämpar AI-efterbearbetning på din transkription."
+          },
+          "paste_last_transcript": {
+            "name": "Klistra in senaste transkription",
+            "description": "Klistrar in den senaste transkriptionen igen där markören är."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Ta bort utfyllnadsord",
         "description": "Tar bort vanliga tvekljud från transkriberingar. Stäng av för att behålla dem."
+      },
+      "dictionary": {
+        "toggleLabel": "Ordbok",
+        "toggleDescription": "Lär automatiskt in tydliga ljudmässiga matchningar mot ditt kända ordförråd. Granska osäkra korrigeringar innan de används.",
+        "title": "Ordboksposter",
+        "description": "Automatiska korrigeringar används i matchande sammanhang. Korrigeringar som du godkänner används varje gång.",
+        "wrongPlaceholder": "Felhört",
+        "rightPlaceholder": "Korrekt",
+        "add": "Lägg till",
+        "remove": "Ta bort {{wrong}} → {{right}}",
+        "duplicate": "Det finns redan en post för \"{{wrong}}\"",
+        "captureLabel": "Lär från ändringar (macOS)",
+        "captureDescription": "När Handy har klistrat in text tittar appen kort på texten i närheten. Tydliga matchningar mot ordförråd som du har lärt Handy lärs in automatiskt med möjlighet att ångra; osäkra par väntar på ditt godkännande. Endast korrigeringspar och några få sammanhangsord sparas lokalt."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Transkribera igen",
       "retranscribeError": "Misslyckades med att transkribera igen. Försök igen.",
       "transcribing": "Transkriberar...",
-      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök."
+      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök.",
+      "dictionary": {
+        "editTitle": "Korrigera transkription",
+        "saveEdit": "Lär från korrigering",
+        "cancelEdit": "Avbryt",
+        "nothingLearned": "Inga nya förslag från den här ändringen",
+        "added": "Föreslaget: {{wrong}} → {{right}}",
+        "undo": "Ignorera",
+        "alreadyKnown": "Redan granskat eller föreslaget: {{wrong}} → {{right}}",
+        "autoAdded": "Inlärt: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Felsökning",
@@ -636,6 +665,36 @@
         "label": "Visa nyheter",
         "description": "Visa versionsinformation efter Handy-uppdateringar"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Inlärning",
+      "entriesGroup": "Dina korrigeringar ({{count}})",
+      "search": "Sök poster",
+      "empty": "Det finns inga korrigeringar ännu. Lär Handy ett ord, granska ett förslag eller lägg till ett eget.",
+      "noMatch": "Inga poster matchar din sökning",
+      "source": {
+        "manual": "Manuell",
+        "history": "Historik",
+        "capture": "Fångad"
+      },
+      "edit": "Redigera",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "active": "Aktiv",
+      "seen": "sedd {{count}}×",
+      "addTitle": "Lägg till en korrigering",
+      "suggestedGroup": "Föreslagna ({{count}})",
+      "suggestedDescription": "Dessa ändringar är mindre säkra. Välj ”Ersätt alltid” endast om korrigeringen ska tillämpas varje gång.",
+      "noSuggestions": "Inga förslag att granska.",
+      "approve": "Ersätt alltid",
+      "ignore": "Ignorera",
+      "ignoredGroup": "Ignorerade ({{count}})",
+      "ignoredDescription": "Dessa par förblir avstängda och föreslås inte igen. Du kan fortfarande välja ”Ersätt alltid”.",
+      "actionError": "Ordboken kunde inte uppdateras. Försök igen.",
+      "review": "Granska",
+      "automatic": "Automatiskt",
+      "automaticHint": "Inlärt från känt ordförråd. Används endast nära ett matchande sammanhang.",
+      "autoUndo": "Ångra"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "Transkriberar...",
-    "processing": "Bearbetar..."
+    "autoLearned": "Inlärt: {{wrong}} → {{right}}",
+    "autoUndo": "Ångra",
+    "processing": "Bearbetar...",
+    "learned": "Föreslaget: {{wrong}} → {{right}}",
+    "undo": "Ignorera",
+    "correctionQuestion": "Ersätt alltid {{wrong}} med {{right}}?",
+    "correctionNext": "Nästa",
+    "correctionRemaining": "{{count}} till"
   },
   "whatsNew": {
     "title": "Nytt i Handy v{{version}}"

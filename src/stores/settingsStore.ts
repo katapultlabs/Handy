@@ -136,6 +136,10 @@ const settingUpdaters: {
     commands.changeOverlayPositionSetting(value as string),
   debug_mode: (value) => commands.changeDebugModeSetting(value as boolean),
   custom_words: (value) => commands.updateCustomWords(value as string[]),
+  dictionary_enabled: (value) =>
+    commands.changeDictionaryEnabledSetting(value as boolean),
+  dictionary_capture_enabled: (value) =>
+    commands.changeDictionaryCaptureEnabledSetting(value as boolean),
   word_correction_threshold: (value) =>
     commands.changeWordCorrectionThresholdSetting(value as number),
   paste_delay_ms: (value) =>

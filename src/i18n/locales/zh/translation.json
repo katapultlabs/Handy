@@ -3,6 +3,7 @@
     "settings": "设置...",
     "checkUpdates": "检查更新...",
     "copyLastTranscript": "复制最新转录",
+    "correctLastTranscript": "修正最新转录...",
     "unloadModel": "卸载模型",
     "model": "模型",
     "quit": "退出",
@@ -16,7 +17,8 @@
     "postProcessing": "后处理",
     "history": "历史记录",
     "debug": "调试",
-    "about": "关于"
+    "about": "关于",
+    "dictionary": "字典"
   },
   "onboarding": {
     "subtitle": "请选择一个转录模型以开始使用",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "后处理快捷键",
             "description": "可选：一个专用快捷键，始终对您的转录应用 AI 后处理。"
+          },
+          "paste_last_transcript": {
+            "name": "粘贴最新的转录",
+            "description": "在光标位置再次粘贴最新的转录。"
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "移除语气词",
         "description": "从转录中移除常见的语气词。关闭此选项即可保留这些词。"
+      },
+      "dictionary": {
+        "toggleLabel": "词典",
+        "toggleDescription": "自动学习与已知词汇发音高度相近的内容。应用不确定的更正前请先查看。",
+        "title": "词典条目",
+        "description": "自动更正会在匹配的上下文中应用。你批准的更正则会每次应用。",
+        "wrongPlaceholder": "听错的文本",
+        "rightPlaceholder": "正确文本",
+        "add": "添加",
+        "remove": "删除 {{wrong}} → {{right}}",
+        "duplicate": "\"{{wrong}}\" 的条目已存在",
+        "captureLabel": "从编辑内容学习（macOS）",
+        "captureDescription": "Handy 粘贴文本后，会短暂关注附近的文本。与教给 Handy 的词汇明确匹配的内容会自动学习，并提供“撤销”选项；不确定的词语配对则会等待你的批准。只有更正词语配对和少量上下文词汇会保存在本地。"
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "重新转录",
       "retranscribeError": "重新转录失败。请重试。",
       "transcribing": "转录中...",
-      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。"
+      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。",
+      "dictionary": {
+        "editTitle": "更正转录",
+        "saveEdit": "从更正内容中学习",
+        "cancelEdit": "取消",
+        "nothingLearned": "此次编辑没有产生新建议",
+        "added": "建议：{{wrong}} → {{right}}",
+        "undo": "忽略",
+        "alreadyKnown": "已查看或建议：{{wrong}} → {{right}}",
+        "autoAdded": "已学习：{{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "调试",
@@ -636,6 +665,36 @@
         "label": "显示新功能",
         "description": "Handy 更新后显示发行说明"
       }
+    },
+    "dictionary": {
+      "learningGroup": "学习",
+      "entriesGroup": "你的更正（{{count}}）",
+      "search": "搜索条目",
+      "empty": "尚无更正。请教 Handy 一个词、查看建议或自行添加更正。",
+      "noMatch": "没有符合搜索的条目",
+      "source": {
+        "manual": "手动",
+        "history": "历史",
+        "capture": "已捕获"
+      },
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "active": "启用",
+      "seen": "出现 {{count}} 次",
+      "addTitle": "添加更正",
+      "suggestedGroup": "建议（{{count}}）",
+      "suggestedDescription": "这些编辑内容的确定性较低。仅当这项更正每次都应应用时，才选择“始终替换”。",
+      "noSuggestions": "没有要查看的建议。",
+      "approve": "始终替换",
+      "ignore": "忽略",
+      "ignoredGroup": "已忽略（{{count}}）",
+      "ignoredDescription": "这些配对会保持停用，且不会再次建议。你仍可以选择“始终替换”。",
+      "actionError": "无法更新词典。请重试。",
+      "review": "查看",
+      "automatic": "自动",
+      "automaticHint": "从已知词汇中学习。仅在匹配的上下文附近应用。",
+      "autoUndo": "撤销"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "正在转录...",
-    "processing": "处理中..."
+    "autoLearned": "已学习：{{wrong}} → {{right}}",
+    "autoUndo": "撤销",
+    "processing": "处理中...",
+    "learned": "建议：{{wrong}} → {{right}}",
+    "undo": "忽略",
+    "correctionQuestion": "始终将 {{wrong}} 替换为 {{right}}？",
+    "correctionNext": "下一个",
+    "correctionRemaining": "还有 {{count}} 个"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

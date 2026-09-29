@@ -1,6 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Cog, FlaskConical, History, Info, Sparkles, Cpu } from "lucide-react";
+import {
+  BookA,
+  Cog,
+  FlaskConical,
+  History,
+  Info,
+  Sparkles,
+  Cpu,
+} from "lucide-react";
 import HandyTextLogo from "./icons/HandyTextLogo";
 import HandyHand from "./icons/HandyHand";
 import { useSettings } from "../hooks/useSettings";
@@ -8,6 +16,7 @@ import {
   GeneralSettings,
   AdvancedSettings,
   HistorySettings,
+  DictionarySettings,
   DebugSettings,
   AboutSettings,
   PostProcessingSettings,
@@ -43,6 +52,16 @@ export const SECTIONS_CONFIG = {
     icon: History,
     component: HistorySettings,
     enabled: () => true,
+  },
+  // Appears once the Dictionary is turned on (Advanced -> Experimental),
+  // the same way Debug appears with debug mode.
+  dictionary: {
+    labelKey: "sidebar.dictionary",
+    icon: BookA,
+    component: DictionarySettings,
+    enabled: (settings) =>
+      (settings?.experimental_enabled ?? false) &&
+      (settings?.dictionary_enabled ?? false),
   },
   models: {
     labelKey: "sidebar.models",

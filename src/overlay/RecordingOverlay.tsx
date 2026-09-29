@@ -1,9 +1,16 @@
 import { listen } from "@tauri-apps/api/event";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { commands, events } from "@/bindings";
 import type {
+  CorrectionNoticeSnapshot,
   StreamPhase,
   StreamPhaseEvent,
   StreamTextEvent,
@@ -12,7 +19,13 @@ import type {
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
-type OverlayState = "recording" | "streaming" | "transcribing" | "processing";
+// "learned" is a queued Dictionary correction notice, not a dictation session.
+type OverlayState =
+  | "recording"
+  | "streaming"
+  | "transcribing"
+  | "processing"
+  | "learned";
 
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
@@ -43,8 +56,25 @@ const RecordingOverlay: React.FC = () => {
   // True once live text overflows the cap. A top overlay fades its top edge only
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
+  const [correctionSnapshot, setCorrectionSnapshot] =
+    useState<CorrectionNoticeSnapshot | null>(null);
+  const [noticeError, setNoticeError] = useState<{
+    token: number;
+    message: string;
+  } | null>(null);
+  const [hoveringNotice, setHoveringNotice] = useState(false);
+  const [focusWithinNotice, setFocusWithinNotice] = useState(false);
+  const [actionPendingToken, setActionPendingToken] = useState<number | null>(
+    null,
+  );
 
   const smoothedLevelsRef = useRef<number[]>(Array(16).fill(0));
+  const overlayStateRef = useRef<OverlayState>("recording");
+  const correctionSnapshotRef = useRef<CorrectionNoticeSnapshot | null>(null);
+  const latestNoticeRevisionRef = useRef(-1);
+  const presentationSequenceRef = useRef(0);
+  const acknowledgedTokenRef = useRef<number | null>(null);
+  const pauseSentRef = useRef<{ token: number; paused: boolean } | null>(null);
   // Live-text scroll-back: the text region "sticks" to the newest line while the
   // user is at the bottom; if they scroll up to read history, auto-follow pauses
   // until they scroll back down.
@@ -52,87 +82,302 @@ const RecordingOverlay: React.FC = () => {
   const pinnedRef = useRef(true);
   const direction = getLanguageDirection(i18n.language);
 
-  useEffect(() => {
-    const setupEventListeners = async () => {
-      const unlistenShow = await listen("show-overlay", async (event) => {
-        const overlayState = event.payload as OverlayState;
-        // Reset synchronously before settings I/O. A fast microphone can emit
-        // recording-ready while the awaits below are in flight; resetting after
-        // them would overwrite that event and leave the overlay stuck arming.
-        if (overlayState === "recording" || overlayState === "streaming") {
-          setCaptureReady(false);
-          smoothedLevelsRef.current = Array(16).fill(0);
-          setLevels(Array(WAVE_BARS).fill(0));
-          setStreamText({ committed: "", tentative: "" });
-        }
+  const applyCorrectionSnapshot = useCallback(
+    (snapshot: CorrectionNoticeSnapshot) => {
+      if (snapshot.revision <= latestNoticeRevisionRef.current) return false;
 
-        await syncLanguageFromSettings();
-        // The Live panel flows downward from a top overlay and upward from a
-        // bottom one; read the placement so the layout can flip to match.
-        try {
-          const settings = await commands.getAppSettings();
-          if (settings.status === "ok") {
-            setPosition(
-              settings.data.overlay_position === "top" ? "top" : "bottom",
-            );
-          }
-        } catch {
-          // Keep the previous/default placement if settings can't be read.
-        }
-        setState(overlayState);
-        if (overlayState === "streaming") {
-          setPhase("listening");
-          setWorkKind("transcribing");
-          setElapsed(0);
-          setSession((s) => s + 1); // remount the card fresh for this session
-        }
+      const previous = correctionSnapshotRef.current;
+      const wasNoticeVisible = Boolean(
+        previous && !previous.recording && previous.notice,
+      );
+      const previousToken = previous?.notice?.token ?? null;
+      const nextToken = snapshot.notice?.token ?? null;
+      const noticeIsVisible = !snapshot.recording && snapshot.notice !== null;
+      const presentationChanged =
+        noticeIsVisible !== wasNoticeVisible ||
+        (noticeIsVisible && nextToken !== previousToken);
+
+      latestNoticeRevisionRef.current = snapshot.revision;
+      correctionSnapshotRef.current = snapshot;
+      setCorrectionSnapshot(snapshot);
+
+      if (noticeIsVisible) {
+        if (presentationChanged) presentationSequenceRef.current += 1;
+        overlayStateRef.current = "learned";
+        setState("learned");
         setIsVisible(true);
-      });
+      } else {
+        setHoveringNotice(false);
+        setFocusWithinNotice(false);
+        if (overlayStateRef.current === "learned") {
+          presentationSequenceRef.current += 1;
+          setIsVisible(false);
+        }
+      }
 
-      const unlistenHide = await listen("hide-overlay", () => {
-        setIsVisible(false);
-        setCaptureReady(false);
-      });
+      setActionPendingToken((token) =>
+        token !== null && token !== nextToken ? null : token,
+      );
+      return presentationChanged && noticeIsVisible;
+    },
+    [],
+  );
 
-      const unlistenReady = await listen("recording-ready", () => {
-        setElapsed(0);
-        setCaptureReady(true);
-      });
+  useEffect(() => {
+    let disposed = false;
+    const unlisteners: Array<() => void> = [];
 
-      const unlistenLevel = await listen<number[]>("mic-level", (event) => {
-        const newLevels = event.payload as number[];
-        // Exponential smoothing across the 16 buckets, then take the first N
-        // bars for the shared waveform.
-        const smoothed = smoothedLevelsRef.current.map((prev, i) => {
-          const target = newLevels[i] || 0;
-          return prev * 0.7 + target * 0.3;
-        });
-        smoothedLevelsRef.current = smoothed;
-        setLevels(smoothed.slice(0, WAVE_BARS));
-      });
-
-      const unlistenStream = await events.streamTextEvent.listen((event) => {
-        setStreamText(event.payload);
-      });
-
-      const unlistenPhase = await events.streamPhaseEvent.listen((event) => {
-        const payload: StreamPhaseEvent = event.payload;
-        setPhase(payload.phase);
-        if (payload.kind) setWorkKind(payload.kind);
-      });
-
-      return () => {
-        unlistenShow();
-        unlistenHide();
-        unlistenReady();
-        unlistenLevel();
-        unlistenStream();
-        unlistenPhase();
-      };
+    const refreshPresentationPreferences = async (sequence: number) => {
+      const [, settingsResult] = await Promise.allSettled([
+        syncLanguageFromSettings(),
+        commands.getAppSettings(),
+      ]);
+      if (
+        disposed ||
+        sequence !== presentationSequenceRef.current ||
+        settingsResult.status !== "fulfilled" ||
+        settingsResult.value.status !== "ok"
+      ) {
+        return;
+      }
+      setPosition(
+        settingsResult.value.data.overlay_position === "top" ? "top" : "bottom",
+      );
     };
 
-    setupEventListeners();
-  }, []);
+    const setupEventListeners = async () => {
+      const register = async (listener: Promise<() => void>) => {
+        try {
+          const unlisten = await listener;
+          if (disposed) {
+            unlisten();
+            return false;
+          }
+          unlisteners.push(unlisten);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      // Register the notice event first. Only then replay current state, so an
+      // event that races the fetch wins through the monotonic revision check.
+      const correctionRegistered = await register(
+        listen<CorrectionNoticeSnapshot>(
+          "correction-notice-changed",
+          (event) => {
+            if (disposed) return;
+            const shown = applyCorrectionSnapshot(event.payload);
+            if (shown) {
+              void refreshPresentationPreferences(
+                presentationSequenceRef.current,
+              );
+            }
+          },
+        ),
+      );
+      if (disposed) return;
+
+      await Promise.all([
+        register(
+          listen("show-overlay", (event) => {
+            const overlayState = event.payload as OverlayState;
+            const sequence = ++presentationSequenceRef.current;
+            overlayStateRef.current = overlayState;
+            setState(overlayState);
+            setIsVisible(true);
+
+            // Reset synchronously before settings I/O. A fast microphone can emit
+            // recording-ready while the awaits below are in flight; resetting after
+            // them would overwrite that event and leave the overlay stuck arming.
+            if (overlayState === "recording" || overlayState === "streaming") {
+              setCaptureReady(false);
+              smoothedLevelsRef.current = Array(16).fill(0);
+              setLevels(Array(WAVE_BARS).fill(0));
+              setStreamText({ committed: "", tentative: "" });
+            }
+            if (overlayState === "streaming") {
+              setPhase("listening");
+              setWorkKind("transcribing");
+              setElapsed(0);
+              setSession((s) => s + 1); // remount the card fresh for this session
+            }
+            void refreshPresentationPreferences(sequence);
+          }),
+        ),
+        register(
+          listen("hide-overlay", () => {
+            const snapshot = correctionSnapshotRef.current;
+            if (snapshot?.notice && !snapshot.recording) return;
+            presentationSequenceRef.current += 1;
+            setIsVisible(false);
+            setCaptureReady(false);
+          }),
+        ),
+        register(
+          listen("recording-ready", () => {
+            setElapsed(0);
+            setCaptureReady(true);
+          }),
+        ),
+        register(
+          listen<number[]>("mic-level", (event) => {
+            const newLevels = event.payload as number[];
+            // Exponential smoothing across the 16 buckets, then take the first N
+            // bars for the shared waveform.
+            const smoothed = smoothedLevelsRef.current.map((prev, i) => {
+              const target = newLevels[i] || 0;
+              return prev * 0.7 + target * 0.3;
+            });
+            smoothedLevelsRef.current = smoothed;
+            setLevels(smoothed.slice(0, WAVE_BARS));
+          }),
+        ),
+        register(
+          events.streamTextEvent.listen((event) => {
+            setStreamText(event.payload);
+          }),
+        ),
+        register(
+          events.streamPhaseEvent.listen((event) => {
+            const payload: StreamPhaseEvent = event.payload;
+            setPhase(payload.phase);
+            if (payload.kind) setWorkKind(payload.kind);
+          }),
+        ),
+      ]);
+
+      if (disposed || !correctionRegistered) return;
+
+      try {
+        const result = await commands.getCorrectionNotice();
+        if (!disposed && result.status === "ok") {
+          const shown = applyCorrectionSnapshot(result.data);
+          if (shown) {
+            void refreshPresentationPreferences(
+              presentationSequenceRef.current,
+            );
+          }
+        }
+      } catch {
+        // A future notice event can still recover the overlay.
+      }
+    };
+
+    void setupEventListeners();
+    return () => {
+      disposed = true;
+      presentationSequenceRef.current += 1;
+      unlisteners.splice(0).forEach((unlisten) => unlisten());
+    };
+  }, [applyCorrectionSnapshot]);
+
+  const visibleNotice =
+    correctionSnapshot && !correctionSnapshot.recording
+      ? correctionSnapshot.notice
+      : null;
+  const noticeBusy = Boolean(
+    visibleNotice &&
+      (visibleNotice.busy || actionPendingToken === visibleNotice.token),
+  );
+
+  // A notice becomes eligible for expiry only after React has painted it. The
+  // token ref also prevents StrictMode and later snapshot revisions from
+  // acknowledging the same notice more than once in this webview lifetime.
+  useEffect(() => {
+    if (!isVisible || state !== "learned" || !visibleNotice) return;
+    if (acknowledgedTokenRef.current === visibleNotice.token) return;
+
+    const token = visibleNotice.token;
+    const frame = requestAnimationFrame(() => {
+      acknowledgedTokenRef.current = token;
+      void commands
+        .acknowledgeCorrectionNotice(token)
+        .then((result) => {
+          if (result.status === "ok") {
+            applyCorrectionSnapshot(result.data);
+          } else {
+            setNoticeError({
+              token,
+              message: t("settings.dictionary.actionError"),
+            });
+          }
+        })
+        .catch(() => {
+          setNoticeError({
+            token,
+            message: t("settings.dictionary.actionError"),
+          });
+        });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [applyCorrectionSnapshot, isVisible, state, t, visibleNotice]);
+
+  const shouldPauseNotice =
+    hoveringNotice || focusWithinNotice || actionPendingToken !== null;
+
+  useEffect(() => {
+    if (!visibleNotice) return;
+
+    const token = visibleNotice.token;
+    const last = pauseSentRef.current;
+    if (!shouldPauseNotice && (!last || last.token !== token)) {
+      pauseSentRef.current = { token, paused: false };
+      return;
+    }
+    if (last?.token === token && last.paused === shouldPauseNotice) return;
+
+    pauseSentRef.current = { token, paused: shouldPauseNotice };
+    void commands
+      .pauseCorrectionNotice(token, shouldPauseNotice)
+      .then((result) => {
+        if (result.status === "ok") {
+          applyCorrectionSnapshot(result.data);
+        } else {
+          setNoticeError({
+            token,
+            message: t("settings.dictionary.actionError"),
+          });
+        }
+      })
+      .catch(() => {
+        setNoticeError({
+          token,
+          message: t("settings.dictionary.actionError"),
+        });
+      });
+  }, [applyCorrectionSnapshot, shouldPauseNotice, t, visibleNotice]);
+
+  const runNoticeAction = async (
+    token: number,
+    action: "accept" | "reject" | "dismiss",
+  ) => {
+    setNoticeError(null);
+    setActionPendingToken(token);
+    try {
+      const result =
+        action === "dismiss"
+          ? await commands.dismissCorrectionNotice(token)
+          : await commands.actOnCorrectionNotice(token, action);
+      if (result.status === "ok") {
+        applyCorrectionSnapshot(result.data);
+      } else {
+        setNoticeError({
+          token,
+          message: t("settings.dictionary.actionError"),
+        });
+      }
+    } catch {
+      setNoticeError({
+        token,
+        message: t("settings.dictionary.actionError"),
+      });
+    } finally {
+      setActionPendingToken((pendingToken) =>
+        pendingToken === token ? null : pendingToken,
+      );
+    }
+  };
 
   // Elapsed capture timer starts only once microphone samples are flowing.
   useEffect(() => {
@@ -274,6 +519,109 @@ const RecordingOverlay: React.FC = () => {
                 true,
               )
             : listeningRow(open, true)}
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Reliable correction notice. The backend owns the queue, countdown,
+  // and token validation; this window only presents the current snapshot.
+  if (state === "learned") {
+    if (!visibleNotice) return null;
+    const { entry, pending_count: pendingCount, token } = visibleNotice;
+    const automatic = entry.auto_learned;
+    const label = t(
+      automatic ? "overlay.autoLearned" : "overlay.correctionQuestion",
+      { wrong: entry.wrong, right: entry.right },
+    );
+    const error = noticeError?.token === token ? noticeError.message : null;
+
+    return (
+      <div dir={direction} className={`ov-stage ${position} ov-fade show`}>
+        <div
+          className="correction-card"
+          onMouseEnter={() => setHoveringNotice(true)}
+          onMouseLeave={() => setHoveringNotice(false)}
+          onFocus={() => setFocusWithinNotice(true)}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setFocusWithinNotice(false);
+            }
+          }}
+        >
+          <div className="correction-copy" tabIndex={0}>
+            <div className="correction-title-row">
+              <span className="scheck" aria-hidden="true">
+                <svg viewBox="0 0 16 16">
+                  <path
+                    d="M3.5 8.5 L6.5 11.5 L12.5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="correction-label">{label}</span>
+              {pendingCount > 0 ? (
+                <span className="correction-remaining">
+                  {t("overlay.correctionRemaining", { count: pendingCount })}
+                </span>
+              ) : null}
+            </div>
+            {error ? (
+              <div className="correction-error" role="alert">
+                {error}
+              </div>
+            ) : null}
+          </div>
+          <div className="correction-actions">
+            {automatic ? (
+              <button
+                className="correction-button primary"
+                disabled={noticeBusy}
+                onClick={() => void runNoticeAction(token, "reject")}
+              >
+                {t("overlay.autoUndo")}
+              </button>
+            ) : (
+              <>
+                <button
+                  className="correction-button primary"
+                  disabled={noticeBusy}
+                  onClick={() => void runNoticeAction(token, "accept")}
+                >
+                  {t("settings.dictionary.approve")}
+                </button>
+                <button
+                  className="correction-button"
+                  disabled={noticeBusy}
+                  onClick={() => void runNoticeAction(token, "reject")}
+                >
+                  {t("settings.dictionary.ignore")}
+                </button>
+              </>
+            )}
+            {pendingCount > 0 ? (
+              <button
+                className="correction-button next"
+                disabled={noticeBusy}
+                onClick={() => void runNoticeAction(token, "dismiss")}
+              >
+                {t("overlay.correctionNext")}
+              </button>
+            ) : (
+              <button
+                className="correction-button dismiss"
+                aria-label={t("secureInput.dismiss")}
+                disabled={noticeBusy}
+                onClick={() => void runNoticeAction(token, "dismiss")}
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

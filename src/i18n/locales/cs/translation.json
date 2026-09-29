@@ -3,6 +3,7 @@
     "settings": "Nastavení...",
     "checkUpdates": "Zkontrolovat aktualizace...",
     "copyLastTranscript": "Zkopírovat poslední přepis",
+    "correctLastTranscript": "Opravit poslední přepis...",
     "unloadModel": "Uvolnit model",
     "model": "Model",
     "quit": "Ukončit",
@@ -16,7 +17,8 @@
     "postProcessing": "Následné zpracování",
     "history": "Historie",
     "debug": "Ladění",
-    "about": "O aplikaci"
+    "about": "O aplikaci",
+    "dictionary": "Slovník"
   },
   "onboarding": {
     "subtitle": "Pro začátek vyberte model pro přepis",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Klávesa pro následné zpracování",
             "description": "Volitelné: Vyhrazená klávesová zkratka, která vždy použije AI následné zpracování na váš přepis."
+          },
+          "paste_last_transcript": {
+            "name": "Vložit poslední přepis",
+            "description": "Znovu vloží poslední přepis tam, kde je kurzor."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Odstranit výplňová slova",
         "description": "Odstraňuje běžná slova vyjadřující váhání z přepisů. Vypnutím je zachováte."
+      },
+      "dictionary": {
+        "toggleLabel": "Slovník",
+        "toggleDescription": "Automaticky se učit jasné fonetické shody s vaším známým slovníkem. Nejisté opravy před použitím zkontrolujte.",
+        "title": "Položky slovníku",
+        "description": "Automatické opravy se použijí v odpovídajícím kontextu. Vámi schválené opravy se použijí vždy.",
+        "wrongPlaceholder": "Špatně rozpoznáno",
+        "rightPlaceholder": "Správně",
+        "add": "Přidat",
+        "remove": "Odebrat {{wrong}} → {{right}}",
+        "duplicate": "Položka pro \"{{wrong}}\" již existuje",
+        "captureLabel": "Učit se z úprav (macOS)",
+        "captureDescription": "Poté, co Handy vloží text, krátce sleduje okolní text. Jasné shody se slovní zásobou, kterou jste Handy naučili, se automaticky uloží s možností vrácení; nejisté dvojice čekají na vaše schválení. Místně se ukládají pouze dvojice oprav a několik slov kontextu."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Přepsat znovu",
       "retranscribeError": "Opětovný přepis se nezdařil. Zkuste to prosím znovu.",
       "transcribing": "Přepisuji...",
-      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování."
+      "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování.",
+      "dictionary": {
+        "editTitle": "Opravit přepis",
+        "saveEdit": "Naučit se z opravy",
+        "cancelEdit": "Zrušit",
+        "nothingLearned": "Z této úpravy nevznikly žádné nové návrhy",
+        "added": "Navrženo: {{wrong}} → {{right}}",
+        "undo": "Ignorovat",
+        "alreadyKnown": "Již zkontrolováno nebo navrženo: {{wrong}} → {{right}}",
+        "autoAdded": "Naučeno: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Ladění",
@@ -636,6 +665,36 @@
         "label": "Zobrazovat novinky",
         "description": "Zobrazovat poznámky k vydání po aktualizacích Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Učení",
+      "entriesGroup": "Vaše opravy ({{count}})",
+      "search": "Hledat položky",
+      "empty": "Zatím nejsou žádné opravy. Naučte Handy slovo, zkontrolujte návrh nebo přidejte vlastní.",
+      "noMatch": "Žádné položky neodpovídají hledání",
+      "source": {
+        "manual": "Ručně",
+        "history": "Historie",
+        "capture": "Zachyceno"
+      },
+      "edit": "Upravit",
+      "save": "Uložit",
+      "cancel": "Zrušit",
+      "active": "Aktivní",
+      "seen": "viděno {{count}}×",
+      "addTitle": "Přidat opravu",
+      "suggestedGroup": "Navržené ({{count}})",
+      "suggestedDescription": "Tyto úpravy jsou méně jisté. Možnost „Vždy nahrazovat“ zvolte pouze tehdy, má-li se tato oprava použít pokaždé.",
+      "noSuggestions": "Žádné návrhy ke kontrole.",
+      "approve": "Vždy nahrazovat",
+      "ignore": "Ignorovat",
+      "ignoredGroup": "Ignorované ({{count}})",
+      "ignoredDescription": "Tyto dvojice zůstanou vypnuté a nebudou znovu navrhovány. Stále můžete zvolit „Vždy nahrazovat“.",
+      "actionError": "Slovník se nepodařilo aktualizovat. Zkuste to znovu.",
+      "review": "Zkontrolovat",
+      "automatic": "Automaticky",
+      "automaticHint": "Naučeno ze známé slovní zásoby. Použije se pouze v blízkosti odpovídajícího kontextu.",
+      "autoUndo": "Vrátit zpět"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "Přepisuji...",
-    "processing": "Zpracovávám..."
+    "autoLearned": "Naučeno: {{wrong}} → {{right}}",
+    "autoUndo": "Vrátit zpět",
+    "processing": "Zpracovávám...",
+    "learned": "Navrženo: {{wrong}} → {{right}}",
+    "undo": "Ignorovat",
+    "correctionQuestion": "Vždy nahrazovat {{wrong}} za {{right}}?",
+    "correctionNext": "Další",
+    "correctionRemaining": "Ještě {{count}}"
   },
   "whatsNew": {
     "title": "Novinky v Handy v{{version}}"

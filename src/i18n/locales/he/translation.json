@@ -3,6 +3,7 @@
     "settings": "הגדרות...",
     "checkUpdates": "בדוק עדכונים...",
     "copyLastTranscript": "העתק את התמלול האחרון",
+    "correctLastTranscript": "תקן את התמלול האחרון...",
     "unloadModel": "פרוק מודל",
     "model": "מודל",
     "quit": "יציאה",
@@ -16,7 +17,8 @@
     "postProcessing": "עיבוד משלים",
     "history": "היסטוריה",
     "debug": "ניפוי שגיאות",
-    "about": "אודות"
+    "about": "אודות",
+    "dictionary": "מילון"
   },
   "onboarding": {
     "subtitle": "כדי להתחיל, בחר מודל תמלול",
@@ -179,6 +181,10 @@
           "transcribe_with_post_process": {
             "name": "קיצור לעיבוד משלים",
             "description": "אופציונלי: קיצור מקשים ייעודי שתמיד מפעיל עיבוד AI על התמלול."
+          },
+          "paste_last_transcript": {
+            "name": "הדבק תמלול אחרון",
+            "description": "מדביק שוב את התמלול האחרון במקום שבו נמצא הסמן."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "הסרת מילות מילוי",
         "description": "מסיר מילות היסוס נפוצות מתמלולים. השבת כדי להשאיר אותן."
+      },
+      "dictionary": {
+        "toggleLabel": "מילון",
+        "toggleDescription": "למדו באופן אוטומטי התאמות צליל ברורות לאוצר המילים המוכר שלכם. בדקו תיקונים לא ודאיים לפני החלתם.",
+        "title": "רשומות במילון",
+        "description": "תיקונים אוטומטיים חלים בהקשר תואם. תיקונים שתאשרו יחולו בכל פעם.",
+        "wrongPlaceholder": "נשמע שגוי",
+        "rightPlaceholder": "נכון",
+        "add": "הוסף",
+        "remove": "הסר {{wrong}} → {{right}}",
+        "duplicate": "כבר קיימת רשומה עבור \"{{wrong}}\"",
+        "captureLabel": "למידה מעריכות (macOS)",
+        "captureDescription": "לאחר ש-Handy מדביק טקסט, הוא עוקב לזמן קצר אחר הטקסט הסמוך. התאמות ברורות לאוצר המילים שלימדתם את Handy נלמדות אוטומטית עם אפשרות ביטול; זוגות לא ודאיים ממתינים לאישורכם. רק זוגות תיקון ומילות הקשר ספורות נשמרים מקומית."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "תמלל מחדש",
       "retranscribeError": "תמלול מחדש נכשל. נסה שוב.",
       "transcribing": "מתמלל...",
-      "transcriptionFailed": "התמלול נכשל. אפשר לתמלל מחדש באמצעות אייקון הניסיון החוזר."
+      "transcriptionFailed": "התמלול נכשל. אפשר לתמלל מחדש באמצעות אייקון הניסיון החוזר.",
+      "dictionary": {
+        "editTitle": "תיקון התמלול",
+        "saveEdit": "למידה מהתיקון",
+        "cancelEdit": "ביטול",
+        "nothingLearned": "אין הצעות חדשות מהעריכה הזו",
+        "added": "הוצע: {{wrong}} → {{right}}",
+        "undo": "התעלם",
+        "alreadyKnown": "כבר נבדק או הוצע: {{wrong}} → {{right}}",
+        "autoAdded": "נלמד: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "ניפוי שגיאות",
@@ -636,6 +665,36 @@
         "label": "הצג מה חדש",
         "description": "הצג הערות גרסה לאחר עדכוני Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "למידה",
+      "entriesGroup": "התיקונים שלכם ({{count}})",
+      "search": "חיפוש ערכים",
+      "empty": "עדיין אין תיקונים. למדו את Handy מילה, בדקו הצעה או הוסיפו תיקון משלכם.",
+      "noMatch": "אין ערכים התואמים לחיפוש",
+      "source": {
+        "manual": "ידני",
+        "history": "היסטוריה",
+        "capture": "נלכד"
+      },
+      "edit": "עריכה",
+      "save": "שמירה",
+      "cancel": "ביטול",
+      "active": "פעיל",
+      "seen": "נראה {{count}}×",
+      "addTitle": "הוספת תיקון",
+      "suggestedGroup": "מוצעים ({{count}})",
+      "suggestedDescription": "העריכות האלה פחות ודאיות. בחרו „החלף תמיד” רק אם התיקון הזה צריך לחול בכל פעם.",
+      "noSuggestions": "אין הצעות לבדיקה.",
+      "approve": "החלף תמיד",
+      "ignore": "התעלם",
+      "ignoredGroup": "בהתעלמות ({{count}})",
+      "ignoredDescription": "זוגות אלה יישארו כבויים ולא יוצעו שוב. עדיין ניתן לבחור „החלף תמיד”.",
+      "actionError": "לא ניתן לעדכן את המילון. נסו שוב.",
+      "review": "בדיקה",
+      "automatic": "אוטומטי",
+      "automaticHint": "נלמד מאוצר מילים מוכר. חל רק ליד הקשר תואם.",
+      "autoUndo": "ביטול"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "מתמלל...",
-    "processing": "מעבד..."
+    "autoLearned": "נלמד: {{wrong}} → {{right}}",
+    "autoUndo": "ביטול",
+    "processing": "מעבד...",
+    "learned": "הוצע: {{wrong}} → {{right}}",
+    "undo": "התעלם",
+    "correctionQuestion": "להחליף תמיד את {{wrong}} ב-{{right}}?",
+    "correctionNext": "הבא",
+    "correctionRemaining": "עוד {{count}}"
   },
   "whatsNew": {
     "title": "חדש ב-Handy v{{version}}"

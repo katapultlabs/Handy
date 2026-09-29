@@ -3,6 +3,7 @@
     "settings": "Cài đặt...",
     "checkUpdates": "Kiểm tra cập nhật...",
     "copyLastTranscript": "Sao chép bản chép lời mới nhất",
+    "correctLastTranscript": "Sửa bản chép lời mới nhất...",
     "unloadModel": "Dỡ mô hình",
     "model": "Mô hình",
     "quit": "Thoát",
@@ -16,7 +17,8 @@
     "postProcessing": "Xử lý sau",
     "history": "Lịch sử",
     "debug": "Gỡ lỗi",
-    "about": "Giới thiệu"
+    "about": "Giới thiệu",
+    "dictionary": "Từ điển"
   },
   "onboarding": {
     "subtitle": "Để bắt đầu, hãy chọn một mô hình chuyển đổi giọng nói",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Phím tắt xử lý sau",
             "description": "Tùy chọn: Phím tắt chuyên dụng luôn áp dụng xử lý sau bằng AI cho bản chuyển đổi của bạn."
+          },
+          "paste_last_transcript": {
+            "name": "Dán bản ghi gần nhất",
+            "description": "Dán lại bản ghi gần nhất tại vị trí con trỏ."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Loại bỏ từ đệm",
         "description": "Loại bỏ các từ ngập ngừng phổ biến khỏi bản chép lời. Tắt để giữ lại các từ này."
+      },
+      "dictionary": {
+        "toggleLabel": "Từ điển",
+        "toggleDescription": "Tự động học các từ có cách phát âm gần giống rõ ràng với vốn từ đã biết của bạn. Xem lại các bản sửa chưa chắc chắn trước khi áp dụng.",
+        "title": "Mục từ điển",
+        "description": "Các bản sửa tự động được áp dụng trong ngữ cảnh phù hợp. Các bản sửa bạn phê duyệt sẽ được áp dụng mọi lần.",
+        "wrongPlaceholder": "Nghe nhầm",
+        "rightPlaceholder": "Đúng",
+        "add": "Thêm",
+        "remove": "Xóa {{wrong}} → {{right}}",
+        "duplicate": "Đã có mục cho \"{{wrong}}\"",
+        "captureLabel": "Học từ chỉnh sửa (macOS)",
+        "captureDescription": "Sau khi Handy dán văn bản, ứng dụng sẽ theo dõi nhanh phần văn bản lân cận. Các kết quả khớp rõ ràng với vốn từ bạn đã dạy Handy sẽ được tự động học kèm tùy chọn Hoàn tác; các cặp chưa chắc chắn sẽ chờ bạn phê duyệt. Chỉ các cặp sửa và một vài từ ngữ cảnh được lưu cục bộ."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Phiên âm lại",
       "retranscribeError": "Không thể phiên âm lại. Vui lòng thử lại.",
       "transcribing": "Đang phiên âm...",
-      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại."
+      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại.",
+      "dictionary": {
+        "editTitle": "Sửa bản chép lời",
+        "saveEdit": "Học từ bản sửa",
+        "cancelEdit": "Hủy",
+        "nothingLearned": "Không có đề xuất mới từ chỉnh sửa này",
+        "added": "Đã đề xuất: {{wrong}} → {{right}}",
+        "undo": "Bỏ qua",
+        "alreadyKnown": "Đã được xem xét hoặc đề xuất: {{wrong}} → {{right}}",
+        "autoAdded": "Đã học: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Gỡ lỗi",
@@ -636,6 +665,36 @@
         "label": "Hiển thị điểm mới",
         "description": "Hiển thị ghi chú phát hành sau khi Handy cập nhật"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Học",
+      "entriesGroup": "Bản sửa của bạn ({{count}})",
+      "search": "Tìm mục",
+      "empty": "Chưa có bản sửa nào. Hãy dạy Handy một từ, xem lại đề xuất hoặc tự thêm bản sửa.",
+      "noMatch": "Không có mục nào khớp với tìm kiếm",
+      "source": {
+        "manual": "Thủ công",
+        "history": "Lịch sử",
+        "capture": "Đã ghi nhận"
+      },
+      "edit": "Sửa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "active": "Đang bật",
+      "seen": "gặp {{count}}×",
+      "addTitle": "Thêm bản sửa",
+      "suggestedGroup": "Được đề xuất ({{count}})",
+      "suggestedDescription": "Các chỉnh sửa này ít chắc chắn hơn. Chỉ chọn “Luôn thay thế” nếu bản sửa này phải được áp dụng mọi lần.",
+      "noSuggestions": "Không có đề xuất nào để xem xét.",
+      "approve": "Luôn thay thế",
+      "ignore": "Bỏ qua",
+      "ignoredGroup": "Đã bỏ qua ({{count}})",
+      "ignoredDescription": "Các cặp này sẽ luôn tắt và không được đề xuất lại. Bạn vẫn có thể chọn “Luôn thay thế”.",
+      "actionError": "Không thể cập nhật Từ điển. Vui lòng thử lại.",
+      "review": "Xem xét",
+      "automatic": "Tự động",
+      "automaticHint": "Đã học từ vốn từ đã biết. Chỉ áp dụng gần ngữ cảnh phù hợp.",
+      "autoUndo": "Hoàn tác"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "Đang chuyển đổi...",
-    "processing": "Đang xử lý..."
+    "autoLearned": "Đã học: {{wrong}} → {{right}}",
+    "autoUndo": "Hoàn tác",
+    "processing": "Đang xử lý...",
+    "learned": "Đã đề xuất: {{wrong}} → {{right}}",
+    "undo": "Bỏ qua",
+    "correctionQuestion": "Luôn thay {{wrong}} bằng {{right}}?",
+    "correctionNext": "Tiếp",
+    "correctionRemaining": "Còn {{count}}"
   },
   "whatsNew": {
     "title": "Điểm mới trong Handy v{{version}}"

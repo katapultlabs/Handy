@@ -3,6 +3,7 @@
     "settings": "Impostazioni...",
     "checkUpdates": "Verifica aggiornamenti...",
     "copyLastTranscript": "Copia l'ultima trascrizione",
+    "correctLastTranscript": "Correggi l'ultima trascrizione...",
     "unloadModel": "Rilascia modello",
     "model": "Modello",
     "quit": "Esci",
@@ -16,7 +17,8 @@
     "postProcessing": "Post-Elaborazione",
     "history": "Cronologia",
     "debug": "Debug",
-    "about": "Informazioni"
+    "about": "Informazioni",
+    "dictionary": "Dizionario"
   },
   "onboarding": {
     "subtitle": "Per cominciare, scegli un modello di riconoscimento vocale",
@@ -199,6 +201,10 @@
           "transcribe_with_post_process": {
             "name": "Tasto di post-elaborazione",
             "description": "Facoltativo: Un tasto di scelta rapida dedicato che applica sempre la post-elaborazione IA alla trascrizione."
+          },
+          "paste_last_transcript": {
+            "name": "Incolla ultima trascrizione",
+            "description": "Incolla di nuovo la trascrizione più recente dove si trova il cursore."
           }
         },
         "errors": {
@@ -398,6 +404,19 @@
       "fillerWordRemoval": {
         "title": "Rimuovi le parole riempitive",
         "description": "Rimuove le parole di esitazione più comuni dalle trascrizioni. Disattiva per mantenerle."
+      },
+      "dictionary": {
+        "toggleLabel": "Dizionario",
+        "toggleDescription": "Impara automaticamente le corrispondenze fonetiche nette con il tuo vocabolario conosciuto. Esamina le correzioni incerte prima che vengano applicate.",
+        "title": "Voci del dizionario",
+        "description": "Le correzioni automatiche vengono applicate nel contesto corrispondente. Le correzioni che approvi vengono applicate ogni volta.",
+        "wrongPlaceholder": "Trascritto male",
+        "rightPlaceholder": "Corretto",
+        "add": "Aggiungi",
+        "remove": "Rimuovi {{wrong}} → {{right}}",
+        "duplicate": "Esiste già una voce per \"{{wrong}}\"",
+        "captureLabel": "Impara dalle modifiche (macOS)",
+        "captureDescription": "Dopo che Handy ha incollato il testo, osserva brevemente il testo nelle vicinanze. Le corrispondenze nette con il vocabolario che hai insegnato a Handy vengono apprese automaticamente con l'opzione Annulla; le coppie incerte attendono la tua approvazione. Solo le coppie di correzione e alcune parole di contesto vengono salvate localmente."
       }
     },
     "postProcessing": {
@@ -468,7 +487,17 @@
       "retranscribe": "Ri-trascrivere",
       "retranscribeError": "Impossibile ri-trascrivere. Riprova.",
       "transcribing": "Trascrizione in corso...",
-      "transcriptionFailed": "Trascrizione fallita. Puoi ri-trascrivere usando l'icona di ripetizione."
+      "transcriptionFailed": "Trascrizione fallita. Puoi ri-trascrivere usando l'icona di ripetizione.",
+      "dictionary": {
+        "editTitle": "Correggi trascrizione",
+        "saveEdit": "Impara dalla correzione",
+        "cancelEdit": "Annulla",
+        "nothingLearned": "Nessun nuovo suggerimento da questa modifica",
+        "added": "Suggerimento: {{wrong}} → {{right}}",
+        "undo": "Ignora",
+        "alreadyKnown": "Già esaminato o suggerito: {{wrong}} → {{right}}",
+        "autoAdded": "Appresa: {{wrong}} → {{right}}"
+      }
     },
     "debug": {
       "title": "Debug",
@@ -636,6 +665,36 @@
         "label": "Mostra novità",
         "description": "Mostra le note di rilascio dopo gli aggiornamenti di Handy"
       }
+    },
+    "dictionary": {
+      "learningGroup": "Apprendimento",
+      "entriesGroup": "Le tue correzioni ({{count}})",
+      "search": "Cerca voci",
+      "empty": "Non ci sono ancora correzioni. Insegna una parola a Handy, esamina un suggerimento o aggiungine una tua.",
+      "noMatch": "Nessuna voce corrisponde alla ricerca",
+      "source": {
+        "manual": "Manuale",
+        "history": "Cronologia",
+        "capture": "Acquisita"
+      },
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "active": "Attiva",
+      "seen": "vista {{count}}×",
+      "addTitle": "Aggiungi una correzione",
+      "suggestedGroup": "Suggerite ({{count}})",
+      "suggestedDescription": "Queste modifiche sono meno certe. Scegli «Sostituisci sempre» solo se questa correzione deve essere applicata ogni volta.",
+      "noSuggestions": "Nessun suggerimento da esaminare.",
+      "approve": "Sostituisci sempre",
+      "ignore": "Ignora",
+      "ignoredGroup": "Ignorate ({{count}})",
+      "ignoredDescription": "Queste coppie restano disattivate e non verranno suggerite di nuovo. Puoi comunque scegliere «Sostituisci sempre».",
+      "actionError": "Impossibile aggiornare il Dizionario. Riprova.",
+      "review": "Esamina",
+      "automatic": "Automatico",
+      "automaticHint": "Appresa dal vocabolario conosciuto. Si applica solo vicino a un contesto corrispondente.",
+      "autoUndo": "Annulla"
     }
   },
   "footer": {
@@ -699,7 +758,14 @@
   },
   "overlay": {
     "transcribing": "Trascrizione...",
-    "processing": "Elaborazione..."
+    "autoLearned": "Appresa: {{wrong}} → {{right}}",
+    "autoUndo": "Annulla",
+    "processing": "Elaborazione...",
+    "learned": "Suggerimento: {{wrong}} → {{right}}",
+    "undo": "Ignora",
+    "correctionQuestion": "Sostituire sempre {{wrong}} con {{right}}?",
+    "correctionNext": "Avanti",
+    "correctionRemaining": "{{count}} in più"
   },
   "whatsNew": {
     "title": "Novità in Handy v{{version}}"
