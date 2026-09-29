@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.7+dict.12. It is a test build on upstream Handy 0.9.7. It adds the Dictionary:
+This is Handy 0.9.7+katapult.1, the Katapult team release on upstream Handy 0.9.7. It adds the Dictionary:
 
 - Handy learns clear matches to vocabulary you have taught it automatically,
   with **Undo**. These rules apply only near matching context words.
@@ -150,9 +150,10 @@ Your settings and history stay.
 
 ## 8. Build it yourself (macOS, Apple Silicon)
 
-The source is on the `feat/dictionary-mvp` branch of
-https://github.com/katapultlabs/Handy. A build takes about 5 minutes
-after the first compile, and about 15 minutes the first time.
+The team release is the tag `v0.9.7+katapult.1` on `main` of
+https://github.com/katapultlabs/Handy. Work in progress is on the
+`feat/dictionary-mvp` branch. A build takes about 5 minutes after the
+first compile, and about 15 minutes the first time.
 
 1. Install the tools once:
 
@@ -168,7 +169,7 @@ after the first compile, and about 15 minutes the first time.
    ```bash
    git clone https://github.com/katapultlabs/Handy.git
    cd Handy
-   git checkout feat/dictionary-mvp
+   git checkout v0.9.7+katapult.1
    bun install
    mkdir -p src-tauri/resources/models
    curl -o src-tauri/resources/models/silero_vad_v4.onnx https://blob.handy.computer/silero_vad_v4.onnx
