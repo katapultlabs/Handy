@@ -5,7 +5,7 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.11. It is a test build. It adds the Dictionary:
+This is Handy 0.9.7+dict.12. It is a test build on upstream Handy 0.9.7. It adds the Dictionary:
 
 - Handy learns clear matches to vocabulary you have taught it automatically,
   with **Undo**. These rules apply only near matching context words.

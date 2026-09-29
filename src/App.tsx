@@ -72,6 +72,7 @@ function App() {
   );
   const refreshSettings = useSettingsStore((state) => state.refreshSettings);
   const hasCompletedPostOnboardingInit = useRef(false);
+  const settingsScrollRef = useRef<HTMLDivElement>(null);
   const isShowingOnboarding =
     onboardingPreview !== null ||
     onboardingStep === "accessibility" ||
@@ -85,6 +86,11 @@ function App() {
     document.documentElement.toggleAttribute(attribute, isShowingOnboarding);
     return () => document.documentElement.removeAttribute(attribute);
   }, [isShowingOnboarding]);
+
+  // Reset the scroll position whenever the active section changes.
+  useLayoutEffect(() => {
+    settingsScrollRef.current?.scrollTo({ top: 0 });
+  }, [currentSection]);
 
   useEffect(() => {
     checkOnboardingStatus();
@@ -386,7 +392,7 @@ function App() {
           />
           {/* Scrollable content area */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto">
+            <div ref={settingsScrollRef} className="flex-1 overflow-y-auto">
               <div className="flex flex-col items-center p-4 gap-4">
                 <AccessibilityPermissions />
                 <SecureInputWarning />
