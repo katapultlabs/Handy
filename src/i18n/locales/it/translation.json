@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Dizionario",
-        "toggleDescription": "Correzioni deterministiche: sostituisci parole o frasi esatte che il modello sbaglia. Impara dalle tue modifiche nella Cronologia.",
+        "toggleDescription": "Impara automaticamente le corrispondenze fonetiche nette con il tuo vocabolario conosciuto. Esamina le correzioni incerte prima che vengano applicate.",
         "title": "Voci del dizionario",
-        "description": "Ogni voce sostituisce il testo trascritto male con la tua correzione in ogni trascrizione.",
+        "description": "Le correzioni automatiche vengono applicate nel contesto corrispondente. Le correzioni che approvi vengono applicate ogni volta.",
         "wrongPlaceholder": "Trascritto male",
         "rightPlaceholder": "Corretto",
         "add": "Aggiungi",
         "remove": "Rimuovi {{wrong}} → {{right}}",
         "duplicate": "Esiste già una voce per \"{{wrong}}\"",
         "captureLabel": "Impara dalle modifiche (macOS)",
-        "captureDescription": "Dopo che Handy ha incollato il testo, osserva brevemente il testo vicino a quello incollato. Se correggi quel testo, la correzione viene aggiunta automaticamente al dizionario. Il testo letto rimane solo in memoria e non viene mai salvato né inviato da nessuna parte."
+        "captureDescription": "Dopo che Handy ha incollato il testo, osserva brevemente il testo nelle vicinanze. Le corrispondenze nette con il vocabolario che hai insegnato a Handy vengono apprese automaticamente con l'opzione Annulla; le coppie incerte attendono la tua approvazione. Solo le coppie di correzione e alcune parole di contesto vengono salvate localmente."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Trascrizione in corso...",
       "transcriptionFailed": "Trascrizione fallita. Puoi ri-trascrivere usando l'icona di ripetizione.",
       "dictionary": {
-        "editTitle": "Correggi la trascrizione (insegna al dizionario)",
+        "editTitle": "Correggi trascrizione",
         "saveEdit": "Impara dalla correzione",
         "cancelEdit": "Annulla",
-        "nothingLearned": "Nessuna correzione appresa da questa modifica",
-        "added": "Aggiunto al dizionario: {{wrong}} → {{right}}",
-        "undo": "Annulla",
-        "alreadyKnown": "Già nel dizionario: {{wrong}} → {{right}}"
+        "nothingLearned": "Nessun nuovo suggerimento da questa modifica",
+        "added": "Suggerimento: {{wrong}} → {{right}}",
+        "undo": "Ignora",
+        "alreadyKnown": "Già esaminato o suggerito: {{wrong}} → {{right}}",
+        "autoAdded": "Appresa: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Apprendimento",
-      "entriesGroup": "Voci ({{count}})",
+      "entriesGroup": "Le tue correzioni ({{count}})",
       "search": "Cerca voci",
-      "empty": "Nessuna voce ancora. Correggi una parola dove Handy l'ha incollata, o aggiungi una coppia sopra.",
+      "empty": "Non ci sono ancora correzioni. Insegna una parola a Handy, esamina un suggerimento o aggiungine una tua.",
       "noMatch": "Nessuna voce corrisponde alla ricerca",
       "source": {
         "manual": "Manuale",
@@ -679,7 +680,20 @@
       "save": "Salva",
       "cancel": "Annulla",
       "active": "Attiva",
-      "seen": "vista {{count}}×"
+      "seen": "vista {{count}}×",
+      "addTitle": "Aggiungi una correzione",
+      "suggestedGroup": "Suggerite ({{count}})",
+      "suggestedDescription": "Queste modifiche sono meno certe. Scegli «Sostituisci sempre» solo se questa correzione deve essere applicata ogni volta.",
+      "noSuggestions": "Nessun suggerimento da esaminare.",
+      "approve": "Sostituisci sempre",
+      "ignore": "Ignora",
+      "ignoredGroup": "Ignorate ({{count}})",
+      "ignoredDescription": "Queste coppie restano disattivate e non verranno suggerite di nuovo. Puoi comunque scegliere «Sostituisci sempre».",
+      "actionError": "Impossibile aggiornare il Dizionario. Riprova.",
+      "review": "Esamina",
+      "automatic": "Automatico",
+      "automaticHint": "Appresa dal vocabolario conosciuto. Si applica solo vicino a un contesto corrispondente.",
+      "autoUndo": "Annulla"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Trascrizione...",
+    "autoLearned": "Appresa: {{wrong}} → {{right}}",
+    "autoUndo": "Annulla",
     "processing": "Elaborazione...",
-    "learned": "Imparato: {{wrong}} → {{right}}",
-    "undo": "Annulla"
+    "learned": "Suggerimento: {{wrong}} → {{right}}",
+    "undo": "Ignora",
+    "correctionQuestion": "Sostituire sempre {{wrong}} con {{right}}?",
+    "correctionNext": "Avanti",
+    "correctionRemaining": "{{count}} in più"
   },
   "whatsNew": {
     "title": "Novità in Handy v{{version}}"

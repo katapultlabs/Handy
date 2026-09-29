@@ -1,22 +1,12 @@
-//! The Dictionary replaces misheard words with the user's corrections.
+//! Candidate extraction and matching primitives for Dictionary corrections.
 //!
-//! This is the MVP of the design in `docs/DICTIONARY_DESIGN.md`. It has two
-//! parts:
-//!
-//! - [`apply_dictionary`] is the exact matcher. It makes one pass. The
-//!   longest match wins. It never re-matches its own output. It inserts the
-//!   replacement as literal text, so `$` does not expand. It adds a word
-//!   boundary only where the pattern edge is alphanumeric, so `C++`, `.NET`,
-//!   and `@handle` match. Each entry selects its own case handling.
-//! - [`learn_pairs`] turns an (original, corrected) text pair into proposed
-//!   entries. A word-level diff finds the changes. Gates on run size, edit
-//!   distance, and Double Metaphone similarity keep only real corrections.
-//!   A misheard word sounds like its fix. A rewrite does not.
-//!
-//! MVP deviations from the design doc: entries live in settings, not SQLite.
-//! There is no proposed/active state machine. History-edit pairs are
-//! confirmed in the frontend. Capture-learned pairs apply immediately (see
-//! `dictionary_capture.rs`).
+//! [`learn_pairs`] uses a bounded word diff and spelling/phonetic gates to
+//! identify plausible corrections. Grammar edits and rewrites are filtered.
+//! [`crate::dictionary_learning`] adds stricter trust and context checks for
+//! automatic activation; uncertain candidates remain inactive suggestions.
+//! [`crate::dictionary_matcher`] compiles the active snapshot off the paste
+//! path and reuses the Unicode/casing primitives here. The test-only original
+//! matcher remains a reference for longest-first, literal, non-cascading output.
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -52,8 +42,8 @@ fn is_word_char(c: char) -> bool {
 }
 
 /// Case-insensitive haystack with a byte map back into the original text.
-struct FoldedText {
-    lower: String,
+pub(crate) struct FoldedText {
+    pub(crate) lower: String,
     /// For every byte of `lower`, the byte offset in the original text of the
     /// character it came from.
     map: Vec<usize>,
@@ -61,7 +51,7 @@ struct FoldedText {
 }
 
 impl FoldedText {
-    fn new(text: &str) -> Self {
+    pub(crate) fn new(text: &str) -> Self {
         let mut lower = String::with_capacity(text.len());
         let mut map = Vec::with_capacity(text.len());
         for (oi, ch) in text.char_indices() {
@@ -81,13 +71,13 @@ impl FoldedText {
     }
 
     /// Original byte offset of the character a `lower` byte belongs to.
-    fn orig_start(&self, lower_idx: usize) -> usize {
+    pub(crate) fn orig_start(&self, lower_idx: usize) -> usize {
         self.map[lower_idx]
     }
 
     /// Original byte offset just past the character the last `lower` byte of
     /// a match belongs to.
-    fn orig_end(&self, lower_end: usize, text: &str) -> usize {
+    pub(crate) fn orig_end(&self, lower_end: usize, text: &str) -> usize {
         if lower_end >= self.map.len() {
             return self.orig_len;
         }
@@ -103,7 +93,7 @@ impl FoldedText {
 
 /// True when the match at `[start, end)` (original byte offsets) sits on word
 /// boundaries where the pattern requires them.
-fn boundaries_ok(text: &str, start: usize, end: usize, wrong: &str) -> bool {
+pub(crate) fn boundaries_ok(text: &str, start: usize, end: usize, wrong: &str) -> bool {
     let first_needs = wrong.chars().next().map(is_word_char).unwrap_or(false);
     let last_needs = wrong.chars().last().map(is_word_char).unwrap_or(false);
 
@@ -127,7 +117,7 @@ fn boundaries_ok(text: &str, start: usize, end: usize, wrong: &str) -> bool {
 /// True when `start` (original byte offset) is at a sentence start: the
 /// beginning of the text, or preceded (ignoring whitespace) by `.`, `!`, `?`,
 /// `…`, or a line break.
-fn at_sentence_start(text: &str, start: usize) -> bool {
+pub(crate) fn at_sentence_start(text: &str, start: usize) -> bool {
     for c in text[..start].chars().rev() {
         if c == '\n' || c == '\r' {
             // A line break starts a new sentence.
@@ -181,7 +171,11 @@ fn capitalize_first(s: &str) -> String {
 }
 
 /// Render the replacement for one match.
-fn render_replacement(matched: &str, entry: &DictionaryEntry, sentence_start: bool) -> String {
+pub(crate) fn render_replacement(
+    matched: &str,
+    entry: &DictionaryEntry,
+    sentence_start: bool,
+) -> String {
     match entry.case_mode {
         CaseMode::Exact => {
             // Sentence-start capitalization applies only to an entirely
@@ -207,6 +201,7 @@ fn render_replacement(matched: &str, entry: &DictionaryEntry, sentence_start: bo
 /// The longest `wrong` wins on overlap. Spans that a replacement produced are
 /// never re-matched. Insertion is literal: no regex, no `$` expansion.
 /// Whitespace outside the matched spans is not changed.
+#[cfg(test)]
 pub fn apply_dictionary(text: &str, entries: &[DictionaryEntry]) -> String {
     if text.is_empty() || entries.is_empty() {
         return text.to_string();
@@ -356,6 +351,21 @@ fn alnum_tokens(s: &str) -> Vec<String> {
         .collect()
 }
 
+/// True when `shorter` can be made by removing one or more complete tokens
+/// from `longer` without changing the remaining tokens or their order.
+fn is_strict_token_subsequence(shorter: &[String], longer: &[String]) -> bool {
+    if shorter.len() >= longer.len() {
+        return false;
+    }
+    let mut next = 0;
+    for token in longer {
+        if shorter.get(next) == Some(token) {
+            next += 1;
+        }
+    }
+    next == shorter.len()
+}
+
 /// Decide whether one changed run is a learnable correction, and how.
 fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     let wrong = trim_edges(&run.wrong).trim();
@@ -392,6 +402,19 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     if (multi_word(wrong) || multi_word(right)) && alnum_tokens(wrong) == alnum_tokens(right) {
         return None;
     }
+    // 4. One side only adds or removes complete words. Punctuation can make
+    //    the word-level diff report this as a replacement instead of a pure
+    //    insertion/deletion ("sense again." -> "sense."). Compare the
+    //    normalized token structure so that cosmetic punctuation cannot mask
+    //    that shape. Genuine split/joined names remain eligible because their
+    //    token values differ ("char gebee" -> "ChargeBee").
+    let wrong_tokens = alnum_tokens(wrong);
+    let right_tokens = alnum_tokens(right);
+    if is_strict_token_subsequence(&wrong_tokens, &right_tokens)
+        || is_strict_token_subsequence(&right_tokens, &wrong_tokens)
+    {
+        return None;
+    }
 
     let case_only = wrong.to_lowercase() == right.to_lowercase();
     if case_only {
@@ -418,14 +441,18 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     // Sound similar: equal Double Metaphone keys, or keys one apart, are a
     // strong match. Badly misheard proper nouns can differ more. Example:
     // "Bededa" -> "Pereira" folds to PTT vs PRR. So a weak match, where the
-    // keys begin with the same sound, is also accepted. The edit-distance
-    // gate above already holds. Different first sounds ("meeting" -> "sync")
-    // stay rejected. When the phonetic algorithm does not cover the text
-    // (non-ASCII), the edit-distance gate stands alone.
+    // keys begin with the same sound, is also accepted for a right-hand side
+    // that carries named casing. That keeps the fallback focused on its
+    // purpose instead of turning ordinary lowercase wording preferences into
+    // global replacements. The edit-distance gate above already holds.
+    // Different first sounds ("meeting" -> "sync") stay rejected. When the
+    // phonetic algorithm does not cover the text (non-ASCII), the
+    // edit-distance gate stands alone.
     if let (Some(kw), Some(kr)) = (phonetic_key(&nw), phonetic_key(&nr)) {
         let close_keys = strsim::levenshtein(&kw, &kr) <= 1;
         let same_first_sound = kw.chars().next() == kr.chars().next();
-        if !close_keys && !same_first_sound {
+        let named_right = case_pattern(right) != CasePattern::AllLower;
+        if !close_keys && !(same_first_sound && named_right) {
             return None;
         }
     }
@@ -446,11 +473,11 @@ fn evaluate_run(run: &ChangedRun) -> Option<DictionaryEntry> {
     })
 }
 
-/// Extract proposed dictionary entries from an edit.
+/// Extract plausible dictionary candidates from an edit.
 ///
 /// `original` is the text Handy produced (what was pasted); `corrected` is the
-/// text after the user's edit. Returns deduplicated proposals; the caller
-/// (frontend) confirms them before they are stored.
+/// text after the user's edit. Returns deduplicated candidates; the confidence
+/// classifier and store decide between contextual automatic use and suggestion.
 pub fn learn_pairs(original: &str, corrected: &str) -> Vec<DictionaryEntry> {
     let mut out: Vec<DictionaryEntry> = Vec::new();
     for run in changed_runs(original, corrected) {
@@ -688,6 +715,14 @@ mod tests {
     }
 
     #[test]
+    fn learns_genuine_name_correction() {
+        let pairs = learn_pairs("we use Catapult here", "we use Katapult here");
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].wrong, "Catapult");
+        assert_eq!(pairs[0].right, "Katapult");
+    }
+
+    #[test]
     fn rejects_rewrite() {
         assert!(learn_pairs("the meeting went well", "our sync went well").is_empty());
         assert!(learn_pairs("that is good", "that is great").is_empty());
@@ -771,6 +806,23 @@ mod tests {
     fn rejects_pure_insertion_and_deletion() {
         assert!(learn_pairs("push the branch", "push the new branch").is_empty());
         assert!(learn_pairs("push the new branch", "push the branch").is_empty());
+    }
+
+    #[test]
+    fn rejects_pure_insertion_and_deletion_hidden_by_punctuation() {
+        assert!(learn_pairs("sense again.", "sense.").is_empty());
+        assert!(learn_pairs("sense.", "sense again.").is_empty());
+        assert!(learn_pairs("please sense again!", "please, sense!").is_empty());
+    }
+
+    #[test]
+    fn rejects_contextual_preference_rewrite() {
+        assert!(learn_pairs("enabled", "end-to-end").is_empty());
+        let pairs = learn_pairs(
+            "Keep enabled in this workflow",
+            "Keep end-to-end contextual preference in this workflow",
+        );
+        assert!(pairs.is_empty(), "got {pairs:?}");
     }
 
     #[test]

@@ -854,6 +854,9 @@ pub fn change_dictionary_enabled_setting(app: AppHandle, enabled: bool) -> Resul
     let mut settings = settings::get_settings(&app);
     settings.dictionary_enabled = enabled;
     settings::write_settings(&app, settings);
+    if !enabled {
+        crate::correction_notices::clear(&app);
+    }
     Ok(())
 }
 
@@ -1049,6 +1052,9 @@ pub fn change_experimental_enabled_setting(app: AppHandle, enabled: bool) -> Res
     let mut settings = settings::get_settings(&app);
     settings.experimental_enabled = enabled;
     settings::write_settings(&app, settings);
+    if !enabled {
+        crate::correction_notices::clear(&app);
+    }
     Ok(())
 }
 

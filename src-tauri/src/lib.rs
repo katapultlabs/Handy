@@ -8,8 +8,11 @@ mod catalog;
 pub mod cli;
 mod clipboard;
 mod commands;
+mod correction_notices;
 mod dictionary;
 mod dictionary_capture;
+mod dictionary_learning;
+mod dictionary_matcher;
 mod dictionary_store;
 mod helpers;
 mod input;
@@ -708,7 +711,14 @@ pub fn run(cli_args: CliArgs) {
             commands::dictionary::add_dictionary_entry,
             commands::dictionary::update_dictionary_entry,
             commands::dictionary::delete_dictionary_entry,
+            commands::dictionary::confirm_dictionary_entry,
+            commands::dictionary::reject_dictionary_entry,
             commands::dictionary::learn_dictionary_from_edit,
+            correction_notices::get_correction_notice,
+            correction_notices::acknowledge_correction_notice,
+            correction_notices::pause_correction_notice,
+            correction_notices::dismiss_correction_notice,
+            correction_notices::act_on_correction_notice,
             shortcut::suspend_all_bindings,
             shortcut::resume_all_bindings,
             shortcut::change_mute_while_recording_setting,
@@ -791,7 +801,6 @@ pub fn run(cli_args: CliArgs) {
             managers::history::HistoryUpdatePayload,
             managers::transcription::StreamTextEvent,
             managers::transcription::StreamPhaseEvent,
-            dictionary_capture::DictionaryLearnedEvent,
         ]);
 
     #[cfg(debug_assertions)] // <- Only export on non-release builds

@@ -351,7 +351,9 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   const hasTranscription = entry.transcription_text.trim().length > 0;
 
   // --- Dictionary: edit this entry and learn corrections from the edit ---
-  const dictionaryEnabled = getSetting("dictionary_enabled") || false;
+  const dictionaryEnabled = Boolean(
+    getSetting("experimental_enabled") && getSetting("dictionary_enabled"),
+  );
   // Diff against what Handy actually pasted (post-processed when it exists),
   // not the raw transcription — otherwise applied corrections re-learn.
   const pastedText = entry.post_processed_text ?? entry.transcription_text;
@@ -378,8 +380,8 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
     }
     try {
       // The backend diffs, applies the learn gates, and stores what passes.
-      // An edit made in Handy's own editor is a clear correction, so it
-      // needs no second confirmation. Undo removes the row by id.
+      // Clear matches to trusted vocabulary learn automatically; other pairs
+      // wait for approval in Dictionary.
       const result = await commands.learnDictionaryFromEdit(pastedText, draft);
       if (result.status !== "ok") {
         console.error("Failed to learn from edit:", result.error);
@@ -388,29 +390,6 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       const { added, known } = result.data;
       if (added.length === 0 && known.length === 0) {
         toast.info(t("settings.history.dictionary.nothingLearned"));
-        return;
-      }
-      for (const row of added) {
-        toast.success(
-          t("settings.history.dictionary.added", {
-            wrong: row.wrong,
-            right: row.right,
-          }),
-          {
-            action: {
-              label: t("settings.history.dictionary.undo"),
-              onClick: () => commands.deleteDictionaryEntry(row.id),
-            },
-          },
-        );
-      }
-      for (const row of known) {
-        toast.info(
-          t("settings.history.dictionary.alreadyKnown", {
-            wrong: row.wrong,
-            right: row.right,
-          }),
-        );
       }
     } catch (error) {
       console.error("Failed to learn from edit:", error);

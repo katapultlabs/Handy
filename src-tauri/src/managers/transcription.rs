@@ -1794,7 +1794,7 @@ fn post_process_transcription_text(
             if entries.is_empty() {
                 corrected
             } else {
-                crate::dictionary::apply_dictionary(&corrected, &entries)
+                entries.apply(&corrected)
             }
         } else {
             corrected

@@ -132,13 +132,14 @@ API keys are in a `SecretMap`. The settings store keeps them.
 
 ### 3.8 User interface (native side)
 
-| File                   | Lines | Function                                                                         |
-| ---------------------- | ----- | -------------------------------------------------------------------------------- |
-| `overlay.rs`           | 834   | Creates the overlay window. Platform-specific. On Linux it uses GTK layer shell. |
-| `tray.rs`              | 744   | Creates the tray icon and menu. `set_tray_state()` updates the icon.             |
-| `tray_i18n.rs`         | 82    | Translates the tray menu.                                                        |
-| `audio_feedback.rs`    | 142   | Plays start and stop sounds with `rodio`.                                        |
-| `helpers/clamshell.rs` | 86    | Detects a closed laptop lid. Switches the microphone.                            |
+| File                    | Lines | Function                                                                                                                                            |
+| ----------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `overlay.rs`            | 834   | Creates the overlay window. Platform-specific. On Linux it uses GTK layer shell.                                                                    |
+| `correction_notices.rs` | —     | Queues Dictionary decisions from capture and History. Coordinates render acknowledgement, reading time, inline actions, and recording interruption. |
+| `tray.rs`               | 744   | Creates the tray icon and menu. `set_tray_state()` updates the icon.                                                                                |
+| `tray_i18n.rs`          | 82    | Translates the tray menu.                                                                                                                           |
+| `audio_feedback.rs`     | 142   | Plays start and stop sounds with `rodio`.                                                                                                           |
+| `helpers/clamshell.rs`  | 86    | Detects a closed laptop lid. Switches the microphone.                                                                                               |
 
 ### 3.9 Settings and commands
 

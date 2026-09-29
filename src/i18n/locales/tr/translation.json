@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Sözlük",
-        "toggleDescription": "Kesin düzeltmeler: modelin yanlış algıladığı kelimeleri veya ifadeleri birebir değiştirin. Geçmiş'teki düzenlemelerinizden öğrenir.",
+        "toggleDescription": "Bilinen sözcük dağarcığınızdaki belirgin ses eşleşmelerini otomatik olarak öğrenin. Belirsiz düzeltmeleri uygulanmadan önce inceleyin.",
         "title": "Sözlük girdileri",
-        "description": "Her girdi, yanlış duyulan metni her transkripsiyonda sizin düzeltmenizle değiştirir.",
+        "description": "Otomatik düzeltmeler eşleşen bağlamda uygulanır. Onayladığınız düzeltmeler her seferinde uygulanır.",
         "wrongPlaceholder": "Yanlış duyulan",
         "rightPlaceholder": "Doğrusu",
         "add": "Ekle",
         "remove": "{{wrong}} → {{right}} kaydını kaldır",
         "duplicate": "\"{{wrong}}\" için bir girdi zaten var",
         "captureLabel": "Düzenlemelerden öğren (macOS)",
-        "captureDescription": "Handy metni yapıştırdıktan sonra, yapıştırdığı metnin çevresini kısa bir süre izler. O metni düzeltirseniz, düzeltme otomatik olarak sözlüğe eklenir. Okunan metin yalnızca bellekte kalır; hiçbir zaman saklanmaz veya hiçbir yere gönderilmez."
+        "captureDescription": "Handy metni yapıştırdıktan sonra çevredeki metni kısa süre izler. Handy'ye öğrettiğiniz sözcük dağarcığıyla belirgin eşleşmeler Geri Al seçeneğiyle otomatik olarak öğrenilir; belirsiz çiftler onayınızı bekler. Yalnızca düzeltme çiftleri ve birkaç bağlam sözcüğü yerel olarak kaydedilir."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transkribe ediliyor...",
       "transcriptionFailed": "Transkripsiyon başarısız oldu. Yeniden deneme simgesini kullanarak tekrar transkribe edebilirsiniz.",
       "dictionary": {
-        "editTitle": "Transkripsiyonu düzelt (sözlüğe öğretir)",
+        "editTitle": "Transkripsiyonu düzelt",
         "saveEdit": "Düzeltmeden öğren",
         "cancelEdit": "İptal",
-        "nothingLearned": "Bu düzenlemeden hiçbir düzeltme öğrenilmedi",
-        "added": "Sözlüğe eklendi: {{wrong}} → {{right}}",
-        "undo": "Geri al",
-        "alreadyKnown": "Zaten sözlükte: {{wrong}} → {{right}}"
+        "nothingLearned": "Bu düzenlemeden yeni bir öneri çıkmadı",
+        "added": "Önerildi: {{wrong}} → {{right}}",
+        "undo": "Yok say",
+        "alreadyKnown": "Zaten incelendi veya önerildi: {{wrong}} → {{right}}",
+        "autoAdded": "Öğrenildi: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Öğrenme",
-      "entriesGroup": "Girdiler ({{count}})",
+      "entriesGroup": "Düzeltmeleriniz ({{count}})",
       "search": "Girdilerde ara",
-      "empty": "Henüz girdi yok. Handy'nin yapıştırdığı yerde bir kelimeyi düzeltin veya yukarıya bir çift ekleyin.",
+      "empty": "Henüz düzeltme yok. Handy'ye bir sözcük öğretin, bir öneriyi inceleyin veya kendiniz ekleyin.",
       "noMatch": "Aramanızla eşleşen girdi yok",
       "source": {
         "manual": "Manuel",
@@ -679,7 +680,20 @@
       "save": "Kaydet",
       "cancel": "İptal",
       "active": "Etkin",
-      "seen": "{{count}}× görüldü"
+      "seen": "{{count}}× görüldü",
+      "addTitle": "Düzeltme ekle",
+      "suggestedGroup": "Önerilenler ({{count}})",
+      "suggestedDescription": "Bu düzenlemeler daha az kesindir. Bu düzeltme her seferinde uygulanmalıysa “Her zaman değiştir” seçeneğini belirleyin.",
+      "noSuggestions": "İncelenecek öneri yok.",
+      "approve": "Her zaman değiştir",
+      "ignore": "Yok say",
+      "ignoredGroup": "Yok sayılanlar ({{count}})",
+      "ignoredDescription": "Bu çiftler kapalı kalır ve yeniden önerilmez. Yine de “Her zaman değiştir” seçeneğini belirleyebilirsiniz.",
+      "actionError": "Sözlük güncellenemedi. Lütfen tekrar deneyin.",
+      "review": "İncele",
+      "automatic": "Otomatik",
+      "automaticHint": "Bilinen sözcük dağarcığından öğrenildi. Yalnızca eşleşen bağlamın yakınında uygulanır.",
+      "autoUndo": "Geri al"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Transkribe ediliyor...",
+    "autoLearned": "Öğrenildi: {{wrong}} → {{right}}",
+    "autoUndo": "Geri al",
     "processing": "İşleniyor...",
-    "learned": "Öğrenildi: {{wrong}} → {{right}}",
-    "undo": "Geri al"
+    "learned": "Önerildi: {{wrong}} → {{right}}",
+    "undo": "Yok say",
+    "correctionQuestion": "{{wrong}} her zaman {{right}} ile değiştirilsin mi?",
+    "correctionNext": "Sonraki",
+    "correctionRemaining": "{{count}} daha"
   },
   "whatsNew": {
     "title": "Handy v{{version}} yenilikleri"

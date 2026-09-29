@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "詞典",
-        "toggleDescription": "確定性修正：直接替換模型辨識錯誤的字詞或片語。會從你在歷史記錄中的編輯學習。",
+        "toggleDescription": "自動學習與已知詞彙發音高度相近的內容。套用不確定的修正前請先檢視。",
         "title": "詞典項目",
-        "description": "每個項目都會在所有轉錄中，將聽錯的文字替換為你的修正。",
+        "description": "自動修正會在相符的上下文中套用。你核准的修正則會每次套用。",
         "wrongPlaceholder": "聽錯的文字",
         "rightPlaceholder": "正確文字",
         "add": "新增",
         "remove": "刪除 {{wrong}} → {{right}}",
         "duplicate": "「{{wrong}}」的項目已存在",
-        "captureLabel": "從編輯中學習（macOS）",
-        "captureDescription": "Handy 貼上文字後，會短暫留意所貼上內容附近的文字。若你修正了那段文字，修正內容會自動加入詞典。讀取到的文字僅保留在記憶體中，絕不會儲存或傳送到任何地方。"
+        "captureLabel": "從編輯內容學習（macOS）",
+        "captureDescription": "Handy 貼上文字後，會短暫留意附近的文字。與你教給 Handy 的詞彙明確相符的內容會自動學習，並提供「復原」選項；不確定的配對則會等候你的核准。只有修正配對和少量上下文詞彙會儲存在本機。"
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "轉錄中...",
       "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。",
       "dictionary": {
-        "editTitle": "修正轉錄（用於訓練詞典）",
-        "saveEdit": "從修正中學習",
+        "editTitle": "修正轉錄",
+        "saveEdit": "從修正內容學習",
         "cancelEdit": "取消",
-        "nothingLearned": "本次編輯未學到任何修正",
-        "added": "已加入詞典：{{wrong}} → {{right}}",
-        "undo": "復原",
-        "alreadyKnown": "已在字典中：{{wrong}} → {{right}}"
+        "nothingLearned": "這次編輯沒有產生新的建議",
+        "added": "建議：{{wrong}} → {{right}}",
+        "undo": "忽略",
+        "alreadyKnown": "已檢視或建議：{{wrong}} → {{right}}",
+        "autoAdded": "已學習：{{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "學習",
-      "entriesGroup": "項目 ({{count}})",
+      "entriesGroup": "你的修正（{{count}}）",
       "search": "搜尋項目",
-      "empty": "尚無項目。在 Handy 貼上的位置修正一個字，或在上方新增一組。",
+      "empty": "尚無修正。請教 Handy 一個詞、檢視建議或自行新增修正。",
       "noMatch": "沒有符合搜尋的項目",
       "source": {
         "manual": "手動",
@@ -679,7 +680,20 @@
       "save": "儲存",
       "cancel": "取消",
       "active": "啟用",
-      "seen": "出現 {{count}} 次"
+      "seen": "出現 {{count}} 次",
+      "addTitle": "新增修正",
+      "suggestedGroup": "建議（{{count}}）",
+      "suggestedDescription": "這些編輯內容較不確定。只有在這項修正每次都應套用時，才選擇「一律取代」。",
+      "noSuggestions": "沒有待檢視的建議。",
+      "approve": "一律取代",
+      "ignore": "忽略",
+      "ignoredGroup": "已忽略（{{count}}）",
+      "ignoredDescription": "這些配對會保持停用，且不會再次建議。你仍可選擇「一律取代」。",
+      "actionError": "無法更新詞典。請再試一次。",
+      "review": "檢視",
+      "automatic": "自動",
+      "automaticHint": "從已知詞彙學習。只有在相符的上下文附近才會套用。",
+      "autoUndo": "復原"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "正在轉錄...",
+    "autoLearned": "已學習：{{wrong}} → {{right}}",
+    "autoUndo": "復原",
     "processing": "處理中...",
-    "learned": "已學習：{{wrong}} → {{right}}",
-    "undo": "復原"
+    "learned": "建議：{{wrong}} → {{right}}",
+    "undo": "忽略",
+    "correctionQuestion": "一律將 {{wrong}} 取代為 {{right}}？",
+    "correctionNext": "下一個",
+    "correctionRemaining": "還有 {{count}} 個"
   },
   "whatsNew": {
     "title": "Handy v{{version}} 新功能"

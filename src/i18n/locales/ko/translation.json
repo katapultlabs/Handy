@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "사전",
-        "toggleDescription": "결정적 교정: 모델이 잘못 인식하는 단어나 구를 그대로 교체합니다. 기록에서의 편집 내용을 학습합니다.",
+        "toggleDescription": "등록한 어휘와 소리가 매우 비슷한 표현을 자동으로 학습합니다. 확실하지 않은 교정은 적용 전에 검토하세요.",
         "title": "사전 항목",
-        "description": "각 항목은 모든 변환 결과에서 잘못 인식된 텍스트를 사용자의 교정으로 바꿉니다.",
+        "description": "자동 교정은 일치하는 문맥에서 적용됩니다. 승인한 교정은 항상 적용됩니다.",
         "wrongPlaceholder": "잘못 인식된 표현",
         "rightPlaceholder": "올바른 표현",
         "add": "추가",
         "remove": "{{wrong}} → {{right}} 제거",
         "duplicate": "\"{{wrong}}\"에 대한 항목이 이미 있습니다",
-        "captureLabel": "편집에서 학습 (macOS)",
-        "captureDescription": "Handy가 텍스트를 붙여넣은 뒤, 붙여넣은 위치 주변의 텍스트를 잠시 확인합니다. 해당 텍스트를 수정하면 그 수정 내용이 자동으로 사전에 추가됩니다. 읽어들인 텍스트는 메모리에만 남으며 저장되거나 어디로도 전송되지 않습니다."
+        "captureLabel": "편집 내용에서 학습 (macOS)",
+        "captureDescription": "Handy가 텍스트를 붙여넣은 뒤 주변 텍스트를 잠시 확인합니다. Handy에 등록한 어휘와 명확히 일치하는 내용은 실행 취소 옵션과 함께 자동으로 학습되며, 확실하지 않은 단어 쌍은 승인을 기다립니다. 교정 단어 쌍과 몇 개의 문맥 단어만 로컬에 저장됩니다."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "전사 중...",
       "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다.",
       "dictionary": {
-        "editTitle": "변환된 텍스트 교정 (사전을 학습시킵니다)",
-        "saveEdit": "교정 내용 학습",
+        "editTitle": "받아쓰기 교정",
+        "saveEdit": "교정 내용에서 학습",
         "cancelEdit": "취소",
-        "nothingLearned": "이 편집에서 학습한 교정 내용이 없습니다",
-        "added": "사전에 추가됨: {{wrong}} → {{right}}",
-        "undo": "실행 취소",
-        "alreadyKnown": "이미 사전에 있음: {{wrong}} → {{right}}"
+        "nothingLearned": "이 편집에서 나온 새 제안이 없습니다",
+        "added": "제안됨: {{wrong}} → {{right}}",
+        "undo": "무시",
+        "alreadyKnown": "이미 검토했거나 제안됨: {{wrong}} → {{right}}",
+        "autoAdded": "학습함: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "학습",
-      "entriesGroup": "항목 ({{count}})",
+      "entriesGroup": "내 교정 ({{count}})",
       "search": "항목 검색",
-      "empty": "아직 항목이 없습니다. Handy가 붙여넣은 곳에서 단어를 수정하거나 위에서 쌍을 추가하세요.",
+      "empty": "아직 교정이 없습니다. Handy에 단어를 등록하거나 제안을 검토하거나 직접 추가하세요.",
       "noMatch": "검색과 일치하는 항목이 없습니다",
       "source": {
         "manual": "수동",
@@ -679,7 +680,20 @@
       "save": "저장",
       "cancel": "취소",
       "active": "활성",
-      "seen": "{{count}}회 감지"
+      "seen": "{{count}}회 감지",
+      "addTitle": "교정 추가",
+      "suggestedGroup": "제안됨 ({{count}})",
+      "suggestedDescription": "이 편집 내용은 확실성이 낮습니다. 이 교정을 매번 적용해야 할 때만 ‘항상 바꾸기’를 선택하세요.",
+      "noSuggestions": "검토할 제안이 없습니다.",
+      "approve": "항상 바꾸기",
+      "ignore": "무시",
+      "ignoredGroup": "무시됨 ({{count}})",
+      "ignoredDescription": "이 단어 쌍은 비활성 상태로 유지되며 다시 제안되지 않습니다. 나중에 ‘항상 바꾸기’를 선택할 수도 있습니다.",
+      "actionError": "사전을 업데이트하지 못했습니다. 다시 시도해 주세요.",
+      "review": "검토",
+      "automatic": "자동",
+      "automaticHint": "등록된 어휘에서 학습했습니다. 일치하는 문맥 주변에서만 적용됩니다.",
+      "autoUndo": "실행 취소"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "텍스트로 변환 중...",
+    "autoLearned": "학습함: {{wrong}} → {{right}}",
+    "autoUndo": "실행 취소",
     "processing": "처리 중...",
-    "learned": "학습됨: {{wrong}} → {{right}}",
-    "undo": "실행 취소"
+    "learned": "제안됨: {{wrong}} → {{right}}",
+    "undo": "무시",
+    "correctionQuestion": "{{wrong}}을(를) 항상 {{right}}(으)로 바꿀까요?",
+    "correctionNext": "다음",
+    "correctionRemaining": "{{count}}개 더"
   },
   "whatsNew": {
     "title": "Handy v{{version}}의 새 소식"

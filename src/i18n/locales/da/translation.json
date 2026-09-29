@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Ordbog",
-        "toggleDescription": "Deterministiske rettelser: erstat præcise ord eller sætninger, som modellen hører forkert. Lærer af dine rettelser i Historik.",
+        "toggleDescription": "Lær automatisk tydelige lydmæssige match til dit kendte ordforråd. Gennemgå usikre rettelser, før de anvendes.",
         "title": "Ordbogsposter",
-        "description": "Hver post erstatter den fejlhørte tekst med din rettelse i alle transskriptioner.",
+        "description": "Automatiske rettelser anvendes i en matchende kontekst. Rettelser, du godkender, anvendes hver gang.",
         "wrongPlaceholder": "Hørt forkert",
         "rightPlaceholder": "Korrekt",
         "add": "Tilføj",
         "remove": "Fjern {{wrong}} → {{right}}",
         "duplicate": "Der findes allerede en post for \"{{wrong}}\"",
-        "captureLabel": "Lær af rettelser (macOS)",
-        "captureDescription": "Når Handy har indsat tekst, holder appen kortvarigt øje med teksten omkring det indsatte. Hvis du retter den tekst, føjes rettelsen automatisk til ordbogen. Den tekst, den læser, forbliver kun i hukommelsen og gemmes eller sendes aldrig nogen steder."
+        "captureLabel": "Lær af ændringer (macOS)",
+        "captureDescription": "Når Handy har indsat tekst, holder appen kort øje med tekst i nærheden. Tydelige match til ordforråd, du har lært Handy, læres automatisk med mulighed for at fortryde; usikre par venter på din godkendelse. Kun rettelsespar og nogle få kontekstord gemmes lokalt."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transskriberer...",
       "transcriptionFailed": "Transskription mislykkedes. Du kan transskribere igen ved hjælp af genforsøgsikonet.",
       "dictionary": {
-        "editTitle": "Ret transskription (lærer ordbogen op)",
+        "editTitle": "Ret transskription",
         "saveEdit": "Lær af rettelsen",
         "cancelEdit": "Annuller",
-        "nothingLearned": "Der blev ikke lært nogen rettelser af denne ændring",
-        "added": "Føjet til ordbogen: {{wrong}} → {{right}}",
-        "undo": "Fortryd",
-        "alreadyKnown": "Findes allerede i ordbogen: {{wrong}} → {{right}}"
+        "nothingLearned": "Ingen nye forslag fra denne ændring",
+        "added": "Foreslået: {{wrong}} → {{right}}",
+        "undo": "Ignorer",
+        "alreadyKnown": "Allerede gennemgået eller foreslået: {{wrong}} → {{right}}",
+        "autoAdded": "Lært: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Læring",
-      "entriesGroup": "Poster ({{count}})",
+      "entriesGroup": "Dine rettelser ({{count}})",
       "search": "Søg i poster",
-      "empty": "Ingen poster endnu. Ret et ord der, hvor Handy indsatte det, eller tilføj et par ovenfor.",
+      "empty": "Der er endnu ingen rettelser. Lær Handy et ord, gennemgå et forslag, eller tilføj din egen.",
       "noMatch": "Ingen poster matcher din søgning",
       "source": {
         "manual": "Manuel",
@@ -679,7 +680,20 @@
       "save": "Gem",
       "cancel": "Annuller",
       "active": "Aktiv",
-      "seen": "set {{count}}×"
+      "seen": "set {{count}}×",
+      "addTitle": "Tilføj en rettelse",
+      "suggestedGroup": "Foreslåede ({{count}})",
+      "suggestedDescription": "Disse ændringer er mindre sikre. Vælg kun »Erstat altid«, hvis denne rettelse skal anvendes hver gang.",
+      "noSuggestions": "Ingen forslag at gennemgå.",
+      "approve": "Erstat altid",
+      "ignore": "Ignorer",
+      "ignoredGroup": "Ignorerede ({{count}})",
+      "ignoredDescription": "Disse par forbliver deaktiveret og bliver ikke foreslået igen. Du kan stadig vælge »Erstat altid«.",
+      "actionError": "Ordbogen kunne ikke opdateres. Prøv igen.",
+      "review": "Gennemgå",
+      "automatic": "Automatisk",
+      "automaticHint": "Lært fra kendt ordforråd. Anvendes kun i nærheden af en matchende kontekst.",
+      "autoUndo": "Fortryd"
     }
   },
   "footer": {
@@ -746,9 +760,14 @@
   },
   "overlay": {
     "transcribing": "Transskriberer...",
+    "autoLearned": "Lært: {{wrong}} → {{right}}",
+    "autoUndo": "Fortryd",
     "processing": "Behandler...",
-    "learned": "Lært: {{wrong}} → {{right}}",
-    "undo": "Fortryd"
+    "learned": "Foreslået: {{wrong}} → {{right}}",
+    "undo": "Ignorer",
+    "correctionQuestion": "Erstat altid {{wrong}} med {{right}}?",
+    "correctionNext": "Næste",
+    "correctionRemaining": "{{count}} mere"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokerer muligvis 1 genvej",

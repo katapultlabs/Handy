@@ -360,6 +360,22 @@ async deleteDictionaryEntry(id: number) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async confirmDictionaryEntry(id: number) : Promise<Result<DictionaryRow, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("confirm_dictionary_entry", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async rejectDictionaryEntry(id: number) : Promise<Result<DictionaryRow, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("reject_dictionary_entry", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 /**
  * Diff the text Handy pasted against the user's edit (History screen),
  * then store what the learn gates accept.
@@ -367,6 +383,46 @@ async deleteDictionaryEntry(id: number) : Promise<Result<null, string>> {
 async learnDictionaryFromEdit(original: string, corrected: string) : Promise<Result<LearnReport, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("learn_dictionary_from_edit", { original, corrected }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getCorrectionNotice() : Promise<Result<CorrectionNoticeSnapshot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_correction_notice") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async acknowledgeCorrectionNotice(token: number) : Promise<Result<CorrectionNoticeSnapshot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("acknowledge_correction_notice", { token }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async pauseCorrectionNotice(token: number, paused: boolean) : Promise<Result<CorrectionNoticeSnapshot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("pause_correction_notice", { token, paused }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async dismissCorrectionNotice(token: number) : Promise<Result<CorrectionNoticeSnapshot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("dismiss_correction_notice", { token }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async actOnCorrectionNotice(token: number, action: CorrectionNoticeAction) : Promise<Result<CorrectionNoticeSnapshot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("act_on_correction_notice", { token, action }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -987,12 +1043,10 @@ async isLaptop() : Promise<Result<boolean, string>> {
 
 
 export const events = __makeEvents__<{
-dictionaryLearnedEvent: DictionaryLearnedEvent,
 historyUpdatePayload: HistoryUpdatePayload,
 streamPhaseEvent: StreamPhaseEvent,
 streamTextEvent: StreamTextEvent
 }>({
-dictionaryLearnedEvent: "dictionary-learned-event",
 historyUpdatePayload: "history-update-payload",
 streamPhaseEvent: "stream-phase-event",
 streamTextEvent: "stream-text-event"
@@ -1096,6 +1150,9 @@ export type CaseMode =
  */
 "exact"
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
+export type CorrectionNotice = { token: number; entry: DictionaryRow; remaining_ms: number; pending_count: number; busy: boolean }
+export type CorrectionNoticeAction = "accept" | "reject"
+export type CorrectionNoticeSnapshot = { revision: number; recording: boolean; notice: CorrectionNotice | null }
 export type CustomSounds = { start: boolean; stop: boolean }
 /**
  * One correction: replace `wrong` with `right`.
@@ -1105,11 +1162,6 @@ export type DictionaryEntry = { wrong: string; right: string; case_mode: CaseMod
  * Where the entry came from: "manual" or "history".
  */
 source: string }
-export type DictionaryLearnedEvent = { 
-/**
- * Rows the capture created. Each carries its id so Undo can delete it.
- */
-entries: DictionaryRow[] }
 /**
  * One row of the `dictionary` table, as the frontend sees it.
  */
@@ -1121,7 +1173,15 @@ source: string;
 /**
  * "active", "proposed", or "rejected".
  */
-state: string; enabled: boolean; seen_count: number; created_at: number; updated_at: number }
+state: string; enabled: boolean; 
+/**
+ * True only while this row is governed by automatic-learning safeguards.
+ */
+auto_learned: boolean; 
+/**
+ * Local context guard for an automatically active row.
+ */
+context_words: string[]; seen_count: number; created_at: number; updated_at: number }
 export type EngineType = 
 /**
  * Any GGML/GGUF model loaded through transcribe-cpp (Whisper, Parakeet,

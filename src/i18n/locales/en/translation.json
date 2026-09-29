@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Dictionary",
-        "toggleDescription": "Deterministic corrections: replace exact words or phrases the model gets wrong. Learns from your edits in History.",
+        "toggleDescription": "Learn close matches to your known vocabulary automatically. Review uncertain corrections before they apply.",
         "title": "Dictionary entries",
-        "description": "Each entry replaces the misheard text with your correction in every transcription.",
+        "description": "Automatic corrections apply in matching context. Corrections you approve apply every time.",
         "wrongPlaceholder": "Misheard",
         "rightPlaceholder": "Correct",
         "add": "Add",
         "remove": "Remove {{wrong}} → {{right}}",
         "duplicate": "An entry for \"{{wrong}}\" already exists",
         "captureLabel": "Learn from edits (macOS)",
-        "captureDescription": "After Handy pastes, it briefly watches the text near what it pasted. If you correct that text, the fix is added to the Dictionary automatically. The text it reads stays in memory only and is never stored or sent anywhere."
+        "captureDescription": "After Handy pastes, it briefly watches nearby text. Clear matches to vocabulary you taught Handy are learned automatically with Undo; uncertain pairs wait for your approval. Only correction pairs and a few context words are stored locally."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transcribing...",
       "transcriptionFailed": "Transcription failed. You can re-transcribe using the retry icon.",
       "dictionary": {
-        "editTitle": "Correct transcription (teaches the Dictionary)",
+        "editTitle": "Correct transcription",
         "saveEdit": "Learn from correction",
         "cancelEdit": "Cancel",
-        "nothingLearned": "No corrections learned from this edit",
-        "added": "Added to Dictionary: {{wrong}} → {{right}}",
-        "undo": "Undo",
-        "alreadyKnown": "Already in the Dictionary: {{wrong}} → {{right}}"
+        "nothingLearned": "No new suggestions from this edit",
+        "added": "Suggested: {{wrong}} → {{right}}",
+        "undo": "Ignore",
+        "alreadyKnown": "Already reviewed or suggested: {{wrong}} → {{right}}",
+        "autoAdded": "Learned: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Learning",
-      "entriesGroup": "Entries ({{count}})",
+      "entriesGroup": "Your corrections ({{count}})",
       "search": "Search entries",
-      "empty": "No entries yet. Correct a word where Handy pasted it, or add a pair above.",
+      "empty": "No corrections yet. Teach Handy a word, review a suggestion, or add your own.",
       "noMatch": "No entries match your search",
       "source": {
         "manual": "Manual",
@@ -679,7 +680,20 @@
       "save": "Save",
       "cancel": "Cancel",
       "active": "Active",
-      "seen": "seen {{count}}×"
+      "seen": "seen {{count}}×",
+      "addTitle": "Add a correction",
+      "suggestedGroup": "Suggested ({{count}})",
+      "suggestedDescription": "These edits are less certain. Choose Always replace only if this correction should apply every time.",
+      "noSuggestions": "No suggestions to review.",
+      "approve": "Always replace",
+      "ignore": "Ignore",
+      "ignoredGroup": "Ignored ({{count}})",
+      "ignoredDescription": "These pairs stay off and will not be suggested again. You can still choose Always replace.",
+      "actionError": "Could not update the Dictionary. Please try again.",
+      "review": "Review",
+      "automatic": "Automatic",
+      "automaticHint": "Learned from known vocabulary. Applies only near matching context.",
+      "autoUndo": "Undo"
     }
   },
   "footer": {
@@ -747,8 +761,13 @@
   "overlay": {
     "transcribing": "Transcribing...",
     "processing": "Processing...",
-    "learned": "Learned: {{wrong}} → {{right}}",
-    "undo": "Undo"
+    "correctionQuestion": "Always replace {{wrong}} with {{right}}?",
+    "correctionNext": "Next",
+    "correctionRemaining": "{{count}} more",
+    "learned": "Suggested: {{wrong}} → {{right}}",
+    "undo": "Ignore",
+    "autoLearned": "Learned: {{wrong}} → {{right}}",
+    "autoUndo": "Undo"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} may be blocking 1 shortcut",

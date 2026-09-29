@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Diccionari",
-        "toggleDescription": "Correccions deterministes: substitueix paraules o frases exactes que el model interpreta malament. Aprèn de les teves edicions a l'Historial.",
+        "toggleDescription": "Aprèn automàticament coincidències fonètiques clares amb el teu vocabulari conegut. Revisa les correccions incertes abans que s'apliquin.",
         "title": "Entrades del diccionari",
-        "description": "Cada entrada substitueix el text mal interpretat per la teva correcció a totes les transcripcions.",
+        "description": "Les correccions automàtiques s'apliquen quan el context coincideix. Les correccions que aprovis s'apliquen sempre.",
         "wrongPlaceholder": "Mal interpretat",
         "rightPlaceholder": "Correcte",
         "add": "Afegeix",
         "remove": "Elimina {{wrong}} → {{right}}",
         "duplicate": "Ja existeix una entrada per a \"{{wrong}}\"",
         "captureLabel": "Aprèn de les edicions (macOS)",
-        "captureDescription": "Després d'enganxar, Handy observa breument el text prop del que ha enganxat. Si corregeixes aquest text, la correcció s'afegeix automàticament al Diccionari. El text llegit només es manté en memòria i mai no s'emmagatzema ni s'envia enlloc."
+        "captureDescription": "Després que Handy enganxi el text, observa breument el text proper. Les coincidències clares amb el vocabulari que has ensenyat a Handy s'aprenen automàticament amb l'opció de desfer; les parelles incertes esperen la teva aprovació. Només es desen localment les parelles de correcció i unes quantes paraules de context."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "S'està transcrivint...",
       "transcriptionFailed": "La transcripció ha fallat. Podeu tornar a transcriure amb la icona de reintent.",
       "dictionary": {
-        "editTitle": "Corregeix la transcripció (ensenya el Diccionari)",
+        "editTitle": "Corregeix la transcripció",
         "saveEdit": "Aprèn de la correcció",
         "cancelEdit": "Cancel·la",
-        "nothingLearned": "No s'ha après cap correcció d'aquesta edició",
-        "added": "Afegit al Diccionari: {{wrong}} → {{right}}",
-        "undo": "Desfés",
-        "alreadyKnown": "Ja és al Diccionari: {{wrong}} → {{right}}"
+        "nothingLearned": "Aquesta edició no ha generat suggeriments nous",
+        "added": "Suggeriment: {{wrong}} → {{right}}",
+        "undo": "Ignora",
+        "alreadyKnown": "Ja s'ha revisat o suggerit: {{wrong}} → {{right}}",
+        "autoAdded": "Apresa: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Aprenentatge",
-      "entriesGroup": "Entrades ({{count}})",
+      "entriesGroup": "Les teves correccions ({{count}})",
       "search": "Cerca entrades",
-      "empty": "Encara no hi ha entrades. Corregeix una paraula on Handy l'ha enganxat, o afegeix un parell a dalt.",
+      "empty": "Encara no hi ha correccions. Ensenya una paraula a Handy, revisa un suggeriment o afegeix-ne una.",
       "noMatch": "Cap entrada coincideix amb la cerca",
       "source": {
         "manual": "Manual",
@@ -679,7 +680,20 @@
       "save": "Desa",
       "cancel": "Cancel·la",
       "active": "Actiu",
-      "seen": "vist {{count}}×"
+      "seen": "vist {{count}}×",
+      "addTitle": "Afegeix una correcció",
+      "suggestedGroup": "Suggerides ({{count}})",
+      "suggestedDescription": "Aquestes edicions són menys segures. Tria «Substitueix sempre» només si aquesta correcció s'ha d'aplicar cada vegada.",
+      "noSuggestions": "No hi ha suggeriments per revisar.",
+      "approve": "Substitueix sempre",
+      "ignore": "Ignora",
+      "ignoredGroup": "Ignorades ({{count}})",
+      "ignoredDescription": "Aquestes parelles es mantenen desactivades i no es tornaran a suggerir. Encara pots triar «Substitueix sempre».",
+      "actionError": "No s'ha pogut actualitzar el Diccionari. Torna-ho a provar.",
+      "review": "Revisa",
+      "automatic": "Automàtic",
+      "automaticHint": "Apresa del vocabulari conegut. Només s'aplica a prop d'un context coincident.",
+      "autoUndo": "Desfés"
     }
   },
   "footer": {
@@ -746,9 +760,14 @@
   },
   "overlay": {
     "transcribing": "S'està transcrivint...",
+    "autoLearned": "Apresa: {{wrong}} → {{right}}",
+    "autoUndo": "Desfés",
     "processing": "S'està processant...",
-    "learned": "Après: {{wrong}} → {{right}}",
-    "undo": "Desfés"
+    "learned": "Suggeriment: {{wrong}} → {{right}}",
+    "undo": "Ignora",
+    "correctionQuestion": "Vols substituir sempre {{wrong}} per {{right}}?",
+    "correctionNext": "Següent",
+    "correctionRemaining": "{{count}} més"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} pot estar blocant 1 drecera",

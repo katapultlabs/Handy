@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Dictionnaire",
-        "toggleDescription": "Corrections déterministes : remplacez les mots ou expressions exacts que le modèle transcrit mal. Apprend de vos modifications dans l'Historique.",
+        "toggleDescription": "Apprenez automatiquement les correspondances phonétiques nettes avec votre vocabulaire connu. Examinez les corrections incertaines avant leur application.",
         "title": "Entrées du dictionnaire",
-        "description": "Chaque entrée remplace le texte mal entendu par votre correction dans toutes les transcriptions.",
+        "description": "Les corrections automatiques s'appliquent dans un contexte correspondant. Les corrections que vous approuvez s'appliquent à chaque fois.",
         "wrongPlaceholder": "Mal entendu",
         "rightPlaceholder": "Correct",
         "add": "Ajouter",
         "remove": "Supprimer {{wrong}} → {{right}}",
         "duplicate": "Une entrée pour \"{{wrong}}\" existe déjà",
         "captureLabel": "Apprendre des modifications (macOS)",
-        "captureDescription": "Après que Handy a collé le texte, il surveille brièvement le texte à proximité de ce qu'il a collé. Si vous corrigez ce texte, la correction est ajoutée automatiquement au dictionnaire. Le texte lu reste uniquement en mémoire et n'est jamais enregistré ni envoyé où que ce soit."
+        "captureDescription": "Après que Handy a collé le texte, il observe brièvement le texte à proximité. Les correspondances nettes avec le vocabulaire que vous avez appris à Handy sont mémorisées automatiquement avec une option d'annulation ; les paires incertaines attendent votre approbation. Seules les paires de correction et quelques mots de contexte sont enregistrés localement."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transcription en cours...",
       "transcriptionFailed": "La transcription a échoué. Vous pouvez re-transcrire en utilisant l'icône de réessai.",
       "dictionary": {
-        "editTitle": "Corriger la transcription (enrichit le dictionnaire)",
+        "editTitle": "Corriger la transcription",
         "saveEdit": "Apprendre de la correction",
         "cancelEdit": "Annuler",
-        "nothingLearned": "Aucune correction n'a été apprise à partir de cette modification",
-        "added": "Ajouté au dictionnaire : {{wrong}} → {{right}}",
-        "undo": "Annuler",
-        "alreadyKnown": "Déjà dans le dictionnaire : {{wrong}} → {{right}}"
+        "nothingLearned": "Aucune nouvelle suggestion issue de cette modification",
+        "added": "Suggestion : {{wrong}} → {{right}}",
+        "undo": "Ignorer",
+        "alreadyKnown": "Déjà examinée ou suggérée : {{wrong}} → {{right}}",
+        "autoAdded": "Appris : {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Apprentissage",
-      "entriesGroup": "Entrées ({{count}})",
+      "entriesGroup": "Vos corrections ({{count}})",
       "search": "Rechercher des entrées",
-      "empty": "Aucune entrée pour l'instant. Corrigez un mot là où Handy l'a collé, ou ajoutez une paire ci-dessus.",
+      "empty": "Aucune correction pour le moment. Apprenez un mot à Handy, examinez une suggestion ou ajoutez la vôtre.",
       "noMatch": "Aucune entrée ne correspond à votre recherche",
       "source": {
         "manual": "Manuel",
@@ -679,7 +680,20 @@
       "save": "Enregistrer",
       "cancel": "Annuler",
       "active": "Active",
-      "seen": "vu {{count}}×"
+      "seen": "vu {{count}}×",
+      "addTitle": "Ajouter une correction",
+      "suggestedGroup": "Suggérées ({{count}})",
+      "suggestedDescription": "Ces modifications sont moins certaines. Choisissez « Toujours remplacer » uniquement si cette correction doit s'appliquer à chaque fois.",
+      "noSuggestions": "Aucune suggestion à examiner.",
+      "approve": "Toujours remplacer",
+      "ignore": "Ignorer",
+      "ignoredGroup": "Ignorées ({{count}})",
+      "ignoredDescription": "Ces paires restent désactivées et ne seront plus suggérées. Vous pouvez toujours choisir « Toujours remplacer ».",
+      "actionError": "Impossible de mettre à jour le Dictionnaire. Veuillez réessayer.",
+      "review": "Examiner",
+      "automatic": "Automatique",
+      "automaticHint": "Apprise à partir du vocabulaire connu. S'applique uniquement à proximité d'un contexte correspondant.",
+      "autoUndo": "Annuler"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Transcription...",
+    "autoLearned": "Appris : {{wrong}} → {{right}}",
+    "autoUndo": "Annuler",
     "processing": "Traitement...",
-    "learned": "Appris : {{wrong}} → {{right}}",
-    "undo": "Annuler"
+    "learned": "Suggestion : {{wrong}} → {{right}}",
+    "undo": "Ignorer",
+    "correctionQuestion": "Toujours remplacer {{wrong}} par {{right}} ?",
+    "correctionNext": "Suivant",
+    "correctionRemaining": "{{count}} de plus"
   },
   "whatsNew": {
     "title": "Nouveautés de Handy v{{version}}"

@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Dicionário",
-        "toggleDescription": "Correções determinísticas: substitua palavras ou frases exatas que o modelo erra. Aprende com suas edições no Histórico.",
+        "toggleDescription": "Aprenda automaticamente correspondências fonéticas claras com seu vocabulário conhecido. Analise as correções incertas antes que sejam aplicadas.",
         "title": "Entradas do dicionário",
-        "description": "Cada entrada substitui o texto ouvido incorretamente pela sua correção em todas as transcrições.",
+        "description": "As correções automáticas são aplicadas em um contexto correspondente. As correções que você aprovar são aplicadas sempre.",
         "wrongPlaceholder": "Ouvido errado",
         "rightPlaceholder": "Correto",
         "add": "Adicionar",
         "remove": "Remover {{wrong}} → {{right}}",
         "duplicate": "Já existe uma entrada para \"{{wrong}}\"",
         "captureLabel": "Aprender com edições (macOS)",
-        "captureDescription": "Depois que o Handy cola o texto, ele observa brevemente o texto próximo ao que foi colado. Se você corrigir esse texto, a correção é adicionada automaticamente ao dicionário. O texto lido permanece apenas na memória e nunca é armazenado nem enviado a lugar algum."
+        "captureDescription": "Depois que o Handy cola o texto, ele observa brevemente o texto próximo. Correspondências claras com o vocabulário que você ensinou ao Handy são aprendidas automaticamente com a opção de desfazer; pares incertos aguardam sua aprovação. Somente os pares de correção e algumas palavras de contexto são salvos localmente."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transcrevendo...",
       "transcriptionFailed": "A transcrição falhou. Você pode re-transcrever usando o ícone de tentar novamente.",
       "dictionary": {
-        "editTitle": "Corrigir transcrição (ensina o dicionário)",
+        "editTitle": "Corrigir transcrição",
         "saveEdit": "Aprender com a correção",
         "cancelEdit": "Cancelar",
-        "nothingLearned": "Nenhuma correção aprendida com esta edição",
-        "added": "Adicionado ao dicionário: {{wrong}} → {{right}}",
-        "undo": "Desfazer",
-        "alreadyKnown": "Já está no dicionário: {{wrong}} → {{right}}"
+        "nothingLearned": "Nenhuma nova sugestão desta edição",
+        "added": "Sugerido: {{wrong}} → {{right}}",
+        "undo": "Ignorar",
+        "alreadyKnown": "Já analisado ou sugerido: {{wrong}} → {{right}}",
+        "autoAdded": "Aprendida: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Aprendizado",
-      "entriesGroup": "Entradas ({{count}})",
+      "entriesGroup": "Suas correções ({{count}})",
       "search": "Pesquisar entradas",
-      "empty": "Ainda não há entradas. Corrija uma palavra onde o Handy a colou, ou adicione um par acima.",
+      "empty": "Ainda não há correções. Ensine uma palavra ao Handy, analise uma sugestão ou adicione a sua.",
       "noMatch": "Nenhuma entrada corresponde à sua pesquisa",
       "source": {
         "manual": "Manual",
@@ -679,7 +680,20 @@
       "save": "Salvar",
       "cancel": "Cancelar",
       "active": "Ativa",
-      "seen": "vista {{count}}×"
+      "seen": "vista {{count}}×",
+      "addTitle": "Adicionar uma correção",
+      "suggestedGroup": "Sugeridas ({{count}})",
+      "suggestedDescription": "Essas edições são menos certas. Escolha “Sempre substituir” somente se essa correção deve ser aplicada todas as vezes.",
+      "noSuggestions": "Nenhuma sugestão para analisar.",
+      "approve": "Sempre substituir",
+      "ignore": "Ignorar",
+      "ignoredGroup": "Ignoradas ({{count}})",
+      "ignoredDescription": "Esses pares permanecem desativados e não serão sugeridos novamente. Você ainda pode escolher “Sempre substituir”.",
+      "actionError": "Não foi possível atualizar o Dicionário. Tente novamente.",
+      "review": "Analisar",
+      "automatic": "Automático",
+      "automaticHint": "Aprendida com o vocabulário conhecido. Aplicada somente perto de um contexto correspondente.",
+      "autoUndo": "Desfazer"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Transcrevendo...",
+    "autoLearned": "Aprendida: {{wrong}} → {{right}}",
+    "autoUndo": "Desfazer",
     "processing": "Processando...",
-    "learned": "Aprendido: {{wrong}} → {{right}}",
-    "undo": "Desfazer"
+    "learned": "Sugerido: {{wrong}} → {{right}}",
+    "undo": "Ignorar",
+    "correctionQuestion": "Substituir sempre {{wrong}} por {{right}}?",
+    "correctionNext": "Próximo",
+    "correctionRemaining": "Mais {{count}}"
   },
   "whatsNew": {
     "title": "Novidades no Handy v{{version}}"

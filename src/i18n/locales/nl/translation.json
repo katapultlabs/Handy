@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Woordenboek",
-        "toggleDescription": "Deterministische correcties: vervang exacte woorden of zinnen die het model verkeerd verstaat. Leert van je bewerkingen in Geschiedenis.",
+        "toggleDescription": "Leer duidelijke klankovereenkomsten met je bekende woordenschat automatisch. Beoordeel onzekere correcties voordat ze worden toegepast.",
         "title": "Woordenboekvermeldingen",
-        "description": "Elke vermelding vervangt de verkeerd verstane tekst door jouw correctie in elke transcriptie.",
+        "description": "Automatische correcties worden in een overeenkomende context toegepast. Correcties die je goedkeurt, worden altijd toegepast.",
         "wrongPlaceholder": "Verkeerd verstaan",
         "rightPlaceholder": "Correct",
         "add": "Toevoegen",
         "remove": "{{wrong}} → {{right}} verwijderen",
         "duplicate": "Er bestaat al een vermelding voor \"{{wrong}}\"",
         "captureLabel": "Leren van bewerkingen (macOS)",
-        "captureDescription": "Nadat Handy tekst heeft geplakt, kijkt het kort naar de tekst rond het geplakte fragment. Als je die tekst corrigeert, wordt de correctie automatisch aan het woordenboek toegevoegd. De gelezen tekst blijft alleen in het geheugen en wordt nooit opgeslagen of ergens naartoe verzonden."
+        "captureDescription": "Nadat Handy tekst heeft geplakt, bekijkt het kort de tekst in de buurt. Duidelijke overeenkomsten met woordenschat die je Handy hebt geleerd, worden automatisch aangeleerd met een optie om dit ongedaan te maken; onzekere paren wachten op je goedkeuring. Alleen correctieparen en enkele contextwoorden worden lokaal opgeslagen."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transcriberen...",
       "transcriptionFailed": "Transcriptie mislukt. Je kunt het opnieuw proberen via het herlaad-pictogram.",
       "dictionary": {
-        "editTitle": "Transcriptie corrigeren (leert het woordenboek bij)",
+        "editTitle": "Transcriptie corrigeren",
         "saveEdit": "Leren van correctie",
         "cancelEdit": "Annuleren",
-        "nothingLearned": "Er zijn geen correcties geleerd uit deze bewerking",
-        "added": "Toegevoegd aan woordenboek: {{wrong}} → {{right}}",
-        "undo": "Ongedaan maken",
-        "alreadyKnown": "Staat al in het woordenboek: {{wrong}} → {{right}}"
+        "nothingLearned": "Geen nieuwe suggesties uit deze bewerking",
+        "added": "Voorgesteld: {{wrong}} → {{right}}",
+        "undo": "Negeren",
+        "alreadyKnown": "Al beoordeeld of voorgesteld: {{wrong}} → {{right}}",
+        "autoAdded": "Aangeleerd: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Leren",
-      "entriesGroup": "Items ({{count}})",
+      "entriesGroup": "Jouw correcties ({{count}})",
       "search": "Items zoeken",
-      "empty": "Nog geen items. Corrigeer een woord waar Handy het heeft geplakt, of voeg hierboven een paar toe.",
+      "empty": "Nog geen correcties. Leer Handy een woord, beoordeel een suggestie of voeg er zelf een toe.",
       "noMatch": "Geen items komen overeen met je zoekopdracht",
       "source": {
         "manual": "Handmatig",
@@ -679,7 +680,20 @@
       "save": "Opslaan",
       "cancel": "Annuleren",
       "active": "Actief",
-      "seen": "{{count}}× gezien"
+      "seen": "{{count}}× gezien",
+      "addTitle": "Een correctie toevoegen",
+      "suggestedGroup": "Voorgesteld ({{count}})",
+      "suggestedDescription": "Deze bewerkingen zijn minder zeker. Kies alleen ‘Altijd vervangen’ als deze correctie elke keer moet worden toegepast.",
+      "noSuggestions": "Geen suggesties om te beoordelen.",
+      "approve": "Altijd vervangen",
+      "ignore": "Negeren",
+      "ignoredGroup": "Genegeerd ({{count}})",
+      "ignoredDescription": "Deze paren blijven uitgeschakeld en worden niet opnieuw voorgesteld. Je kunt nog steeds ‘Altijd vervangen’ kiezen.",
+      "actionError": "Het Woordenboek kon niet worden bijgewerkt. Probeer het opnieuw.",
+      "review": "Beoordelen",
+      "automatic": "Automatisch",
+      "automaticHint": "Aangeleerd vanuit bekende woordenschat. Wordt alleen bij een overeenkomende context toegepast.",
+      "autoUndo": "Ongedaan maken"
     }
   },
   "footer": {
@@ -746,9 +760,14 @@
   },
   "overlay": {
     "transcribing": "Transcriberen...",
+    "autoLearned": "Aangeleerd: {{wrong}} → {{right}}",
+    "autoUndo": "Ongedaan maken",
     "processing": "Verwerken...",
-    "learned": "Geleerd: {{wrong}} → {{right}}",
-    "undo": "Ongedaan maken"
+    "learned": "Voorgesteld: {{wrong}} → {{right}}",
+    "undo": "Negeren",
+    "correctionQuestion": "{{wrong}} altijd vervangen door {{right}}?",
+    "correctionNext": "Volgende",
+    "correctionRemaining": "Nog {{count}}"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokkeert mogelijk 1 sneltoets",

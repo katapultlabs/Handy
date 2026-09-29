@@ -1,9 +1,7 @@
-use crate::dictionary_store::DictionaryRow;
 use crate::input;
 use crate::settings;
 use crate::settings::{OverlayPosition, OverlayStyle};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize};
 
@@ -55,10 +53,15 @@ const OVERLAY_HEIGHT: f64 = 50.0;
 const OVERLAY_STREAM_WIDTH: f64 = 400.0;
 const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
 
+const OVERLAY_NOTICE_WIDTH: f64 = 560.0;
+const OVERLAY_NOTICE_HEIGHT: f64 = 112.0;
+
 /// Overlay window size (logical) for a given UI state.
 fn overlay_dimensions(state: &str) -> (f64, f64) {
     if state == "streaming" {
         (OVERLAY_STREAM_WIDTH, OVERLAY_STREAM_HEIGHT)
+    } else if state == "learned" {
+        (OVERLAY_NOTICE_WIDTH, OVERLAY_NOTICE_HEIGHT)
     } else {
         (OVERLAY_WIDTH, OVERLAY_HEIGHT)
     }
@@ -289,7 +292,7 @@ fn current_overlay_logical_size(window: &tauri::webview::WebviewWindow) -> Optio
 }
 
 #[cfg(target_os = "windows")]
-static WINDOWS_OVERLAY_IS_STREAMING: AtomicBool = AtomicBool::new(false);
+static WINDOWS_OVERLAY_STATE: AtomicU64 = AtomicU64::new(0);
 
 /// Windows accessibility text size (Settings > Accessibility > Text size), a
 /// separate axis from display scaling that WebView2 applies as a document zoom.
@@ -488,31 +491,25 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
 }
 
 fn show_overlay_state(app_handle: &AppHandle, state: &str) {
-    // Whether the overlay shows at all is governed by overlay_style; position
-    // only chooses Top vs Bottom placement. Checked here (off the main thread)
-    // so the common overlay-disabled case never pays for a main-thread hop.
-    let settings = settings::get_settings(app_handle);
-    if settings.overlay_style == OverlayStyle::None {
-        return;
-    }
-
-    // A dictation session owns the overlay until `hide_recording_overlay`.
-    // The "learned" card is a notice, not a session, and must not block one.
-    if state != "learned" {
-        OVERLAY_SESSION_ACTIVE.store(true, Ordering::SeqCst);
-    }
-
-    // The rest queries monitors and the cursor and mutates window geometry. On
-    // Linux the monitor/cursor lookups hit GDK/Xlib on the process's shared X11
-    // connection, which is only safe from the GTK main thread — running them on
-    // a background thread corrupts the connection and hard-crashes the app
-    // (issue #227). Hop to the main thread on every platform to keep the
-    // geometry path uniform (a no-op cost on Windows, and it also keeps macOS's
-    // NSScreen access main-thread-correct). run_on_main_thread runs the closure
-    // inline when already on the main thread, so this never deadlocks.
+    // Recording ownership and geometry change together on the main thread.
+    // Even with recording visuals disabled, dictation pauses correction notices.
+    let enabled = settings::get_settings(app_handle).overlay_style != OverlayStyle::None;
     let handle = app_handle.clone();
     let state = state.to_string();
-    let _ = app_handle.run_on_main_thread(move || show_overlay_state_on_main(&handle, &state));
+    let _ = app_handle.run_on_main_thread(move || {
+        crate::correction_notices::recording_started_on_main(&handle);
+        if enabled {
+            show_overlay_state_on_main(&handle, &state);
+        } else {
+            hide_overlay_window_on_main(&handle);
+        }
+    });
+}
+
+/// Dictionary decisions remain visible when recording visuals are disabled.
+/// Called by the notice presenter while already on the native main thread.
+pub(crate) fn show_correction_notice_on_main(app_handle: &AppHandle) {
+    show_overlay_state_on_main(app_handle, "learned");
 }
 
 fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
@@ -546,7 +543,14 @@ fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
             let _ =
                 overlay_window.set_size(tauri::Size::Logical(tauri::LogicalSize { width, height }));
             #[cfg(target_os = "windows")]
-            WINDOWS_OVERLAY_IS_STREAMING.store(state == "streaming", Ordering::Relaxed);
+            WINDOWS_OVERLAY_STATE.store(
+                match state {
+                    "streaming" => 1,
+                    "learned" => 2,
+                    _ => 0,
+                },
+                Ordering::Relaxed,
+            );
             let size_elapsed = size_started.elapsed();
 
             let pos_started = std::time::Instant::now();
@@ -660,10 +664,10 @@ fn update_overlay_position_on_main(app_handle: &AppHandle) {
 
         #[cfg(target_os = "windows")]
         {
-            let state = if WINDOWS_OVERLAY_IS_STREAMING.load(Ordering::Relaxed) {
-                "streaming"
-            } else {
-                "recording"
+            let state = match WINDOWS_OVERLAY_STATE.load(Ordering::Relaxed) {
+                1 => "streaming",
+                2 => "learned",
+                _ => "recording",
             };
             let (width, height) = overlay_dimensions(state);
             if let Err(error) = place_windows_overlay(app_handle, &overlay_window, width, height) {
@@ -693,67 +697,18 @@ fn update_overlay_position_on_main(app_handle: &AppHandle) {
 /// the instant it drained, well inside the 300 ms hide delay.
 static OVERLAY_SHOW_GENERATION: AtomicU64 = AtomicU64::new(0);
 
-/// True from the first show of a dictation session until its hide. Lets the
-/// "learned" notice wait for a session instead of replacing it.
-static OVERLAY_SESSION_ACTIVE: AtomicBool = AtomicBool::new(false);
-
-/// Dictionary pairs learned while a session was on screen. Shown when that
-/// session hides (see `hide_recording_overlay`).
-static PENDING_LEARNED: Mutex<Option<Vec<DictionaryRow>>> = Mutex::new(None);
-
-/// How long the "learned" notice stays on screen. Long enough to read the
-/// pair and click Undo.
-const LEARNED_OVERLAY_MS: u64 = 4000;
-
-/// Show a short "Learned: wrong -> right" notice in the overlay. In-place
-/// capture calls this when it adds pairs to the Dictionary. The settings
-/// window is usually closed at that moment, so its toast is not enough.
-///
-/// Capture most often learns at the start of the next dictation, while the
-/// recording overlay is up. The notice is then queued and shown the moment
-/// that session hides, so it never covers the recording state.
-pub fn show_learned_overlay(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
-    if entries.is_empty() || !OVERLAY_ENABLED.load(Ordering::Relaxed) {
-        return;
-    }
-    if OVERLAY_SESSION_ACTIVE.load(Ordering::SeqCst) {
-        if let Ok(mut pending) = PENDING_LEARNED.lock() {
-            *pending = Some(entries);
-        }
-        return;
-    }
-    present_learned(app_handle, entries);
-}
-
-fn present_learned(app_handle: &AppHandle, entries: Vec<DictionaryRow>) {
-    // Payload first, then the state change, so the card renders with its text.
-    let _ = app_handle.emit_to("recording_overlay", "overlay-learned", &entries);
-    show_overlay_state(app_handle, "learned");
-
+/// Finish a dictation and give any waiting correction its remaining reading time.
+pub fn hide_recording_overlay(app_handle: &AppHandle) {
     let handle = app_handle.clone();
-    std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(LEARNED_OVERLAY_MS));
-        // A dictation that started meanwhile now owns the overlay; its own
-        // hide will take the window down.
-        if OVERLAY_SESSION_ACTIVE.load(Ordering::SeqCst) {
-            return;
+    let _ = app_handle.run_on_main_thread(move || {
+        if !crate::correction_notices::recording_finished_on_main(&handle) {
+            hide_overlay_window_on_main(&handle);
         }
-        hide_recording_overlay(&handle);
     });
 }
 
-/// Hides the recording overlay window with fade-out animation
-pub fn hide_recording_overlay(app_handle: &AppHandle) {
-    OVERLAY_SESSION_ACTIVE.store(false, Ordering::SeqCst);
-
-    // A notice learned during this session takes the overlay over instead of
-    // letting it hide. Its own timer hides the window afterwards.
-    let pending = PENDING_LEARNED.lock().ok().and_then(|mut p| p.take());
-    if let Some(entries) = pending {
-        present_learned(app_handle, entries);
-        return;
-    }
-
+/// Fade the native window without changing recording or correction ownership.
+pub(crate) fn hide_overlay_window_on_main(app_handle: &AppHandle) {
     // Always hide the overlay regardless of settings - if setting was changed while recording,
     // we still want to hide it properly
     if let Some(overlay_window) = app_handle.get_webview_window("recording_overlay") {
@@ -767,11 +722,14 @@ pub fn hide_recording_overlay(app_handle: &AppHandle) {
         let window_clone = overlay_window.clone();
         std::thread::spawn(move || {
             std::thread::sleep(std::time::Duration::from_millis(300));
-            if OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst) != scheduled_at {
-                log::debug!("Skipping stale overlay hide: a newer session is showing the overlay");
-                return;
-            }
-            let _ = window_clone.hide();
+            let handle = window_clone.app_handle().clone();
+            let _ = handle.run_on_main_thread(move || {
+                if OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst) != scheduled_at {
+                    log::debug!("Skipping stale overlay hide: a newer state is showing");
+                    return;
+                }
+                let _ = window_clone.hide();
+            });
         });
     }
 }

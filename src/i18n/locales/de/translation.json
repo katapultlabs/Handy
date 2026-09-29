@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Wörterbuch",
-        "toggleDescription": "Deterministische Korrekturen: Ersetze exakte Wörter oder Wendungen, die das Modell falsch erkennt. Lernt aus deinen Bearbeitungen im Verlauf.",
+        "toggleDescription": "Ähnliche Klangmuster in deinem bekannten Wortschatz automatisch lernen. Unsichere Korrekturen vor der Anwendung prüfen.",
         "title": "Wörterbucheinträge",
-        "description": "Jeder Eintrag ersetzt den falsch verstandenen Text in jeder Transkription durch deine Korrektur.",
+        "description": "Automatische Korrekturen werden in passendem Kontext angewendet. Von dir bestätigte Korrekturen werden jedes Mal angewendet.",
         "wrongPlaceholder": "Falsch verstanden",
         "rightPlaceholder": "Korrekt",
         "add": "Hinzufügen",
         "remove": "{{wrong}} → {{right}} entfernen",
         "duplicate": "Ein Eintrag für \"{{wrong}}\" existiert bereits",
         "captureLabel": "Aus Bearbeitungen lernen (macOS)",
-        "captureDescription": "Nachdem Handy den Text eingefügt hat, beobachtet es kurz den Text rund um das Eingefügte. Wenn du diesen Text korrigierst, wird die Korrektur automatisch zum Wörterbuch hinzugefügt. Der gelesene Text bleibt nur im Arbeitsspeicher und wird nie gespeichert oder irgendwohin gesendet."
+        "captureDescription": "Nachdem Handy Text eingefügt hat, beobachtet es kurz den Text in der Nähe. Eindeutige Treffer mit dem Wortschatz, den du Handy beigebracht hast, werden automatisch mit einer Rückgängig-Option gelernt; unsichere Paare warten auf deine Bestätigung. Nur Korrekturpaare und einige Kontextwörter werden lokal gespeichert."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transkribiere...",
       "transcriptionFailed": "Transkription fehlgeschlagen. Du kannst über das Wiederholen-Symbol erneut transkribieren.",
       "dictionary": {
-        "editTitle": "Transkription korrigieren (bringt es dem Wörterbuch bei)",
+        "editTitle": "Transkription korrigieren",
         "saveEdit": "Aus Korrektur lernen",
         "cancelEdit": "Abbrechen",
-        "nothingLearned": "Aus dieser Bearbeitung wurden keine Korrekturen gelernt",
-        "added": "Zum Wörterbuch hinzugefügt: {{wrong}} → {{right}}",
-        "undo": "Rückgängig",
-        "alreadyKnown": "Bereits im Wörterbuch: {{wrong}} → {{right}}"
+        "nothingLearned": "Keine neuen Vorschläge aus dieser Bearbeitung",
+        "added": "Vorgeschlagen: {{wrong}} → {{right}}",
+        "undo": "Ignorieren",
+        "alreadyKnown": "Bereits geprüft oder vorgeschlagen: {{wrong}} → {{right}}",
+        "autoAdded": "Gelernt: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Lernen",
-      "entriesGroup": "Einträge ({{count}})",
+      "entriesGroup": "Deine Korrekturen ({{count}})",
       "search": "Einträge durchsuchen",
-      "empty": "Noch keine Einträge. Korrigiere ein Wort dort, wo Handy es eingefügt hat, oder füge oben ein Paar hinzu.",
+      "empty": "Noch keine Korrekturen. Bring Handy ein Wort bei, prüfe einen Vorschlag oder füge selbst eine hinzu.",
       "noMatch": "Keine Einträge entsprechen deiner Suche",
       "source": {
         "manual": "Manuell",
@@ -679,7 +680,20 @@
       "save": "Speichern",
       "cancel": "Abbrechen",
       "active": "Aktiv",
-      "seen": "{{count}}× gesehen"
+      "seen": "{{count}}× gesehen",
+      "addTitle": "Korrektur hinzufügen",
+      "suggestedGroup": "Vorgeschlagen ({{count}})",
+      "suggestedDescription": "Diese Bearbeitungen sind weniger sicher. Wähle „Immer ersetzen“ nur, wenn diese Korrektur jedes Mal angewendet werden soll.",
+      "noSuggestions": "Keine Vorschläge zum Prüfen.",
+      "approve": "Immer ersetzen",
+      "ignore": "Ignorieren",
+      "ignoredGroup": "Ignoriert ({{count}})",
+      "ignoredDescription": "Diese Paare bleiben deaktiviert und werden nicht erneut vorgeschlagen. Du kannst weiterhin „Immer ersetzen“ auswählen.",
+      "actionError": "Das Wörterbuch konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "review": "Prüfen",
+      "automatic": "Automatisch",
+      "automaticHint": "Aus bekanntem Wortschatz gelernt. Wird nur bei passendem Kontext angewendet.",
+      "autoUndo": "Rückgängig"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Transkribiere...",
+    "autoLearned": "Gelernt: {{wrong}} → {{right}}",
+    "autoUndo": "Rückgängig",
     "processing": "Verarbeite...",
-    "learned": "Gelernt: {{wrong}} → {{right}}",
-    "undo": "Rückgängig"
+    "learned": "Vorgeschlagen: {{wrong}} → {{right}}",
+    "undo": "Ignorieren",
+    "correctionQuestion": "{{wrong}} immer durch {{right}} ersetzen?",
+    "correctionNext": "Weiter",
+    "correctionRemaining": "{{count}} weitere"
   },
   "whatsNew": {
     "title": "Neu in Handy v{{version}}"

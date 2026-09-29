@@ -5,15 +5,17 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.6+dict.8. It is a test build. It adds the Dictionary:
+This is Handy 0.9.6+dict.11. It is a test build. It adds the Dictionary:
 
-- Handy learns your corrections. It then fixes the same mistake in every
-  later transcription.
+- Handy learns clear matches to vocabulary you have taught it automatically,
+  with **Undo**. These rules apply only near matching context words.
+- Less certain corrections stay in Suggested until you choose **Always replace**.
+  Common grammar changes and rewrites are filtered out.
 - Three ways to teach it:
   1. Correct the pasted text where it landed (WhatsApp, Notes, Telegram,
-     most macOS applications). Handy sees the edit and learns it.
+     most macOS applications). Handy sees the edit and learns or suggests a pair.
   2. Menu bar icon -> "Correct Last Transcript...", or the pencil on a
-     History entry. Edit the text and click Save. Handy learns the fix.
+     History entry. Edit the text and click Learn from correction. Review uncertain pairs directly in the correction overlay or later in Dictionary.
   3. Settings -> Dictionary. Add word pairs by hand.
 
 The build is macOS (Apple Silicon) only. It is not signed with a developer
@@ -46,25 +48,60 @@ the release version.
 
 ## 4. Test it
 
-1. Dictate a sentence with a word Handy gets wrong. A name works well.
-2. Fix the word in the application where the text landed.
-3. Switch applications, or start the next dictation.
-4. Handy shows "Learned: wrong -> right" in the recording overlay for four
-   seconds. Click Undo on it if the pair is wrong. If the overlay is set
-   to None, there is no notice on screen. The settings window also shows
-   a toast with Undo.
-5. Dictate the sentence again. The word comes out right.
+1. Teach Handy the correct vocabulary first. For this test, add a manual
+   correction "katapolt" -> "Katapult" in Dictionary. Custom Words and approved
+   suggestions also supply trusted vocabulary.
+2. Dictate a sentence with a close mistake, such as "Catapult manages releases".
+   Correct "Catapult" to "Katapult" in the target application.
+3. Pause briefly after the edit. Handy checks settled edits without waiting for
+   another dictation. Applications with Accessibility notifications normally
+   produce a candidate about 600 ms after the last edit, plus application and
+   storage response time. Unsupported applications use a bounded fallback.
+4. A strong match to known vocabulary with unchanged useful nearby words shows
+   "Learned: Catapult -> Katapult", with Undo. It is active immediately, only
+   near the saved context. "A catapult launches rocks" stays unchanged when its
+   nearby words do not match that context. A separate approved rule or the
+   existing Custom Words fuzzy correction can still change that word.
+5. An unfamiliar or less certain pair asks "Always replace wrong with right?"
+   directly in the overlay. **Always replace** approves a global replacement.
+   **Ignore** remembers that you do not want it.
+6. Dictate again. Automatic rules apply in matching context; approved and
+   manual corrections apply everywhere they match.
+
+Each correction gets its own card and 8 seconds of visible reading time.
+Hovering, focusing a control, or saving a choice pauses the clock. Recording
+interrupts the card and then returns it with its remaining time. Multiple
+corrections appear in order. **Next** or closing a card only skips the notice;
+it does not approve or ignore the stored pair. You can review it in Dictionary
+later. History edits use the same cards. Recording visuals can be off and
+correction cards still appear.
+
+Try a History edit with two corrections, approve the first, and ignore the
+second. Then trigger another correction, start a recording while its card is
+visible, and confirm it returns afterward. A card should not disappear while
+the pointer is over it. Turning Dictionary off clears waiting cards.
+
+A rapid edit followed by Send can still be missed if the application clears
+its field before Handy has observed a settled edit. A safely observed edit can
+survive a later clear. This does not provide access to text an application
+never exposed through Accessibility.
+
+The automatic test uses close spelling, matching phonetic codes, trusted
+vocabulary, and unchanged context. Word counts alone do not decide: one word
+can correctly become two. Short terms, unsupported scripts, distant sound
+matches, and edits with ambiguous context remain suggestions. This first pass
+favors fewer automatic rules over false replacements.
 
 If in-place learning does not trigger (some applications do not expose
 their text), use the menu bar: "Correct Last Transcript...".
 
-Handy learns only small fixes that sound like the wrong word: one to three
+Handy suggests small fixes that sound like the wrong word: one to three
 words on each side, for example "Bededa" -> "Pereira". If you rewrite a
-sentence, add or delete words, or fix punctuation, Handy shows "No
-corrections learned from this edit". This is by design.
+sentence, add or delete words, or fix punctuation, Handy shows "No new
+suggestions from this edit". This is by design.
 
-Handy also does not learn style and grammar edits, because an entry
-applies to every later transcription:
+Handy filters common style and grammar edits, because an approved entry
+applies to every later transcription. Examples of filtered edits:
 
 - Common words on both sides: "there" -> "their", "the" -> "The".
 - Contractions: "we are" -> "we're".
@@ -73,15 +110,29 @@ applies to every later transcription:
 
 ## 5. Control what it learned
 
-Settings -> Dictionary shows every entry with where it came from
-(Manual, History, Captured). Search the list, add a pair, click the pencil
-to edit one in place, or click the trash icon to delete one. The checkbox
-turns an entry off without deleting it. "seen 3x" means Handy learned the
-same pair three times.
+Settings -> Dictionary separates Suggested, Your corrections, and Ignored.
+Search across all groups. Each pair shows its source: Manual, History, or
+Captured. Automatic rows also show Automatic. A suggestion remains inactive
+no matter how often it is seen.
 
-Entries now live in the same database as History. The first start of this
-build moves your existing entries there. Two corrections for the same
-wrong word: the newest one applies, the older one turns off.
+- **Always replace** approves a pair. If another correction for the same
+  wrong text is active, it moves to Suggested. Merely discovering a new pair
+  never replaces an approved correction.
+- **Undo** stops an automatic rule and remembers the rejection. It does not
+  change text already pasted. The correction remains in Ignored.
+- **Ignore** remembers your choice. That pair stays off and is not suggested
+  again. Expand Ignored to approve it later if you change your mind.
+- The pencil edits a pair in place. Editing a suggestion does not approve it.
+- The checkbox turns an approved pair off without deleting it.
+- A pair you add manually applies immediately.
+
+When upgrading from a build older than dict.9, its automatically learned
+corrections move to Suggested once for review. Decisions made in dict.9 stay
+as they were; existing suggestions are not automatically promoted. Manually
+added entries stay as they were.
+No entries are deleted. Entries imported from the old settings list follow the
+same rule. "seen 3x" means Handy found that pair three times; it does not mean
+that the pair was approved.
 
 ## 6. Paste the last transcript again
 
@@ -126,12 +177,10 @@ after the first compile, and about 15 minutes the first time.
 3. Build the application bundle:
 
    ```bash
-   CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri build --bundles app
+   CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri build --bundles app --config '{"bundle":{"createUpdaterArtifacts":false}}'
    ```
 
-   The build ends with an error about a missing `TAURI_SIGNING_PRIVATE_KEY`.
-   This is expected. It only affects the auto-update artifact, not the
-   application.
+   This builds the application without an auto-update artifact or updater key.
 
 4. The application is at `src-tauri/target/release/bundle/macos/Handy.app`.
    Install it with the steps in section 2.
@@ -143,7 +192,15 @@ the installed Handy first and run:
 CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri dev
 ```
 
-## 9. Report problems
+## 9. Local processing
+
+Learning runs off the paste path. It uses local string comparisons and the
+existing phonetic library; it makes no model or network calls. The matcher is
+compiled after dictionary changes and reused for dictation. Capture retains
+only the correction pair and up to four context words in the local database;
+it does not save the surrounding field text.
+
+## 10. Report problems
 
 Tell us:
 

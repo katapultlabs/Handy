@@ -2539,6 +2539,7 @@ name = "handy"
 version = "0.9.6"
 dependencies = [
  "accessibility-sys",
+ "aho-corasick",
  "anyhow",
  "chrono",
  "clap",

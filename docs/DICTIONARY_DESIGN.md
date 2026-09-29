@@ -2,7 +2,16 @@
 
 This document is written in Simplified Technical English (STE).
 It describes the design of the Dictionary feature.
-It is a plan. The code does not exist yet.
+It contains the design and future work. The MVP is implemented.
+
+Current test build (0.9.6+dict.10): entries live in SQLite. Clear matches to
+explicitly taught vocabulary can activate automatically with a small context
+guard and Undo. Uncertain pairs remain inactive suggestions. Repeated edits
+never override a user decision. Grammar changes and rewrites are filtered.
+Manual additions and explicit approvals apply globally. The compiled matcher
+is rebuilt after mutations and shared by the paste path. The broader features
+below (such as vocabulary migration, CSV transfer, and prompt integration)
+remain future work unless described in `docs/TEST_BUILD.md`.
 
 Read `docs/ARCHITECTURE.md` first. It shows where the current code is.
 
@@ -29,7 +38,7 @@ The user does not have to make the same correction again.
 
 ## 3. Non-goals
 
-- Handy does not retain or transmit the content of the target application. Capture reads a bounded window around the pasted text (section 7.3.1), compares it, and drops it. Where the platform only offers a full-value read, Handy truncates to the window at once and never stores or sends the rest.
+- Handy does not retain full target-application text. Capture reads a bounded window around the pasted text (section 7.3.1), compares it, and drops it. Only correction pairs and up to four context words are kept locally. Where the platform only offers a full-value read, Handy truncates to the window at once and never stores or sends the rest.
 - Handy does not send the target application content to a server.
 - Handy does not change text that the user did not dictate.
 - Per-application dictionaries are not part of the first version. The data model permits them later.
@@ -80,6 +89,8 @@ CREATE TABLE dictionary (
   source        TEXT NOT NULL,                 -- 'manual', 'history', 'capture'
   state         TEXT NOT NULL DEFAULT 'active',-- 'proposed', 'active', 'rejected'
   enabled       INTEGER NOT NULL DEFAULT 1,
+  auto_learned  INTEGER NOT NULL DEFAULT 0,    -- active by classifier, not explicit approval
+  context_words TEXT NOT NULL DEFAULT '[]', -- JSON: up to four lowercase context words
   seen_count    INTEGER NOT NULL DEFAULT 1,    -- times a producer proposed this pair
   applied_count INTEGER NOT NULL DEFAULT 0,    -- times the consumer used it
   app_id        TEXT NOT NULL DEFAULT '',      -- '' = all applications (reserved)
@@ -100,7 +111,8 @@ and the normalized `*_key` columns instead. `ON CONFLICT` targets `dictionary_pa
 The `dictionary_active_wrong` index enforces one active replacement per `wrong`.
 When a new pair for an existing active `wrong` reaches activation, the old entry
 moves to `state = 'proposed'` and the new one becomes active, in one transaction.
-The last correction wins. The user can flip this in the Dictionary screen.
+Only explicit approval or a manual change can displace an active rule. An
+automatic candidate with the same wrong text remains proposed.
 
 Rules:
 
@@ -108,8 +120,8 @@ Rules:
 - `match_mode = 'word'` matches on word boundaries. `'phrase'` matches a run of words.
 - `case_mode = 'smart'` keeps the case pattern of the matched text. `'exact'` writes `right` as stored.
 - A producer that proposes a pair that exists increases `seen_count`. It does not make a second row. Use one SQL `UPSERT` in one transaction.
-- The same `UPSERT` statement performs the activation: when the new `seen_count` reaches the entry's threshold and `state = 'proposed'`, set `state = 'active'`. This is one atomic write. No separate pass promotes entries.
-- The threshold for an entry is `dictionary_auto_apply_threshold` (default 2). For a homophone pair (both sides are real words in the active language) the threshold is `dictionary_auto_apply_threshold + 1`. A change to the setting applies to future proposals; it does not demote active entries.
+- A new learned pair can activate only under the strict tests in section 8.3. For an existing pair, learning only increases `seen_count` and preserves state, enabled flag, and context guard.
+- Explicit approval (Always replace) clears automatic metadata and makes the pair globally applicable. A new suggestion or automatic candidate does not demote an active replacement.
 - A user confirmation sets `state = 'active'` directly, at any count.
 - `state = 'rejected'` means the user dismissed the pair. The `UPSERT` still increases `seen_count`, but it never changes `rejected` to another state. Only the user can, in the Dictionary screen.
 - Only `state = 'active'` and `enabled = 1` entries apply.
@@ -176,6 +188,10 @@ A transcription has fewer than 1,000 words in most cases.
 The dictionary has fewer than 1,000 entries in most cases.
 A single-pass Aho-Corasick or regex-set matcher is fast enough.
 Do not call the database for each transcription. Read the table once into memory. Refresh on change.
+The implemented matcher uses Aho-Corasick, preserves longest-first overlap
+priority, checks context on original text, and does not cascade replacements.
+Transcripts above 128 KiB or more than 16,384 raw matches skip this pass to
+bound work on pathological inputs.
 The budgets are in section 16.
 
 ## 7. Producers
@@ -202,7 +218,7 @@ Add an "Edit" action to each entry.
 2. The user saves.
 3. Handy stores the edited text in a new column `user_edited_text`.
 4. Handy calls `learn(pasted_text, user_edited_text, "history")`.
-5. Handy shows the entries it learned as **proposed**. The user confirms or dismisses each one. Dismiss sets `state = 'rejected'`. Nothing becomes active without this step or the `seen_count` rule in section 9.
+5. Handy activates only new pairs that pass section 8.3, with Undo. It shows other accepted pairs as **proposed**. Dismiss sets `state = 'rejected'`. See section 9.
 
 `pasted_text` is the text Handy wrote into the target application. Store it in a new column `pasted_text` at paste time.
 Do not diff against `transcription_text`. That text is from before the Dictionary ran. A diff against it learns the same corrections again and inflates `seen_count`.
@@ -226,19 +242,20 @@ Just before the paste (the **snapshot**):
 4. The snapshot runs on the AX thread with a 100 ms budget (section 16.3). The paste does not wait past that budget: on timeout, paste without an anchor and skip capture for this dictation. The snapshot never reads the field content.
 5. Do not store field text on disk. Anchor data stays in memory only.
 
-At check time:
+At check time (implemented in dict.11):
 
-1. Read a bounded window of text around the anchor from the element. Prefer `kAXStringForRangeParameterizedAttribute` with a range of the pasted length plus margin. If the application does not support it, read `kAXValueAttribute` and keep only the 32 KB window around the anchor; drop the rest at once.
-2. Find the pasted text near the anchor position. Use a fuzzy locator, because the user can type before the anchor.
-3. Compare the text at that location with the pasted text.
-4. If the text changed, call `learn(pasted, current, "capture")`.
-5. Drop the anchor.
+1. Read a bounded window around the anchor. Prefer `AXStringForRange`. If the application does not support it, read `AXValue` and immediately retain only the bounded window around the anchor.
+2. Align the edited paste conservatively at the caret-derived offset. An unchanged suffix or a bounded prefix-distance search identifies its end. Ambiguous alignment is skipped.
+3. Coalesce value changes for 400 ms. An aligned edited span waits another 200 ms before learning. A new event cancels that confirmation until the next settled read.
+4. Retain the last safely aligned span in memory so clearing the field can finalize an already-observed edit. A clear before any safe read cannot be recovered. Reverted text clears the candidate.
+5. Run the shared classifier and transaction on the capture thread. A new or already-known correction finishes the anchor. An edit with no learnable pairs leaves the anchor watching. Expiry, cancellation, or an inaccessible element drops it.
 
-Check triggers (any one of them):
+Check triggers:
 
-- The user presses the transcribe shortcut again. Check before the new recording starts.
-- The focused application changes. Watch `NSWorkspace.didActivateApplicationNotification`.
-- A timer expires. Default: 20 seconds after the last check. Stop after 3 minutes.
+- A per-element `AXObserver` receives `AXValueChanged` on the dedicated capture thread. Its callback only increments a counter; it never reads field text.
+- Until a value notification proves the observer works, a 750 ms active-anchor fallback checks a bounded window. The first notification disables repeated fallback reads.
+- The next dictation requests a final check after taking ownership of the overlay. The request is asynchronous and adds no AX wait to recording startup.
+- An anchor expires after 180 seconds. With no anchor, the thread blocks with no polling. Active observers pump their run loop in slices of at most 50 ms so channel messages remain responsive.
 
 #### 7.3.2 When capture cannot work
 
@@ -305,21 +322,81 @@ Examples:
 | `good`        | `great`     | no             | reject (style edit)  |
 | `their`       | `there`     | yes            | accept, but see note |
 
-Note: homophone fixes such as `their` -> `there` depend on context. They pass this test but they are risky as global replacements. Their activation threshold is one higher than normal: `dictionary_auto_apply_threshold + 1`. See the activation rules in section 5. A future version can mark an entry as "context-dependent" and give it to the LLM prompt only.
+Note: homophone fixes such as `their` -> `there` depend on context and are risky as global replacements. The MVP rejects common-word grammar edits. It requires explicit approval for uncertain pairs and uses a local context guard for automatic pairs. See sections 5 and 8.3.
 
 ### 8.2 Tests for `learn()`
 
 Write unit tests for each row of the table above.
 Add tests for: a paragraph the user rewrote (no entries), a single typo fix, a name split in two, a change in the middle of a long text, CJK text, an empty edit.
 
+### 8.3 Conservative automatic learning (implemented)
+
+A candidate can activate automatically only when all of these checks pass:
+
+- The complete target is a Custom Word or the target of an enabled, explicitly
+  approved/manual correction. Automatic rules never supply new trusted terms.
+- Both normalized sides have at least four ASCII letters. Character distance
+  is at most 25 percent and Double Metaphone keys match exactly.
+- At least three quarters of the edit's tokens stay unchanged in order.
+- Each pair side occurs exactly once in its respective text.
+- One to four useful, unchanged context words occur within four tokens at the
+  same relative position in both texts. Only alphabetic words of at least four
+  characters qualify. Stop words and pair words are excluded.
+- The pair is new, and no active rule already owns that wrong text.
+
+The runtime matcher applies such a rule only if at least one saved context
+word occurs within four tokens. This is a conservative lexical check, not a
+semantic understanding of the sentence. It can miss valid corrections; it
+cannot guarantee that every nearby homophone has the intended meaning.
+
+Inputs are capped at 32 KiB, 2,048 tokens, and 128 characters per token. The
+classifier trims equal prefix/suffix tokens before its bounded LCS check and
+falls back to suggestions when the residual comparison exceeds its budget.
+It returns at most 16 pairs (capture stores at most 3). Classification, writes,
+and matcher compilation run off the paste path. No model call is made.
+
 ## 9. Trust and confirmation
 
-Auto-learned entries can be wrong. The user must stay in control.
+- New automatic pairs show a brief "Learned" notice with Undo. They appear in
+  Your corrections with an Automatic marker; no approval step is needed.
+- Other accepted pairs start as **proposed** and show "Suggested". They apply
+  only after the user chooses Always replace.
+- Undo and Ignore both persist a rejection. They stop future application and
+  suppress repeated suggestions. Undo does not rewrite text already pasted.
+- Repeated edits do not establish intent. `seen_count` is informational; it
+  never promotes a suggestion or changes a disabled/ignored rule.
+- Editing an active rule's text makes it explicit and clears the automatic
+  guard. Toggling its enabled checkbox preserves the guard.
+- The Dictionary screen separates Suggested, Your corrections, and a collapsed
+  Ignored group. Ignored pairs can be explicitly approved later.
+- Migration 6 moves older automatically active learned entries to Suggested
+  once. Migration 7 adds automatic metadata without changing existing choices.
+  No stored pairs are deleted.
 
-- `history` and `capture` entries start as **proposed**. They apply after `seen_count >= 2`, or after the user confirms them once.
-- Setting: `dictionary_auto_apply_threshold`. Default: 2. Value 1 means "apply at once".
-- When Handy learns an entry, show a small notification: "Learned: Cortex -> Kortix. Undo".
-- The Dictionary screen shows proposed entries in a separate group.
+### 9.1 Correction notices (dict.11)
+
+`correction_notices.rs` owns one FIFO for newly committed capture and History
+pairs. Native show/hide, queue mutations, and recording ownership serialize on
+the main thread; classification, SQLite, and matcher rebuilds stay off it.
+Previously known pairs and grammar edits do not create repeated notices.
+
+Each card shows one complete pair. Proposed entries offer **Always replace**
+and **Ignore**. Automatic entries offer **Undo**. **Next** or close dismisses
+only the card; it does not make a dictionary decision. Stored entries remain
+available in Settings. This transient queue lasts for the current process.
+
+The 8-second clock starts after the frontend acknowledges rendering that
+notice token. Hover, focus, and saving pause it. Recording pauses the card and
+resumes its remaining time with a new token. New batches append in order.
+Token/deadline checks prevent old timers or clicks from affecting another
+card. A failed save retains the card and shows a localized retry error.
+
+The overlay subscribes before fetching the current snapshot and rejects older
+revisions, recovering events missed while the webview initialized. Successful
+History edits use the same queue instead of a second toast. Recording visuals
+can be disabled while correction notices still appear. Disabling Dictionary
+or Experimental clears transient notices. Debug logs contain token/count/timing
+metadata only, never correction text. System notifications are not used.
 
 ## 10. Settings
 
@@ -338,14 +415,13 @@ When it is on, `AdvancedSettings.tsx` shows an "Experimental" group.
 
 Add these fields to `AppSettings`:
 
-| Field                             | Type | Default | Function                                                   |
-| --------------------------------- | ---- | ------- | ---------------------------------------------------------- |
-| `dictionary_enabled`              | bool | false   | Master switch. Experimental group.                         |
-| `dictionary_fuzzy_enabled`        | bool | true    | Tier 2 on or off.                                          |
-| `dictionary_learn_from_history`   | bool | true    | Producer 7.2 on or off.                                    |
-| `dictionary_learn_from_capture`   | bool | false   | Producer 7.3 on or off. Off by default until it is proven. |
-| `dictionary_auto_apply_threshold` | u32  | 2       | See section 9.                                             |
-| `dictionary_capture_window_secs`  | u32  | 180     | How long an anchor lives.                                  |
+| Field                            | Type | Default | Function                                                   |
+| -------------------------------- | ---- | ------- | ---------------------------------------------------------- |
+| `dictionary_enabled`             | bool | false   | Master switch. Experimental group.                         |
+| `dictionary_fuzzy_enabled`       | bool | true    | Tier 2 on or off.                                          |
+| `dictionary_learn_from_history`  | bool | true    | Producer 7.2 on or off.                                    |
+| `dictionary_learn_from_capture`  | bool | false   | Producer 7.3 on or off. Off by default until it is proven. |
+| `dictionary_capture_window_secs` | u32  | 180     | How long an anchor lives.                                  |
 
 Each field needs a `change_*_setting` command. See `docs/ARCHITECTURE.md` section 6.1.
 
@@ -371,7 +447,7 @@ Events:
 ## 12. Privacy
 
 - All data stays on the local machine, with one exception, below.
-- Capture reads only the focused element. It keeps the text in memory for the anchor lifetime. It writes only the learned pairs.
+- Capture reads only the focused element. It keeps the text in memory for the anchor lifetime. It writes only the learned pairs and, for automatic rules, up to four context words.
 - Capture is off by default.
 - The exception: if the user puts `${dictionary}` in a post-process prompt, the dictionary words go to the configured LLM provider with each post-processed transcription. That provider can be remote. The placeholder documentation and the prompt editor must say this. A test must show the dictionary is sent only when the prompt contains the placeholder.
 
@@ -510,3 +586,50 @@ Each phase (section 13) ships with numbers in the pull request:
 2. Matcher build time at 100 / 1,000 / 10,000 entries.
 3. `learn()` time on a 1,000-word edit.
 4. For capture: paste-to-anchor time, and check time against a responsive and an unresponsive application.
+
+### 16.7 Local verification for dict.10 (2026-09-16)
+
+Release-mode measurements on the development Apple Silicon Mac, 51 samples
+per case, one test thread, 1,000-word input with contextual automatic matches:
+
+| Dictionary rules | Build snapshot | Apply median | Apply p95 |
+| ---------------- | -------------- | ------------ | --------- |
+| 100              | 0.110 ms       | 0.068 ms     | 0.108 ms  |
+| 1,000            | 0.799 ms       | 0.095 ms     | 0.102 ms  |
+| 10,000           | 20.308 ms      | 0.077 ms     | 0.093 ms  |
+
+The bounded classifier on a 1,000-word edit measured 0.259 ms median and
+0.339 ms p95. Learning, SQLite writes, and mutation-triggered matcher rebuilds
+run off the paste path. Only the immutable snapshot is shared with dictation.
+The initial snapshot is still loaded during DictionaryManager initialization;
+lazy startup from section 16.5 remains future work.
+
+These are local microbenchmarks. They do not establish the budget on the
+oldest supported hardware or measure the full audio-to-paste path, existing
+Custom Words fuzzy matching, or target-application Accessibility latency.
+
+Reproduce the focused tests and measurements from `src-tauri`:
+
+```bash
+CMAKE_POLICY_VERSION_MINIMUM=3.5 cargo test --release --lib dictionary -- --include-ignored --nocapture --test-threads=1
+```
+
+The Dictionary UI tests use the real React component with mocked Tauri IPC.
+They cover approval, persistent rejection, editing without approval, manual
+additions, automatic Undo, and settings-window layout. Live dictation and
+capture in third-party applications still need hands-on testing of this build.
+
+### 16.8 Notice and capture verification for dict.11
+
+Pure Rust tests exercise FIFO bursts, delayed render acknowledgement, stale
+timers and actions, recording interruption, hover/action pauses, feature-off
+cleanup, and candidate timing across rapid edits, clear, revert, and fallback.
+Browser tests render the real overlay with mocked Tauri IPC to exercise the
+controls, replay, revisions, and fixed-size native window layout. Local validation
+passed 370 regular Rust tests plus the binding export check, and all 13
+Dictionary/overlay browser tests. Frontend build, lint, formatting, and 24 locale
+translation checks passed. Clippy completed with existing warnings in model
+and transcription code. The two opt-in performance tests from dict.10 were not
+rerun because their implementation did not change. These checks
+do not replace hands-on capture testing in each target application. The
+matcher and classifier measured in section 16.7 are unchanged by this build.

@@ -29,7 +29,7 @@ import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useUiStore } from "./stores/uiStore";
-import { commands, events } from "@/bindings";
+import { commands } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
 type OnboardingStep = "accessibility" | "model" | "done";
@@ -106,33 +106,6 @@ function App() {
       unlisten.then((fn) => fn());
     };
   }, []);
-
-  // Dictionary in-place capture: surface entries learned from the user's
-  // edits in the target application.
-  useEffect(() => {
-    const unlisten = events.dictionaryLearnedEvent.listen((event) => {
-      for (const entry of event.payload.entries) {
-        toast.success(
-          t("settings.history.dictionary.added", {
-            wrong: entry.wrong,
-            right: entry.right,
-          }),
-          {
-            action: {
-              label: t("settings.history.dictionary.undo"),
-              onClick: () => commands.deleteDictionaryEntry(entry.id),
-            },
-          },
-        );
-      }
-      // The entries were written backend-side; pull them into the store so
-      // the Dictionary panel shows them immediately.
-      refreshSettings();
-    });
-    return () => {
-      unlisten.then((fn) => fn());
-    };
-  }, [t, refreshSettings]);
 
   // An entry was removed from another window (overlay Undo) or by the
   // backend. Reload so no window keeps a stale copy that a later save

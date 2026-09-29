@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Slovník",
-        "toggleDescription": "Deterministické opravy: nahraďte přesná slova nebo fráze, které model chybně rozpozná. Učí se z vašich úprav v Historii.",
+        "toggleDescription": "Automaticky se učit jasné fonetické shody s vaším známým slovníkem. Nejisté opravy před použitím zkontrolujte.",
         "title": "Položky slovníku",
-        "description": "Každá položka nahradí špatně rozpoznaný text vaší opravou v každém přepisu.",
+        "description": "Automatické opravy se použijí v odpovídajícím kontextu. Vámi schválené opravy se použijí vždy.",
         "wrongPlaceholder": "Špatně rozpoznáno",
         "rightPlaceholder": "Správně",
         "add": "Přidat",
         "remove": "Odebrat {{wrong}} → {{right}}",
         "duplicate": "Položka pro \"{{wrong}}\" již existuje",
         "captureLabel": "Učit se z úprav (macOS)",
-        "captureDescription": "Poté, co Handy vloží text, krátce sleduje text v okolí vloženého. Pokud tento text opravíte, oprava se automaticky přidá do slovníku. Přečtený text zůstává pouze v paměti a nikdy se neukládá ani nikam neodesílá."
+        "captureDescription": "Poté, co Handy vloží text, krátce sleduje okolní text. Jasné shody se slovní zásobou, kterou jste Handy naučili, se automaticky uloží s možností vrácení; nejisté dvojice čekají na vaše schválení. Místně se ukládají pouze dvojice oprav a několik slov kontextu."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Přepisuji...",
       "transcriptionFailed": "Přepis selhal. Můžete zkusit přepis znovu pomocí ikony opakování.",
       "dictionary": {
-        "editTitle": "Opravit přepis (učí slovník)",
+        "editTitle": "Opravit přepis",
         "saveEdit": "Naučit se z opravy",
         "cancelEdit": "Zrušit",
-        "nothingLearned": "Z této úpravy nebyly naučeny žádné opravy",
-        "added": "Přidáno do slovníku: {{wrong}} → {{right}}",
-        "undo": "Zpět",
-        "alreadyKnown": "Už je ve slovníku: {{wrong}} → {{right}}"
+        "nothingLearned": "Z této úpravy nevznikly žádné nové návrhy",
+        "added": "Navrženo: {{wrong}} → {{right}}",
+        "undo": "Ignorovat",
+        "alreadyKnown": "Již zkontrolováno nebo navrženo: {{wrong}} → {{right}}",
+        "autoAdded": "Naučeno: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Učení",
-      "entriesGroup": "Položky ({{count}})",
+      "entriesGroup": "Vaše opravy ({{count}})",
       "search": "Hledat položky",
-      "empty": "Zatím žádné položky. Opravte slovo tam, kam ho Handy vložil, nebo přidejte dvojici výše.",
+      "empty": "Zatím nejsou žádné opravy. Naučte Handy slovo, zkontrolujte návrh nebo přidejte vlastní.",
       "noMatch": "Žádné položky neodpovídají hledání",
       "source": {
         "manual": "Ručně",
@@ -679,7 +680,20 @@
       "save": "Uložit",
       "cancel": "Zrušit",
       "active": "Aktivní",
-      "seen": "viděno {{count}}×"
+      "seen": "viděno {{count}}×",
+      "addTitle": "Přidat opravu",
+      "suggestedGroup": "Navržené ({{count}})",
+      "suggestedDescription": "Tyto úpravy jsou méně jisté. Možnost „Vždy nahrazovat“ zvolte pouze tehdy, má-li se tato oprava použít pokaždé.",
+      "noSuggestions": "Žádné návrhy ke kontrole.",
+      "approve": "Vždy nahrazovat",
+      "ignore": "Ignorovat",
+      "ignoredGroup": "Ignorované ({{count}})",
+      "ignoredDescription": "Tyto dvojice zůstanou vypnuté a nebudou znovu navrhovány. Stále můžete zvolit „Vždy nahrazovat“.",
+      "actionError": "Slovník se nepodařilo aktualizovat. Zkuste to znovu.",
+      "review": "Zkontrolovat",
+      "automatic": "Automaticky",
+      "automaticHint": "Naučeno ze známé slovní zásoby. Použije se pouze v blízkosti odpovídajícího kontextu.",
+      "autoUndo": "Vrátit zpět"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Přepisuji...",
+    "autoLearned": "Naučeno: {{wrong}} → {{right}}",
+    "autoUndo": "Vrátit zpět",
     "processing": "Zpracovávám...",
-    "learned": "Naučeno: {{wrong}} → {{right}}",
-    "undo": "Zpět"
+    "learned": "Navrženo: {{wrong}} → {{right}}",
+    "undo": "Ignorovat",
+    "correctionQuestion": "Vždy nahrazovat {{wrong}} za {{right}}?",
+    "correctionNext": "Další",
+    "correctionRemaining": "Ještě {{count}}"
   },
   "whatsNew": {
     "title": "Novinky v Handy v{{version}}"

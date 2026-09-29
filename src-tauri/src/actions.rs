@@ -470,14 +470,6 @@ impl ShortcutAction for TranscribeAction {
         let start_time = Instant::now();
         debug!("TranscribeAction::start called for binding: {}", binding_id);
 
-        // A new dictation is the strongest "done editing the last one" signal:
-        // ask the capture thread to check the previous paste's anchor now
-        // (non-blocking send; see dictionary_capture.rs).
-        #[cfg(target_os = "macos")]
-        if let Some(capture) = app.try_state::<crate::dictionary_capture::CaptureManager>() {
-            capture.check_now();
-        }
-
         // Load model in the background
         let tm = app.state::<Arc<TranscriptionManager>>();
         let rm = app.state::<Arc<AudioRecordingManager>>();
@@ -533,8 +525,16 @@ impl ShortcutAction for TranscribeAction {
         match settings.overlay_style {
             OverlayStyle::Live if model_supports_streaming => utils::show_streaming_overlay(app),
             OverlayStyle::Live | OverlayStyle::Minimal => show_recording_overlay(app),
-            OverlayStyle::None => {} // show_overlay_state no-ops on None anyway
+            OverlayStyle::None => show_recording_overlay(app), // Pauses correction notices.
         }
+        // A new dictation is the strongest "done editing the last one" signal:
+        // ask the capture thread to check the previous paste's anchor now
+        // (non-blocking send; see dictionary_capture.rs).
+        #[cfg(target_os = "macos")]
+        if let Some(capture) = app.try_state::<crate::dictionary_capture::CaptureManager>() {
+            capture.check_now();
+        }
+
         // Everything above runs before capture can begin, so each span here is
         // added keypress->capture latency.
         debug!(

@@ -47,9 +47,9 @@ export const DictionarySettings: React.FC = () => {
     if (result.status === "ok") {
       setRows(result.data);
     } else {
-      console.error("Failed to load dictionary entries:", result.error);
+      toast.error(t("settings.dictionary.actionError"));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     reload();
@@ -79,6 +79,10 @@ export const DictionarySettings: React.FC = () => {
     );
   }, [rows, query]);
 
+  const suggested = visible.filter((row) => row.state === "proposed");
+  const approved = visible.filter((row) => row.state === "active");
+  const ignored = visible.filter((row) => row.state === "rejected");
+
   const run = async (
     action: () => Promise<
       { status: "ok" } | { status: "error"; error: string }
@@ -90,10 +94,15 @@ export const DictionarySettings: React.FC = () => {
       const result = await action();
       if (result.status === "error") {
         if (onError) onError(result.error);
-        else console.error("Dictionary command failed:", result.error);
+        else toast.error(t("settings.dictionary.actionError"));
         return false;
       }
+      await reload();
       return true;
+    } catch (error) {
+      console.error("Dictionary command failed:", error);
+      toast.error(t("settings.dictionary.actionError"));
+      return false;
     } finally {
       setBusy(false);
     }
@@ -109,7 +118,7 @@ export const DictionarySettings: React.FC = () => {
             t("settings.advanced.dictionary.duplicate", { wrong: wrongClean }),
           );
         } else {
-          console.error("Failed to add dictionary entry:", error);
+          toast.error(t("settings.dictionary.actionError"));
         }
       },
     );
@@ -118,6 +127,12 @@ export const DictionarySettings: React.FC = () => {
       setRight("");
     }
   };
+
+  const handleApprove = (row: DictionaryRow) =>
+    run(() => commands.confirmDictionaryEntry(row.id));
+
+  const handleIgnore = (row: DictionaryRow) =>
+    run(() => commands.rejectDictionaryEntry(row.id));
 
   const handleRemove = (row: DictionaryRow) =>
     run(() => commands.deleteDictionaryEntry(row.id));
@@ -160,7 +175,7 @@ export const DictionarySettings: React.FC = () => {
             t("settings.advanced.dictionary.duplicate", { wrong: w }),
           );
         } else {
-          console.error("Failed to update dictionary entry:", error);
+          toast.error(t("settings.dictionary.actionError"));
         }
       },
     );
@@ -187,35 +202,230 @@ export const DictionarySettings: React.FC = () => {
   const iconButton =
     "shrink-0 p-1.5 rounded-md text-text/50 hover:text-logo-primary transition-colors cursor-pointer disabled:cursor-not-allowed disabled:text-text/20";
 
+  const renderRow = (row: DictionaryRow) => {
+    const approved = row.state === "active";
+    const editing = editingId === row.id;
+    return (
+      <div
+        key={row.id}
+        className="px-4 py-3 flex flex-wrap items-center gap-3 text-sm"
+      >
+        {approved && (
+          <input
+            type="checkbox"
+            className="shrink-0 cursor-pointer accent-logo-primary"
+            checked={isActive(row)}
+            disabled={busy}
+            onChange={(e) => handleToggleActive(row, e.target.checked)}
+            title={t("settings.dictionary.active")}
+            aria-label={t("settings.dictionary.active")}
+          />
+        )}
+        {editing ? (
+          <div className="min-w-0 flex-1 flex items-center gap-2">
+            <Input
+              type="text"
+              value={draftWrong}
+              onChange={(e) => setDraftWrong(e.target.value)}
+              onKeyDown={onEditKey(row)}
+              aria-label={t("settings.advanced.dictionary.wrongPlaceholder")}
+              variant="compact"
+              disabled={busy}
+              autoFocus
+            />
+            <span className="text-text/40">{ARROW}</span>
+            <Input
+              type="text"
+              value={draftRight}
+              onChange={(e) => setDraftRight(e.target.value)}
+              onKeyDown={onEditKey(row)}
+              aria-label={t("settings.advanced.dictionary.rightPlaceholder")}
+              variant="compact"
+              disabled={busy}
+            />
+          </div>
+        ) : (
+          <span
+            className={`min-w-0 flex-1 break-words ${approved && !row.enabled ? "opacity-50" : ""}`}
+          >
+            <span className="text-text/60">{row.wrong}</span>
+            <span className="text-text/40 px-2">{ARROW}</span>
+            <span className="font-medium">{row.right}</span>
+          </span>
+        )}
+        <span className="shrink-0 text-xs text-text/50 rounded-md border border-mid-gray/20 px-1.5 py-0.5">
+          {t(SOURCE_KEYS[row.source] ?? SOURCE_KEYS.manual)}
+        </span>
+        {row.auto_learned && row.state === "active" && (
+          <span
+            className="shrink-0 text-xs text-text/50"
+            title={t("settings.dictionary.automaticHint")}
+          >
+            {t("settings.dictionary.automatic")}
+          </span>
+        )}
+        {row.seen_count > 1 && (
+          <span className="shrink-0 text-xs text-text/40">
+            {t("settings.dictionary.seen", { count: row.seen_count })}
+          </span>
+        )}
+        <div className="flex items-center gap-1 ms-auto">
+          {editing ? (
+            <>
+              <button
+                onClick={() => saveEdit(row)}
+                disabled={
+                  busy || !sanitize(draftWrong) || !sanitize(draftRight)
+                }
+                className={iconButton}
+                title={t("settings.dictionary.save")}
+                aria-label={t("settings.dictionary.save")}
+              >
+                <Check width={16} height={16} />
+              </button>
+              <button
+                onClick={cancelEdit}
+                disabled={busy}
+                className={iconButton}
+                title={t("settings.dictionary.cancel")}
+                aria-label={t("settings.dictionary.cancel")}
+              >
+                <X width={16} height={16} />
+              </button>
+            </>
+          ) : (
+            <>
+              {row.state !== "rejected" && (
+                <button
+                  onClick={() => startEdit(row)}
+                  disabled={busy}
+                  className={iconButton}
+                  title={t("settings.dictionary.edit")}
+                  aria-label={t("settings.dictionary.edit")}
+                >
+                  <Pencil width={16} height={16} />
+                </button>
+              )}
+              {!approved && (
+                <Button
+                  onClick={() => handleApprove(row)}
+                  disabled={busy}
+                  variant="primary-soft"
+                  size="sm"
+                >
+                  {t("settings.dictionary.approve")}
+                </Button>
+              )}
+              {row.state !== "rejected" &&
+                (approved && row.source === "manual" ? (
+                  <button
+                    onClick={() => handleRemove(row)}
+                    disabled={busy}
+                    className={iconButton}
+                    title={t("settings.advanced.dictionary.remove", row)}
+                    aria-label={t("settings.advanced.dictionary.remove", row)}
+                  >
+                    <Trash2 width={16} height={16} />
+                  </button>
+                ) : (
+                  <Button
+                    onClick={() => handleIgnore(row)}
+                    disabled={busy}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    {t(
+                      row.auto_learned && approved
+                        ? "settings.dictionary.autoUndo"
+                        : "settings.dictionary.ignore",
+                    )}
+                  </Button>
+                ))}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <SettingsGroup title={t("settings.dictionary.learningGroup")}>
         <DictionaryCaptureToggle descriptionMode="tooltip" grouped={true} />
       </SettingsGroup>
 
+      <div className="flex items-center gap-2 px-1 text-text/50">
+        <Search width={16} height={16} aria-hidden="true" />
+        <Input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("settings.dictionary.search")}
+          aria-label={t("settings.dictionary.search")}
+          variant="compact"
+        />
+      </div>
+
       <SettingsGroup
-        title={t("settings.dictionary.entriesGroup", { count: rows.length })}
+        title={t("settings.dictionary.suggestedGroup", {
+          count: suggested.length,
+        })}
+        description={t("settings.dictionary.suggestedDescription")}
+      >
+        {suggested.length ? (
+          suggested.map(renderRow)
+        ) : (
+          <p className="px-4 py-5 text-sm text-text/60">
+            {t(
+              query
+                ? "settings.dictionary.noMatch"
+                : "settings.dictionary.noSuggestions",
+            )}
+          </p>
+        )}
+      </SettingsGroup>
+
+      <SettingsGroup
+        title={t("settings.dictionary.entriesGroup", {
+          count: approved.length,
+        })}
         description={t("settings.advanced.dictionary.description")}
       >
-        <div className="px-4 py-3 flex flex-wrap items-center gap-2 border-b border-mid-gray/20">
+        {approved.length ? (
+          approved.map(renderRow)
+        ) : (
+          <p className="px-4 py-5 text-sm text-text/60">
+            {t(
+              query
+                ? "settings.dictionary.noMatch"
+                : "settings.dictionary.empty",
+            )}
+          </p>
+        )}
+      </SettingsGroup>
+
+      <SettingsGroup title={t("settings.dictionary.addTitle")}>
+        <div className="px-4 py-3 flex flex-wrap items-center gap-2">
           <Input
             type="text"
-            className="max-w-40"
+            className="min-w-24 flex-1"
             value={wrong}
             onChange={(e) => setWrong(e.target.value)}
             onKeyDown={onAddKey}
             placeholder={t("settings.advanced.dictionary.wrongPlaceholder")}
+            aria-label={t("settings.advanced.dictionary.wrongPlaceholder")}
             variant="compact"
             disabled={busy}
           />
           <span className="text-text/50">{ARROW}</span>
           <Input
             type="text"
-            className="max-w-40"
+            className="min-w-24 flex-1"
             value={right}
             onChange={(e) => setRight(e.target.value)}
             onKeyDown={onAddKey}
             placeholder={t("settings.advanced.dictionary.rightPlaceholder")}
+            aria-label={t("settings.advanced.dictionary.rightPlaceholder")}
             variant="compact"
             disabled={busy}
           />
@@ -227,146 +437,22 @@ export const DictionarySettings: React.FC = () => {
           >
             {t("settings.advanced.dictionary.add")}
           </Button>
-          <div className="ms-auto flex items-center gap-2 text-text/50">
-            <Search width={14} height={14} />
-            <Input
-              type="text"
-              className="max-w-40"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("settings.dictionary.search")}
-              variant="compact"
-            />
-          </div>
         </div>
-
-        {rows.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-text/60">
-            {t("settings.dictionary.empty")}
-          </div>
-        ) : visible.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-text/60">
-            {t("settings.dictionary.noMatch")}
-          </div>
-        ) : (
-          <div className="divide-y divide-mid-gray/20">
-            {visible.map((row) => {
-              const active = isActive(row);
-              const editing = editingId === row.id;
-              return (
-                <div
-                  key={row.id}
-                  className={`px-4 py-2 flex items-center gap-3 text-sm ${
-                    active ? "" : "opacity-60"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="shrink-0 cursor-pointer"
-                    checked={active}
-                    disabled={busy}
-                    onChange={(e) => handleToggleActive(row, e.target.checked)}
-                    title={t("settings.dictionary.active")}
-                    aria-label={t("settings.dictionary.active")}
-                  />
-                  {editing ? (
-                    <div className="min-w-0 flex-1 flex items-center gap-2">
-                      <Input
-                        type="text"
-                        className="max-w-40"
-                        value={draftWrong}
-                        onChange={(e) => setDraftWrong(e.target.value)}
-                        onKeyDown={onEditKey(row)}
-                        variant="compact"
-                        disabled={busy}
-                        autoFocus
-                      />
-                      <span className="text-text/40">{ARROW}</span>
-                      <Input
-                        type="text"
-                        className="max-w-40"
-                        value={draftRight}
-                        onChange={(e) => setDraftRight(e.target.value)}
-                        onKeyDown={onEditKey(row)}
-                        variant="compact"
-                        disabled={busy}
-                      />
-                    </div>
-                  ) : (
-                    <span className="min-w-0 flex-1 truncate">
-                      <span className="text-text/60">{row.wrong}</span>
-                      <span className="text-text/40 px-2">{ARROW}</span>
-                      <span className="font-medium">{row.right}</span>
-                    </span>
-                  )}
-                  <span className="shrink-0 text-xs text-text/50 rounded-md border border-mid-gray/20 px-1.5 py-0.5">
-                    {t(SOURCE_KEYS[row.source] ?? SOURCE_KEYS.manual)}
-                  </span>
-                  {row.seen_count > 1 && (
-                    <span
-                      className="shrink-0 text-xs text-text/40"
-                      title={t("settings.dictionary.seen", {
-                        count: row.seen_count,
-                      })}
-                    >
-                      {t("settings.dictionary.seen", { count: row.seen_count })}
-                    </span>
-                  )}
-                  {editing ? (
-                    <>
-                      <button
-                        onClick={() => saveEdit(row)}
-                        disabled={busy}
-                        className={iconButton}
-                        title={t("settings.dictionary.save")}
-                        aria-label={t("settings.dictionary.save")}
-                      >
-                        <Check width={16} height={16} />
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        disabled={busy}
-                        className={iconButton}
-                        title={t("settings.dictionary.cancel")}
-                        aria-label={t("settings.dictionary.cancel")}
-                      >
-                        <X width={16} height={16} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => startEdit(row)}
-                        disabled={busy}
-                        className={iconButton}
-                        title={t("settings.dictionary.edit")}
-                        aria-label={t("settings.dictionary.edit")}
-                      >
-                        <Pencil width={16} height={16} />
-                      </button>
-                      <button
-                        onClick={() => handleRemove(row)}
-                        disabled={busy}
-                        className={iconButton}
-                        title={t("settings.advanced.dictionary.remove", {
-                          wrong: row.wrong,
-                          right: row.right,
-                        })}
-                        aria-label={t("settings.advanced.dictionary.remove", {
-                          wrong: row.wrong,
-                          right: row.right,
-                        })}
-                      >
-                        <Trash2 width={16} height={16} />
-                      </button>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
       </SettingsGroup>
+
+      {ignored.length > 0 && (
+        <details className="text-sm">
+          <summary className="cursor-pointer px-4 py-2 text-text/60">
+            {t("settings.dictionary.ignoredGroup", { count: ignored.length })}
+          </summary>
+          <p className="px-4 py-2 text-xs text-text/60">
+            {t("settings.dictionary.ignoredDescription")}
+          </p>
+          <div className="border border-mid-gray/20 rounded-lg divide-y divide-mid-gray/20">
+            {ignored.map(renderRow)}
+          </div>
+        </details>
+      )}
     </div>
   );
 };

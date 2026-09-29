@@ -407,16 +407,16 @@
       },
       "dictionary": {
         "toggleLabel": "Słownik",
-        "toggleDescription": "Deterministyczne poprawki: zastępuj dokładne słowa lub zwroty, które model błędnie rozpoznaje. Uczy się na podstawie Twoich zmian w Historii.",
+        "toggleDescription": "Automatycznie ucz się wyraźnych dopasowań fonetycznych do znanego słownictwa. Przejrzyj niepewne poprawki przed ich zastosowaniem.",
         "title": "Wpisy słownika",
-        "description": "Każdy wpis zastępuje błędnie rozpoznany tekst Twoją poprawką w każdej transkrypcji.",
+        "description": "Automatyczne poprawki są stosowane w pasującym kontekście. Zatwierdzone przez Ciebie poprawki są stosowane za każdym razem.",
         "wrongPlaceholder": "Błędnie rozpoznane",
         "rightPlaceholder": "Poprawnie",
         "add": "Dodaj",
         "remove": "Usuń {{wrong}} → {{right}}",
         "duplicate": "Wpis dla \"{{wrong}}\" już istnieje",
-        "captureLabel": "Ucz się ze zmian (macOS)",
-        "captureDescription": "Po wklejeniu tekstu przez Handy aplikacja przez chwilę obserwuje tekst w pobliżu wklejonego fragmentu. Jeśli go poprawisz, poprawka zostanie automatycznie dodana do słownika. Odczytany tekst pozostaje wyłącznie w pamięci i nigdy nie jest zapisywany ani nigdzie wysyłany."
+        "captureLabel": "Uczenie się ze zmian (macOS)",
+        "captureDescription": "Po wklejeniu tekstu Handy przez chwilę obserwuje tekst w pobliżu. Wyraźne dopasowania do słownictwa nauczonego Handy są zapamiętywane automatycznie z możliwością cofnięcia; niepewne pary czekają na Twoje zatwierdzenie. Lokalnie zapisywane są tylko pary poprawek i kilka słów kontekstu."
       }
     },
     "postProcessing": {
@@ -488,13 +488,14 @@
       "transcribing": "Transkrybuję...",
       "transcriptionFailed": "Transkrypcja nie powiodła się. Możesz transkrybować ponownie za pomocą ikony ponowienia.",
       "dictionary": {
-        "editTitle": "Popraw transkrypcję (uczy słownik)",
-        "saveEdit": "Ucz się z poprawki",
+        "editTitle": "Popraw transkrypcję",
+        "saveEdit": "Naucz się z poprawki",
         "cancelEdit": "Anuluj",
-        "nothingLearned": "Z tej zmiany nie nauczono się żadnych poprawek",
-        "added": "Dodano do słownika: {{wrong}} → {{right}}",
-        "undo": "Cofnij",
-        "alreadyKnown": "Już jest w słowniku: {{wrong}} → {{right}}"
+        "nothingLearned": "Brak nowych propozycji z tej zmiany",
+        "added": "Zaproponowano: {{wrong}} → {{right}}",
+        "undo": "Ignoruj",
+        "alreadyKnown": "Już przejrzano lub zaproponowano: {{wrong}} → {{right}}",
+        "autoAdded": "Nauczono: {{wrong}} → {{right}}"
       }
     },
     "debug": {
@@ -666,9 +667,9 @@
     },
     "dictionary": {
       "learningGroup": "Uczenie",
-      "entriesGroup": "Wpisy ({{count}})",
+      "entriesGroup": "Twoje poprawki ({{count}})",
       "search": "Szukaj wpisów",
-      "empty": "Brak wpisów. Popraw słowo tam, gdzie Handy je wkleił, lub dodaj parę powyżej.",
+      "empty": "Nie ma jeszcze poprawek. Naucz Handy słowa, przejrzyj propozycję lub dodaj własną.",
       "noMatch": "Żadne wpisy nie pasują do wyszukiwania",
       "source": {
         "manual": "Ręcznie",
@@ -679,7 +680,20 @@
       "save": "Zapisz",
       "cancel": "Anuluj",
       "active": "Aktywny",
-      "seen": "widziano {{count}}×"
+      "seen": "widziano {{count}}×",
+      "addTitle": "Dodaj poprawkę",
+      "suggestedGroup": "Proponowane ({{count}})",
+      "suggestedDescription": "Te zmiany są mniej pewne. Wybierz „Zawsze zamieniaj” tylko wtedy, gdy ta poprawka ma być stosowana za każdym razem.",
+      "noSuggestions": "Brak propozycji do przejrzenia.",
+      "approve": "Zawsze zamieniaj",
+      "ignore": "Ignoruj",
+      "ignoredGroup": "Ignorowane ({{count}})",
+      "ignoredDescription": "Te pary pozostaną wyłączone i nie będą ponownie proponowane. Nadal możesz wybrać „Zawsze zamieniaj”.",
+      "actionError": "Nie udało się zaktualizować Słownika. Spróbuj ponownie.",
+      "review": "Przejrzyj",
+      "automatic": "Automatycznie",
+      "automaticHint": "Nauczone ze znanego słownictwa. Stosowane tylko w pobliżu pasującego kontekstu.",
+      "autoUndo": "Cofnij"
     }
   },
   "footer": {
@@ -743,9 +757,14 @@
   },
   "overlay": {
     "transcribing": "Transkrypcja...",
+    "autoLearned": "Nauczono: {{wrong}} → {{right}}",
+    "autoUndo": "Cofnij",
     "processing": "Przetwarzanie...",
-    "learned": "Nauczono: {{wrong}} → {{right}}",
-    "undo": "Cofnij"
+    "learned": "Zaproponowano: {{wrong}} → {{right}}",
+    "undo": "Ignoruj",
+    "correctionQuestion": "Zawsze zamieniać {{wrong}} na {{right}}?",
+    "correctionNext": "Dalej",
+    "correctionRemaining": "Jeszcze {{count}}"
   },
   "whatsNew": {
     "title": "Nowości w Handy v{{version}}"

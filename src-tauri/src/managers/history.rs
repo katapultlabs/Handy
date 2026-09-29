@@ -59,6 +59,25 @@ static MIGRATIONS: &[M] = &[
             ON dictionary (wrong_key, app_id)
             WHERE state = 'active' AND wrong_key != '';",
     ),
+    // Early SQLite builds activated every learned row immediately. Require a
+    // fresh user confirmation for those rows without changing manual entries,
+    // rejected rows, or entries the user already disabled.
+    M::up(
+        "UPDATE dictionary
+         SET state = 'proposed'
+         WHERE source IN ('history', 'capture')
+           AND state = 'active'
+           AND enabled = 1;",
+    ),
+    // Conservative automatic learning. `auto_learned` distinguishes rows
+    // activated by the classifier from explicit user decisions. Context is a
+    // JSON array and is required at match time for automatic rows.
+    M::up(
+        "ALTER TABLE dictionary
+             ADD COLUMN auto_learned INTEGER NOT NULL DEFAULT 0;
+         ALTER TABLE dictionary
+             ADD COLUMN context_words TEXT NOT NULL DEFAULT '[]';",
+    ),
 ];
 
 #[derive(Clone, Debug, Serialize, Deserialize, Type)]
@@ -761,5 +780,85 @@ mod tests {
 
         assert_eq!(entry.timestamp, 100);
         assert_eq!(entry.transcription_text, "completed");
+    }
+
+    #[test]
+    fn migration_demotes_only_enabled_active_learned_dictionary_rows() {
+        let mut conn = Connection::open_in_memory().expect("open in-memory db");
+        Migrations::new(MIGRATIONS[..5].to_vec())
+            .to_latest(&mut conn)
+            .expect("apply pre-lifecycle migrations");
+
+        let rows = [
+            ("manual", "active", 1, "manual"),
+            ("history", "active", 1, "history"),
+            ("capture", "active", 1, "capture"),
+            ("capture-disabled", "active", 0, "capture"),
+            ("history-rejected", "rejected", 1, "history"),
+        ];
+        for (wrong, state, enabled, source) in rows {
+            conn.execute(
+                "INSERT INTO dictionary
+                   (wrong, right, source, state, enabled, wrong_key, right_key,
+                    created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?1, ?2, 1, 1)",
+                params![wrong, format!("{wrong}-right"), source, state, enabled],
+            )
+            .expect("insert legacy dictionary row");
+        }
+
+        Migrations::new(MIGRATIONS.to_vec())
+            .to_latest(&mut conn)
+            .expect("apply lifecycle migration");
+
+        let row_count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM dictionary", [], |row| row.get(0))
+            .expect("count retained dictionary rows");
+        assert_eq!(row_count, 5);
+
+        let state = |wrong: &str| {
+            conn.query_row(
+                "SELECT state FROM dictionary WHERE wrong = ?1",
+                [wrong],
+                |row| row.get::<_, String>(0),
+            )
+            .expect("read migrated state")
+        };
+        assert_eq!(state("manual"), "active");
+        assert_eq!(state("history"), "proposed");
+        assert_eq!(state("capture"), "proposed");
+        assert_eq!(state("capture-disabled"), "active");
+        assert_eq!(state("history-rejected"), "rejected");
+    }
+
+    #[test]
+    fn automatic_learning_migration_preserves_rows_with_safe_defaults() {
+        let mut conn = Connection::open_in_memory().expect("open in-memory db");
+        Migrations::new(MIGRATIONS[..6].to_vec())
+            .to_latest(&mut conn)
+            .expect("apply pre-automatic-learning migrations");
+        conn.execute(
+            "INSERT INTO dictionary
+               (wrong, right, source, state, enabled, wrong_key, right_key,
+                created_at, updated_at)
+             VALUES ('maine', 'main', 'manual', 'active', 1,
+                     'maine', 'main', 1, 1)",
+            [],
+        )
+        .expect("insert explicit row");
+
+        Migrations::new(MIGRATIONS.to_vec())
+            .to_latest(&mut conn)
+            .expect("apply automatic-learning migration");
+
+        let (auto_learned, context_words): (i64, String) = conn
+            .query_row(
+                "SELECT auto_learned, context_words FROM dictionary WHERE wrong = 'maine'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("read migrated row");
+        assert_eq!(auto_learned, 0);
+        assert_eq!(context_words, "[]");
     }
 }

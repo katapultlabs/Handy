@@ -68,6 +68,7 @@ natural = "0.5.0"
 similar = "2.6"
 rphonetic = "3.0"
 regex = "1"
+aho-corasick = "1.1"
 # Text-based language ID (filler-word removal fallback); isolang bridges the
 # ISO 639-1 codes in model metadata to whatlang's 639-3 codes.
 whatlang = "0.16"
