@@ -54,6 +54,8 @@ every upstream merge. Remove an item when upstream accepts it.
 | Version suffix `+katapult.N` / `+dict.N`            | `src-tauri/tauri.conf.json`                                                     | Never sent                                              |
 | Tester guide                                        | `docs/TEST_BUILD.md`                                                            | Never sent                                              |
 | This document                                       | `docs/FORK.md`                                                                  | Never sent                                              |
+| Upstream plan and Discussion drafts                 | `docs/UPSTREAM.md`                                                              | Never sent                                              |
+| Pointer to this document                            | `CLAUDE.md`, last line                                                          | Never sent                                              |
 | Dictionary: store, matcher, learning, settings page | `src-tauri/src/dictionary*.rs`, `src/components/settings/dictionary/`           | Not yet sent; needs a Discussion first (feature freeze) |
 | Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                           | Part of the Dictionary pull request                     |
 | Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs` | Follow-up to the Dictionary pull request                |
@@ -72,3 +74,29 @@ every upstream merge. Remove an item when upstream accepts it.
 
 Read `.github/PULL_REQUEST_TEMPLATE.md` before each pull request and
 fill every section.
+
+## 6. Claude Code sessions
+
+Several sessions can work on this fork at the same time. The rules:
+
+- Start every session from the main checkout,
+  `~/Projects/oss_projects/Handy`, which stays on `main`. Keep that
+  checkout clean; do not commit there directly.
+- A background job gets its own worktree under `.claude/worktrees/`,
+  branched from `main`. Name the branch `feat/<topic>`. Commit and push
+  it before the job ends; a worktree can be deleted with its session.
+- Run `git status` before a merge or a build. A worktree can hold
+  uncommitted work from another session. Commit it as its own unit if it
+  passes the checks; do not discard it.
+- Only one session merges into `main` at a time. When `main` is checked
+  out elsewhere, work on a temporary branch (`git checkout -b main-work
+origin/main`), merge, commit, push with `git push origin
+main-work:main`, tag, then return to the feature branch.
+- Never rebase a shared branch. Merge `upstream/main` or `main` in.
+- Each worktree compiles the Rust side from scratch once (about 15
+  minutes). Later builds in the same worktree take about 5 minutes.
+- Public actions (GitHub releases, mass branch deletion) are blocked for
+  sessions by policy. The session prepares the command and a person runs
+  it.
+- Project memory for Claude is shared across sessions of this repository,
+  so a session can rely on what an earlier session recorded.
