@@ -151,9 +151,9 @@ Your settings and history stay.
 ## 8. Build it yourself (macOS, Apple Silicon)
 
 The team release is the tag `v0.9.7+katapult.1` on `main` of
-https://github.com/katapultlabs/Handy. Work in progress is on the
-`feat/dictionary-mvp` branch. A build takes about 5 minutes after the
-first compile, and about 15 minutes the first time.
+https://github.com/katapultlabs/Handy. Work in progress is on `feat/*`
+branches. A build takes about 5 minutes after the first compile, and
+about 15 minutes the first time.
 
 1. Install the tools once:
 
