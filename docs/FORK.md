@@ -68,8 +68,8 @@ The fork has no Apple or Microsoft code signing certificate:
 - macOS builds are ad-hoc signed. First start needs right-click -> Open.
   After each update, macOS asks again for Accessibility and Microphone.
 - Windows installers are unsigned. SmartScreen warns on first install.
-- Linux: only the AppImage updates itself. Reinstall `.deb` and `.rpm`
-  packages by hand.
+- Linux: the `.AppImage`, `.deb`, and `.rpm` packages all update
+  themselves.
 
 ### 2.3 Workflows disabled on the fork
 

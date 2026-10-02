@@ -40,8 +40,8 @@ time. Later releases arrive inside Handy (section 3).
      (System Settings -> Privacy & Security).
 - Windows: the `-setup.exe`. SmartScreen warns about an unknown
   publisher. Click "More info" -> "Run anyway".
-- Linux: the `.AppImage` updates itself. The `.deb` and `.rpm` packages
-  do not.
+- Linux: the `.AppImage`, `.deb`, or `.rpm`. All three update
+  themselves.
 
 Your settings, models, and history stay. The build uses the same data as
 the upstream release.
