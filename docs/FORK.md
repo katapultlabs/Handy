@@ -9,8 +9,8 @@ It explains how this fork relates to upstream Handy
 - `main`: the product the team runs. It is upstream `main` plus every
   change the fork has accepted. Merge into it with a merge commit, not a
   squash, so single commits stay available for upstream pull requests.
-- `feat/*`: work in progress. Test builds come from these branches with
-  the version `<upstream>+dict.N` (or another feature name). Merge a
+- `feat/*`: work in progress. Local test builds come from these branches
+  with the version `<upstream>+dict.N` (or another feature name). Merge a
   feature branch into `main` when it is done.
 - `up/*`: one branch per upstream pull request. Branch from
   `upstream/main`, cherry-pick the commits from `main`, open the pull
@@ -20,23 +20,82 @@ It explains how this fork relates to upstream Handy
 
 ## 2. Releases
 
-A team release is an annotated tag on `main`, for example
-`v0.9.7+katapult.1`. The number before the plus sign is the upstream
-version inside the build. The number after `katapult.` counts fork
-releases on that upstream version. `src-tauri/tauri.conf.json` carries
-the same string, so the application reports it in About and in logs.
+A team release is a GitHub release on this repository with the version
+`<upstream>-katapult.N`, for example `0.9.7-katapult.2`. The part before
+the hyphen is the upstream version inside the build. `N` counts fork
+releases on that upstream version.
 
-Build a release from the tag with the steps in `docs/TEST_BUILD.md`,
-section 8.
+The hyphen form is a semver pre-release. The updater compares it
+correctly: `0.9.7-katapult.3` is newer than `0.9.7-katapult.2`, and
+`0.9.8-katapult.1` is newer than both. Do not use `+` for a release. The
+updater ignores everything after `+`. `v0.9.7+katapult.1` was the last
+release with that form.
+
+### 2.1 Cut a release
+
+1. On `main`, set `version` in `src-tauri/tauri.conf.json` to the new
+   `<upstream>-katapult.N`. Set `bundle.windows.wix.version` in
+   `src-tauri/tauri.windows.conf.json` to `<upstream>.N`, for example
+   `0.9.7.2`. The MSI installer accepts only numbers.
+2. Commit and push `main`.
+3. Run the "Katapult Release" workflow on `main`, from the Actions tab or
+   with:
+
+   ```bash
+   gh api -X POST repos/katapultlabs/Handy/actions/workflows/katapult-release.yml/dispatches -f ref=main
+   ```
+
+4. The workflow creates the tag `v<version>` and a draft release, builds
+   all platforms, and signs the updater files. It publishes the release
+   only when `latest.json` is attached. A failed run leaves only a draft;
+   GitHub creates the tag when the release is published. Delete the draft,
+   fix the problem, and run again.
+
+### 2.2 Automatic updates
+
+Installed fork builds read
+`https://github.com/katapultlabs/Handy/releases/latest/download/latest.json`
+and accept an update only if it is signed with the fork's updater key.
+The public key is `plugins.updater.pubkey` in `src-tauri/tauri.conf.json`.
+The private key and its password are the Actions secrets
+`TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. A
+copy stays with the fork owner, outside the repository. If the key is
+lost, installed builds cannot update, and everybody must install the
+next build by hand.
+
+The fork has no Apple or Microsoft code signing certificate:
+
+- macOS builds are ad-hoc signed. First start needs right-click -> Open.
+  After each update, macOS asks again for Accessibility and Microphone.
+- Windows installers are unsigned. SmartScreen warns on first install.
+- Linux: only the AppImage updates itself. Reinstall `.deb` and `.rpm`
+  packages by hand.
+
+### 2.3 Workflows disabled on the fork
+
+Upstream's "Release", "Main Branch Build", "Build Test", and "PR Test
+Build" need upstream's Apple and Azure secrets, so they fail here. They
+are disabled in the fork's Actions settings, not in the files, so
+upstream merges stay clean. "test", "code quality", "nix build check",
+and "Playwright" stay on.
+
+Build a release locally with the steps in `docs/TEST_BUILD.md`,
+section 9. A local build has no updater signature.
 
 ## 3. Merging upstream
 
 Run `git merge upstream/main` into `main` (never rebase; the team builds
-from the branch). Two conflicts repeat and have fixed answers:
+from the branch). These conflicts repeat and have fixed answers:
 
 - `src-tauri/tauri.conf.json` `version`: take the new upstream version
-  and add `+katapult.N`. `package.json` and `src-tauri/Cargo.toml` keep
-  the plain upstream version.
+  and add `-katapult.1`. Set `wix.version` in
+  `src-tauri/tauri.windows.conf.json` to `<upstream>.1`. `package.json`
+  and `src-tauri/Cargo.toml` keep the plain upstream version.
+- `src-tauri/tauri.conf.json` `plugins.updater` and `bundle.windows`:
+  keep ours. The fork's updater feed and key must survive every merge,
+  and the fork has no Windows `signCommand`.
+- `.github/workflows/build.yml`: keep the `sign-updater` input and the
+  two `TAURI_SIGNING_*` lines that read it.
 - `src/i18n/locales/*/translation.json`: keep both sides, then run
   `bun run check:translations`. A new upstream locale needs every
   fork-only key added before the check passes.
@@ -49,19 +108,24 @@ After the merge, run the full check set: `cargo test`, `bun run build`,
 These parts exist in this fork and not upstream. Review this list at
 every upstream merge. Remove an item when upstream accepts it.
 
-| Part                                                | Where                                                                           | Upstream status                                         |
-| --------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Version suffix `+katapult.N` / `+dict.N`            | `src-tauri/tauri.conf.json`                                                     | Never sent                                              |
-| Tester guide                                        | `docs/TEST_BUILD.md`                                                            | Never sent                                              |
-| This document                                       | `docs/FORK.md`                                                                  | Never sent                                              |
-| Upstream plan and Discussion drafts                 | `docs/UPSTREAM.md`                                                              | Never sent                                              |
-| Pointer to this document                            | `CLAUDE.md`, last line                                                          | Never sent                                              |
-| Dictionary: store, matcher, learning, settings page | `src-tauri/src/dictionary*.rs`, `src/components/settings/dictionary/`           | Not yet sent; needs a Discussion first (feature freeze) |
-| Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                           | Part of the Dictionary pull request                     |
-| Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs` | Follow-up to the Dictionary pull request                |
-| macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                           | Separate pull request after the Dictionary              |
-| Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                       | Separate Discussion; unrelated to the Dictionary        |
-| Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                             | Sent as documentation pull requests when stable         |
+| Part                                                | Where                                                                            | Upstream status                                         |
+| --------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Version form `-katapult.N` / `+dict.N`              | `src-tauri/tauri.conf.json`, `src-tauri/tauri.windows.conf.json` (`wix.version`) | Never sent                                              |
+| Updater feed and public key                         | `src-tauri/tauri.conf.json`, `plugins.updater`                                   | Never sent                                              |
+| No Windows `signCommand`                            | `src-tauri/tauri.conf.json`, `bundle.windows`                                    | Never sent                                              |
+| Release workflow                                    | `.github/workflows/katapult-release.yml`                                         | Never sent                                              |
+| `sign-updater` build input                          | `.github/workflows/build.yml`                                                    | Could go upstream as a small CI change                  |
+| Portable installer fallback link                    | `src/components/update-checker/portableInstaller.ts`                             | Never sent                                              |
+| Tester guide                                        | `docs/TEST_BUILD.md`                                                             | Never sent                                              |
+| This document                                       | `docs/FORK.md`                                                                   | Never sent                                              |
+| Upstream plan and Discussion drafts                 | `docs/UPSTREAM.md`                                                               | Never sent                                              |
+| Pointer to this document                            | `CLAUDE.md`, last line                                                           | Never sent                                              |
+| Dictionary: store, matcher, learning, settings page | `src-tauri/src/dictionary*.rs`, `src/components/settings/dictionary/`            | Not yet sent; needs a Discussion first (feature freeze) |
+| Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                            | Part of the Dictionary pull request                     |
+| Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs`  | Follow-up to the Dictionary pull request                |
+| macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                            | Separate pull request after the Dictionary              |
+| Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                        | Separate Discussion; unrelated to the Dictionary        |
+| Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                              | Sent as documentation pull requests when stable         |
 
 ## 5. Upstream pull request order
 
@@ -88,15 +152,15 @@ Several sessions can work on this fork at the same time. The rules:
 - Run `git status` before a merge or a build. A worktree can hold
   uncommitted work from another session. Commit it as its own unit if it
   passes the checks; do not discard it.
-- Only one session merges into `main` at a time. When `main` is checked
-  out elsewhere, work on a temporary branch (`git checkout -b main-work
-origin/main`), merge, commit, push with `git push origin
-main-work:main`, tag, then return to the feature branch.
+- Only one session lands work on `main` at a time. From the worktree:
+  `git fetch origin`, `git merge origin/main`, run the checks, then
+  `git push origin HEAD:main`. The main checkout picks it up with
+  `git pull`.
 - Never rebase a shared branch. Merge `upstream/main` or `main` in.
 - Each worktree compiles the Rust side from scratch once (about 15
   minutes). Later builds in the same worktree take about 5 minutes.
-- Public actions (GitHub releases, mass branch deletion) are blocked for
-  sessions by policy. The session prepares the command and a person runs
-  it.
+- `.claude/settings.local.json` in the main checkout lets sessions run
+  `gh release`, `gh pr`, `gh api`, remote branch deletion, and pruning.
+  Writing repository secrets stays with a person.
 - Project memory for Claude is shared across sessions of this repository,
   so a session can rely on what an earlier session recorded.

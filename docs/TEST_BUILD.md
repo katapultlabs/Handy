@@ -5,7 +5,8 @@ It explains how to install and test the Handy Dictionary build.
 
 ## 1. What this build is
 
-This is Handy 0.9.7+katapult.1, the Katapult team release on upstream Handy 0.9.7. It adds the Dictionary:
+This is Handy 0.9.7-katapult.2, the Katapult team release on upstream
+Handy 0.9.7. It adds the Dictionary:
 
 - Handy learns clear matches to vocabulary you have taught it automatically,
   with **Undo**. These rules apply only near matching context words.
@@ -18,24 +19,48 @@ This is Handy 0.9.7+katapult.1, the Katapult team release on upstream Handy 0.9.
      History entry. Edit the text and click Learn from correction. Review uncertain pairs directly in the correction overlay or later in Dictionary.
   3. Settings -> Dictionary. Add word pairs by hand.
 
-The build is macOS (Apple Silicon) only. It is not signed with a developer
-certificate.
+Builds exist for macOS (Apple Silicon and Intel), Windows, and Linux.
+They are not signed with an Apple or Microsoft certificate. The Dictionary
+learns from edits in other applications on macOS only.
 
 ## 2. Install
 
-1. Quit Handy if it runs.
-2. Copy `Handy.app` to `/Applications`. Replace the old one.
-3. macOS blocks unsigned applications on first start. Do one of these:
-   - Right-click `Handy.app` -> Open -> Open.
-   - Or run: `xattr -cr /Applications/Handy.app`, then open it.
-4. macOS treats this build as a new application. Grant the permissions
-   again when it asks: Accessibility and Microphone
-   (System Settings -> Privacy & Security).
+Download the file for your system from
+https://github.com/katapultlabs/Handy/releases/latest. You do this one
+time. Later releases arrive inside Handy (section 3).
+
+- macOS: the `.dmg` (`aarch64` for Apple Silicon, `x64` for Intel).
+  1. Quit Handy if it runs.
+  2. Open the `.dmg` and drag `Handy.app` to `/Applications`. Replace the
+     old one.
+  3. macOS blocks unsigned applications on first start. Right-click
+     `Handy.app` -> Open -> Open. Or run
+     `xattr -cr /Applications/Handy.app`, then open it.
+  4. Grant Accessibility and Microphone again when macOS asks
+     (System Settings -> Privacy & Security).
+- Windows: the `-setup.exe`. SmartScreen warns about an unknown
+  publisher. Click "More info" -> "Run anyway".
+- Linux: the `.AppImage` updates itself. The `.deb` and `.rpm` packages
+  do not.
 
 Your settings, models, and history stay. The build uses the same data as
-the release version.
+the upstream release.
 
-## 3. Turn the Dictionary on
+## 3. Updates
+
+Handy checks for updates when it starts. It gets them from the Katapult
+releases, not from upstream. Keep Settings -> Advanced -> "Check for
+updates" on.
+
+When an update is ready, Handy shows it in the footer. Click it to
+download and restart. On macOS, grant Accessibility and Microphone again
+after each update. macOS sees each build as a new application until the
+builds carry an Apple certificate.
+
+Builds `0.9.7+katapult.1` and older do not update to Katapult releases.
+Install this build by hand one time.
+
+## 4. Turn the Dictionary on
 
 1. Open Handy Settings -> Advanced.
 2. Turn on "Enable experimental features".
@@ -43,10 +68,8 @@ the release version.
    appears in the sidebar.
 4. In the Dictionary section, turn on "Learn from edits (macOS)" for
    in-place learning.
-5. Back in Advanced, in the App group, turn off "Check for updates". An
-   upstream release would otherwise offer to replace this test build.
 
-## 4. Test it
+## 5. Test it
 
 1. Teach Handy the correct vocabulary first. For this test, add a manual
    correction "katapolt" -> "Katapult" in Dictionary. Custom Words and approved
@@ -108,7 +131,7 @@ applies to every later transcription. Examples of filtered edits:
 - Punctuation or spacing between the same words: "so there" ->
   "so, there", "hand created" -> "hand-created".
 
-## 5. Control what it learned
+## 6. Control what it learned
 
 Settings -> Dictionary separates Suggested, Your corrections, and Ignored.
 Search across all groups. Each pair shows its source: Manual, History, or
@@ -134,7 +157,7 @@ No entries are deleted. Entries imported from the old settings list follow the
 same rule. "seen 3x" means Handy found that pair three times; it does not mean
 that the pair was approved.
 
-## 6. Paste the last transcript again
+## 7. Paste the last transcript again
 
 Handy restores your clipboard after each paste, so the transcript is gone
 once it lands. Press Ctrl+Cmd+V to paste the most recent transcript again
@@ -143,14 +166,14 @@ want the same text in a second place.
 
 Change the chord in Settings -> General -> "Paste Last Transcript".
 
-## 7. Go back to the release version
+## 8. Go back to the release version
 
 Download Handy from https://handy.computer and install it over this build.
 Your settings and history stay.
 
-## 8. Build it yourself (macOS, Apple Silicon)
+## 9. Build it yourself (macOS, Apple Silicon)
 
-The team release is the tag `v0.9.7+katapult.1` on `main` of
+The team release is the tag `v0.9.7-katapult.2` on `main` of
 https://github.com/katapultlabs/Handy. Work in progress is on `feat/*`
 branches. A build takes about 5 minutes after the first compile, and
 about 15 minutes the first time.
@@ -169,7 +192,7 @@ about 15 minutes the first time.
    ```bash
    git clone https://github.com/katapultlabs/Handy.git
    cd Handy
-   git checkout v0.9.7+katapult.1
+   git checkout v0.9.7-katapult.2
    bun install
    mkdir -p src-tauri/resources/models
    curl -o src-tauri/resources/models/silero_vad_v4.onnx https://blob.handy.computer/silero_vad_v4.onnx
@@ -193,7 +216,7 @@ the installed Handy first and run:
 CMAKE_POLICY_VERSION_MINIMUM=3.5 bun run tauri dev
 ```
 
-## 9. Local processing
+## 10. Local processing
 
 Learning runs off the paste path. It uses local string comparisons and the
 existing phonetic library; it makes no model or network calls. The matcher is
@@ -201,7 +224,7 @@ compiled after dictionary changes and reused for dictation. Capture retains
 only the correction pair and up to four context words in the local database;
 it does not save the surrounding field text.
 
-## 10. Report problems
+## 11. Report problems
 
 Tell us:
 

@@ -3,6 +3,11 @@
     "resources": {
       "resources": "resources",
       "transcribe-libs": "."
+    },
+    "windows": {
+      "wix": {
+        "version": "0.9.7.2"
+      }
     }
   }
 }

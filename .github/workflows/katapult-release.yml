@@ -1,0 +1,130 @@
+# Katapult fork release. See docs/FORK.md, section 2.
+#
+# Builds every platform from the commit it runs on, signs the updater files
+# with the fork's own key (secrets TAURI_SIGNING_PRIVATE_KEY and
+# TAURI_SIGNING_PRIVATE_KEY_PASSWORD), and publishes a full release. Installed
+# fork builds read latest.json from the newest release of this repository, so
+# a release goes public only after latest.json is attached.
+#
+# There is no Apple or Azure code signing: macOS builds are ad-hoc signed and
+# Windows installers are unsigned.
+name: "Katapult Release"
+
+on: workflow_dispatch
+
+jobs:
+  create-release:
+    if: github.repository == 'katapultlabs/Handy'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release-id: ${{ steps.create-release.outputs.result }}
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Get version from tauri.conf.json
+        id: get-version
+        shell: bash
+        run: |
+          VERSION=$(grep -o '"version": "[^"]*"' src-tauri/tauri.conf.json | head -1 | cut -d'"' -f4)
+          echo "Application version from tauri.conf.json: $VERSION"
+          case "$VERSION" in
+            *-katapult.*) ;;
+            *) echo "::error::Version $VERSION is not a fork version (<upstream>-katapult.N)"; exit 1 ;;
+          esac
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft release
+        id: create-release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${{ steps.get-version.outputs.version }}`,
+              target_commitish: context.sha,
+              name: `Handy ${{ steps.get-version.outputs.version }}`,
+              draft: true,
+              prerelease: false,
+              generate_release_notes: true
+            })
+            return data.id
+
+  build:
+    permissions:
+      contents: write
+    needs: create-release
+    strategy:
+      fail-fast: false
+      # Same platforms as upstream's release.yml.
+      matrix:
+        include:
+          - platform: "macos-26" # for Arm based macs (M1 and above). Uses macOS 26 for Apple Intelligence SDK.
+            args: "--target aarch64-apple-darwin"
+            target: "aarch64-apple-darwin"
+          - platform: "macos-latest" # for Intel based macs.
+            args: "--target x86_64-apple-darwin"
+            target: "x86_64-apple-darwin"
+          - platform: "ubuntu-22.04" # Build .deb on 22.04
+            args: "--bundles deb"
+            target: "x86_64-unknown-linux-gnu"
+          - platform: "ubuntu-24.04" # Build AppImage and RPM on 24.04
+            args: "--bundles appimage,rpm"
+            target: "x86_64-unknown-linux-gnu"
+          - platform: "ubuntu-24.04-arm" # Build for ARM64 Linux
+            args: "--bundles appimage,deb,rpm"
+            target: "aarch64-unknown-linux-gnu"
+          - platform: "windows-latest"
+            args: ""
+            target: "x86_64-pc-windows-msvc"
+          - platform: "windows-11-arm" # for ARM64 Windows runner
+            args: "--target aarch64-pc-windows-msvc"
+            target: "aarch64-pc-windows-msvc"
+
+    uses: ./.github/workflows/build.yml
+    with:
+      platform: ${{ matrix.platform }}
+      target: ${{ matrix.target }}
+      build-args: ${{ matrix.args }}
+      sign-binaries: false
+      sign-updater: true
+      asset-prefix: "handy"
+      upload-artifacts: false
+      release-id: ${{ needs.create-release.outputs.release-id }}
+      no-cache: true
+    secrets: inherit
+
+  publish:
+    permissions:
+      contents: write
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const release_id = Number('${{ needs.create-release.outputs.release-id }}');
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id,
+            });
+            const names = assets.map((a) => a.name);
+            core.info(`Assets: ${names.join(', ')}`);
+            if (!names.includes('latest.json')) {
+              core.setFailed('latest.json is missing. The release stays a draft so installed apps do not see it.');
+              return;
+            }
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id,
+              draft: false,
+              make_latest: 'true',
+            });
+            core.info('Published.');
