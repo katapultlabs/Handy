@@ -551,6 +551,10 @@ jobs:
           releaseId: ${{ inputs.release-id }}
           assetNamePattern: ${{ steps.patch-release-name.outputs.platform }}
           args: ${{ inputs.build-args }}
+          # Without code signing, the Apple variables above are empty strings.
+          # Tauri treats an empty APPLE_CERTIFICATE as set and tries to import
+          # it, so unset them and let the config's ad-hoc identity apply.
+          tauriScript: ${{ (contains(inputs.platform, 'macos') && !inputs.sign-binaries) && 'env -u APPLE_CERTIFICATE -u APPLE_CERTIFICATE_PASSWORD -u APPLE_SIGNING_IDENTITY -u APPLE_ID -u APPLE_ID_PASSWORD -u APPLE_PASSWORD -u APPLE_TEAM_ID bun tauri' || '' }}
 
       # tauri-action uploads release assets before returning. All AppImage
       # filtering therefore happens inside linuxdeploy above; this verifies the
