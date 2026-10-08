@@ -6,8 +6,10 @@
 # fork builds read latest.json from the newest release of this repository, so
 # a release goes public only after latest.json is attached.
 #
-# There is no Apple or Azure code signing: macOS builds are ad-hoc signed and
-# Windows installers are unsigned.
+# macOS builds are signed with Katapult's Developer ID and notarized (secrets
+# APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, KEYCHAIN_PASSWORD, APPLE_ID,
+# APPLE_PASSWORD, APPLE_TEAM_ID). A stable signature keeps the Microphone and
+# Accessibility permissions across updates. Windows installers are unsigned.
 name: "Katapult Release"
 
 on: workflow_dispatch
@@ -91,6 +93,7 @@ jobs:
       target: ${{ matrix.target }}
       build-args: ${{ matrix.args }}
       sign-binaries: false
+      sign-macos: true
       sign-updater: true
       asset-prefix: "handy"
       upload-artifacts: false
