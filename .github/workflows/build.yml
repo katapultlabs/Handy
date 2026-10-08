@@ -39,6 +39,13 @@ on:
         required: false
         type: boolean
         default: false
+      # Sign and notarize macOS builds with Apple secrets, without the Windows
+      # Azure signing that sign-binaries also turns on. A stable Developer ID
+      # keeps macOS privacy permissions across updates.
+      sign-macos:
+        required: false
+        type: boolean
+        default: false
       repository:
         required: false
         type: string
@@ -226,7 +233,7 @@ jobs:
         run: rustup target add ${{ inputs.target }}
 
       - name: import Apple Developer Certificate
-        if: contains(inputs.platform, 'macos') && inputs.sign-binaries
+        if: contains(inputs.platform, 'macos') && (inputs.sign-binaries || inputs.sign-macos)
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -242,7 +249,7 @@ jobs:
           security find-identity -v -p codesigning build.keychain
 
       - name: verify certificate
-        if: contains(inputs.platform, 'macos') && inputs.sign-binaries
+        if: contains(inputs.platform, 'macos') && (inputs.sign-binaries || inputs.sign-macos)
         run: |
           CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
@@ -523,13 +530,13 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_ID: ${{ inputs.sign-binaries && secrets.APPLE_ID || '' }}
-          APPLE_ID_PASSWORD: ${{ inputs.sign-binaries && secrets.APPLE_ID_PASSWORD || '' }}
-          APPLE_PASSWORD: ${{ inputs.sign-binaries && secrets.APPLE_PASSWORD || '' }}
-          APPLE_TEAM_ID: ${{ inputs.sign-binaries && secrets.APPLE_TEAM_ID || '' }}
-          APPLE_CERTIFICATE: ${{ inputs.sign-binaries && secrets.APPLE_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ inputs.sign-binaries && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_SIGNING_IDENTITY: ${{ inputs.sign-binaries && env.CERT_ID || '' }}
+          APPLE_ID: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_ID || '' }}
+          APPLE_ID_PASSWORD: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_ID_PASSWORD || '' }}
+          APPLE_PASSWORD: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_PASSWORD || '' }}
+          APPLE_TEAM_ID: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_TEAM_ID || '' }}
+          APPLE_CERTIFICATE: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_CERTIFICATE || '' }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ (inputs.sign-binaries || inputs.sign-macos) && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
+          APPLE_SIGNING_IDENTITY: ${{ (inputs.sign-binaries || inputs.sign-macos) && env.CERT_ID || '' }}
           AZURE_CLIENT_ID: ${{ inputs.sign-binaries && secrets.AZURE_CLIENT_ID || '' }}
           AZURE_CLIENT_SECRET: ${{ inputs.sign-binaries && secrets.AZURE_CLIENT_SECRET || '' }}
           AZURE_TENANT_ID: ${{ inputs.sign-binaries && secrets.AZURE_TENANT_ID || '' }}
@@ -554,7 +561,7 @@ jobs:
           # Without code signing, the Apple variables above are empty strings.
           # Tauri treats an empty APPLE_CERTIFICATE as set and tries to import
           # it, so unset them and let the config's ad-hoc identity apply.
-          tauriScript: ${{ (contains(inputs.platform, 'macos') && !inputs.sign-binaries) && 'env -u APPLE_CERTIFICATE -u APPLE_CERTIFICATE_PASSWORD -u APPLE_SIGNING_IDENTITY -u APPLE_ID -u APPLE_ID_PASSWORD -u APPLE_PASSWORD -u APPLE_TEAM_ID bun tauri' || '' }}
+          tauriScript: ${{ (contains(inputs.platform, 'macos') && !inputs.sign-binaries && !inputs.sign-macos) && 'env -u APPLE_CERTIFICATE -u APPLE_CERTIFICATE_PASSWORD -u APPLE_SIGNING_IDENTITY -u APPLE_ID -u APPLE_ID_PASSWORD -u APPLE_PASSWORD -u APPLE_TEAM_ID bun tauri' || '' }}
 
       # tauri-action uploads release assets before returning. All AppImage
       # filtering therefore happens inside linuxdeploy above; this verifies the

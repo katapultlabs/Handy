@@ -93,6 +93,38 @@ and "Playwright" stay on.
 Build a release locally with the steps in `docs/TEST_BUILD.md`,
 section 9. A local build has no updater signature.
 
+### 2.4 macOS signing
+
+macOS keeps Microphone and Accessibility permissions only while the
+code signature stays the same. An ad-hoc signature changes with every
+build, so each update asks for the permissions again. A Developer ID
+signature from one team stays the same.
+
+The `sign-macos` input of `.github/workflows/build.yml` signs and
+notarizes macOS builds with Katapult's Developer ID (team `8T7NBWB34M`).
+It does not turn on upstream's Windows signing. It reads these Actions
+secrets:
+
+| Secret                       | Value                                                 |
+| ---------------------------- | ----------------------------------------------------- |
+| `APPLE_CERTIFICATE`          | Base64 of the Developer ID Application `.p12`         |
+| `APPLE_CERTIFICATE_PASSWORD` | Password of the `.p12`                                |
+| `KEYCHAIN_PASSWORD`          | Any random string; protects the temporary CI keychain |
+| `APPLE_ID`                   | Apple ID that notarizes; a member of the team         |
+| `APPLE_PASSWORD`             | App-specific password of that Apple ID                |
+| `APPLE_TEAM_ID`              | `8T7NBWB34M`                                          |
+
+Only the team's Account Holder can make a Developer ID Application
+certificate. The private key and the certificate request stay with the
+fork owner in `~/.katapult-signing/`. `make-p12.sh` in that folder turns
+the certificate from Apple into the `.p12` and password files.
+
+To test signing without a release, run "Katapult macOS Signing Check"
+on a branch. It builds the Apple Silicon app with the release signing
+and uploads it as a workflow artifact. Check the app with
+`codesign -dv --verbose=2` (team `8T7NBWB34M`) and
+`spctl -a -vv` ("Notarized Developer ID").
+
 ## 3. Merging upstream
 
 Run `git merge upstream/main` into `main` (never rebase; the team builds
@@ -106,7 +138,9 @@ from the branch). These conflicts repeat and have fixed answers:
   keep ours. The fork's updater feed and key must survive every merge,
   and the fork has no Windows `signCommand`.
 - `.github/workflows/build.yml`: keep the `sign-updater` input and the
-  two `TAURI_SIGNING_*` lines that read it.
+  two `TAURI_SIGNING_*` lines that read it. Keep the `sign-macos` input and
+  every `inputs.sign-binaries || inputs.sign-macos` condition on the Apple
+  steps and `APPLE_*` lines.
 - `src-tauri/src/managers/history.rs`: take upstream's `MIGRATIONS`
   exactly. The fork adds only the `dictionary_db::move_out_of_history` call.
   Never put a fork migration in this file; Dictionary migrations go in
@@ -130,6 +164,8 @@ every upstream merge. Remove an item when upstream accepts it.
 | No Windows `signCommand`                            | `src-tauri/tauri.conf.json`, `bundle.windows`                                    | Never sent                                              |
 | Release workflow                                    | `.github/workflows/katapult-release.yml`                                         | Never sent                                              |
 | `sign-updater` build input                          | `.github/workflows/build.yml`                                                    | Could go upstream as a small CI change                  |
+| `sign-macos` build input                            | `.github/workflows/build.yml`                                                    | Never sent                                              |
+| macOS signing check workflow                        | `.github/workflows/katapult-macos-check.yml`                                     | Never sent                                              |
 | Portable installer fallback link                    | `src/components/update-checker/portableInstaller.ts`                             | Never sent                                              |
 | Tester guide                                        | `docs/TEST_BUILD.md`                                                             | Never sent                                              |
 | This document                                       | `docs/FORK.md`                                                                   | Never sent                                              |

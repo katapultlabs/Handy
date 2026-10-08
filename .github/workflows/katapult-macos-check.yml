@@ -1,0 +1,24 @@
+# Katapult fork: test macOS signing without a release. See docs/FORK.md,
+# section 2.4.
+#
+# Builds the Apple Silicon app from the chosen branch with the same signing
+# and notarization as "Katapult Release", and uploads it as a workflow
+# artifact. Nothing is published and no updater feed changes.
+name: "Katapult macOS Signing Check"
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    if: github.repository == 'katapultlabs/Handy'
+    uses: ./.github/workflows/build.yml
+    with:
+      platform: "macos-26"
+      target: "aarch64-apple-darwin"
+      build-args: "--target aarch64-apple-darwin"
+      sign-binaries: false
+      sign-macos: true
+      sign-updater: false
+      asset-prefix: "handy-signing-check"
+      upload-artifacts: true
+    secrets: inherit
