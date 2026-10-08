@@ -417,6 +417,15 @@
         "duplicate": "\"{{wrong}}\" için bir girdi zaten var",
         "captureLabel": "Düzenlemelerden öğren (macOS)",
         "captureDescription": "Handy metni yapıştırdıktan sonra çevredeki metni kısa süre izler. Handy'ye öğrettiğiniz sözcük dağarcığıyla belirgin eşleşmeler Geri Al seçeneğiyle otomatik olarak öğrenilir; belirsiz çiftler onayınızı bekler. Yalnızca düzeltme çiftleri ve birkaç bağlam sözcüğü yerel olarak kaydedilir."
+      },
+      "chineseScript": {
+        "title": "Çince yazı",
+        "description": "Mandarin ve Kantonca transkripsiyonları Basitleştirilmiş veya Geleneksel karakterlerle yazar. Diğer diller değiştirilmez.",
+        "options": {
+          "asTranscribed": "Transkripsiyondaki gibi",
+          "simplified": "Basitleştirilmiş",
+          "traditional": "Geleneksel"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "Yok say",
     "correctionQuestion": "{{wrong}} her zaman {{right}} ile değiştirilsin mi?",
     "correctionNext": "Sonraki",
-    "correctionRemaining": "{{count}} daha"
+    "correctionRemaining": "{{count}} daha",
+    "loadingModel": "Model yükleniyor..."
   },
   "whatsNew": {
     "title": "Handy v{{version}} yenilikleri"

@@ -417,6 +417,15 @@
         "duplicate": "Der findes allerede en post for \"{{wrong}}\"",
         "captureLabel": "Lær af ændringer (macOS)",
         "captureDescription": "Når Handy har indsat tekst, holder appen kort øje med tekst i nærheden. Tydelige match til ordforråd, du har lært Handy, læres automatisk med mulighed for at fortryde; usikre par venter på din godkendelse. Kun rettelsespar og nogle få kontekstord gemmes lokalt."
+      },
+      "chineseScript": {
+        "title": "Kinesisk skrift",
+        "description": "Skriver mandarin- og kantonesisk-transskriptioner med forenklede eller traditionelle tegn. Andre sprog ændres ikke.",
+        "options": {
+          "asTranscribed": "Som transskriberet",
+          "simplified": "Forenklet",
+          "traditional": "Traditionel"
+        }
       }
     },
     "postProcessing": {
@@ -768,7 +777,8 @@
     "undo": "Ignorer",
     "correctionQuestion": "Erstat altid {{wrong}} med {{right}}?",
     "correctionNext": "Næste",
-    "correctionRemaining": "{{count}} mere"
+    "correctionRemaining": "{{count}} mere",
+    "loadingModel": "Indlæser model..."
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} blokerer muligvis 1 genvej",

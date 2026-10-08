@@ -417,6 +417,15 @@
         "duplicate": "Entri untuk \"{{wrong}}\" sudah ada",
         "captureLabel": "Pelajari dari suntingan (macOS)",
         "captureDescription": "Setelah Handy menempel, Handy mengamati teks di sekitarnya sebentar. Kecocokan jelas dengan kosakata yang Anda ajarkan dipelajari otomatis dengan Urungkan; pasangan yang belum pasti menunggu persetujuan Anda. Hanya pasangan koreksi dan beberapa kata konteks yang disimpan secara lokal."
+      },
+      "chineseScript": {
+        "title": "Aksara Tionghoa",
+        "description": "Menulis transkripsi Mandarin dan Kanton dengan aksara Sederhana atau Tradisional. Bahasa lain tidak diubah.",
+        "options": {
+          "asTranscribed": "Sesuai transkripsi",
+          "simplified": "Sederhana",
+          "traditional": "Tradisional"
+        }
       }
     },
     "postProcessing": {
@@ -768,7 +777,8 @@
     "learned": "Disarankan: {{wrong}} → {{right}}",
     "undo": "Abaikan",
     "autoLearned": "Dipelajari: {{wrong}} → {{right}}",
-    "autoUndo": "Urungkan"
+    "autoUndo": "Urungkan",
+    "loadingModel": "Memuat model..."
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} mungkin memblokir 1 pintasan",

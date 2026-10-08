@@ -417,6 +417,15 @@
         "duplicate": "Ja existeix una entrada per a \"{{wrong}}\"",
         "captureLabel": "Aprèn de les edicions (macOS)",
         "captureDescription": "Després que Handy enganxi el text, observa breument el text proper. Les coincidències clares amb el vocabulari que has ensenyat a Handy s'aprenen automàticament amb l'opció de desfer; les parelles incertes esperen la teva aprovació. Només es desen localment les parelles de correcció i unes quantes paraules de context."
+      },
+      "chineseScript": {
+        "title": "Escriptura xinesa",
+        "description": "Escriu les transcripcions en mandarí i cantonès amb caràcters simplificats o tradicionals. Els altres idiomes no es modifiquen.",
+        "options": {
+          "asTranscribed": "Tal com s'ha transcrit",
+          "simplified": "Simplificat",
+          "traditional": "Tradicional"
+        }
       }
     },
     "postProcessing": {
@@ -768,7 +777,8 @@
     "undo": "Ignora",
     "correctionQuestion": "Vols substituir sempre {{wrong}} per {{right}}?",
     "correctionNext": "Següent",
-    "correctionRemaining": "{{count}} més"
+    "correctionRemaining": "{{count}} més",
+    "loadingModel": "S'està carregant el model..."
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} pot estar blocant 1 drecera",

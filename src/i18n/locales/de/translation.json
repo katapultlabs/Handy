@@ -417,6 +417,15 @@
         "duplicate": "Ein Eintrag für \"{{wrong}}\" existiert bereits",
         "captureLabel": "Aus Bearbeitungen lernen (macOS)",
         "captureDescription": "Nachdem Handy Text eingefügt hat, beobachtet es kurz den Text in der Nähe. Eindeutige Treffer mit dem Wortschatz, den du Handy beigebracht hast, werden automatisch mit einer Rückgängig-Option gelernt; unsichere Paare warten auf deine Bestätigung. Nur Korrekturpaare und einige Kontextwörter werden lokal gespeichert."
+      },
+      "chineseScript": {
+        "title": "Chinesische Schrift",
+        "description": "Schreibt Transkriptionen auf Mandarin und Kantonesisch in vereinfachten oder traditionellen Schriftzeichen. Andere Sprachen bleiben unverändert.",
+        "options": {
+          "asTranscribed": "Wie transkribiert",
+          "simplified": "Vereinfacht",
+          "traditional": "Traditionell"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "Ignorieren",
     "correctionQuestion": "{{wrong}} immer durch {{right}} ersetzen?",
     "correctionNext": "Weiter",
-    "correctionRemaining": "{{count}} weitere"
+    "correctionRemaining": "{{count}} weitere",
+    "loadingModel": "Modell wird geladen..."
   },
   "whatsNew": {
     "title": "Neu in Handy v{{version}}"

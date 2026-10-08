@@ -417,6 +417,15 @@
         "duplicate": "Položka pro \"{{wrong}}\" již existuje",
         "captureLabel": "Učit se z úprav (macOS)",
         "captureDescription": "Poté, co Handy vloží text, krátce sleduje okolní text. Jasné shody se slovní zásobou, kterou jste Handy naučili, se automaticky uloží s možností vrácení; nejisté dvojice čekají na vaše schválení. Místně se ukládají pouze dvojice oprav a několik slov kontextu."
+      },
+      "chineseScript": {
+        "title": "Čínské písmo",
+        "description": "Zapisuje přepisy v mandarínštině a kantonštině zjednodušenými nebo tradičními znaky. Ostatní jazyky zůstávají beze změny.",
+        "options": {
+          "asTranscribed": "Jak bylo přepsáno",
+          "simplified": "Zjednodušené",
+          "traditional": "Tradiční"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "Ignorovat",
     "correctionQuestion": "Vždy nahrazovat {{wrong}} za {{right}}?",
     "correctionNext": "Další",
-    "correctionRemaining": "Ještě {{count}}"
+    "correctionRemaining": "Ještě {{count}}",
+    "loadingModel": "Načítání modelu..."
   },
   "whatsNew": {
     "title": "Novinky v Handy v{{version}}"

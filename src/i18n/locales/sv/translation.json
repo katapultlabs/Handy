@@ -417,6 +417,15 @@
         "duplicate": "Det finns redan en post för \"{{wrong}}\"",
         "captureLabel": "Lär från ändringar (macOS)",
         "captureDescription": "När Handy har klistrat in text tittar appen kort på texten i närheten. Tydliga matchningar mot ordförråd som du har lärt Handy lärs in automatiskt med möjlighet att ångra; osäkra par väntar på ditt godkännande. Endast korrigeringspar och några få sammanhangsord sparas lokalt."
+      },
+      "chineseScript": {
+        "title": "Kinesisk skrift",
+        "description": "Skriver mandarin- och kantonesiska transkriptioner med förenklade eller traditionella tecken. Andra språk lämnas oförändrade.",
+        "options": {
+          "asTranscribed": "Som transkriberat",
+          "simplified": "Förenklad",
+          "traditional": "Traditionell"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "Ignorera",
     "correctionQuestion": "Ersätt alltid {{wrong}} med {{right}}?",
     "correctionNext": "Nästa",
-    "correctionRemaining": "{{count}} till"
+    "correctionRemaining": "{{count}} till",
+    "loadingModel": "Laddar modell..."
   },
   "whatsNew": {
     "title": "Nytt i Handy v{{version}}"

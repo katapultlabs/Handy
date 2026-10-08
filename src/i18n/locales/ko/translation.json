@@ -417,6 +417,15 @@
         "duplicate": "\"{{wrong}}\"에 대한 항목이 이미 있습니다",
         "captureLabel": "편집 내용에서 학습 (macOS)",
         "captureDescription": "Handy가 텍스트를 붙여넣은 뒤 주변 텍스트를 잠시 확인합니다. Handy에 등록한 어휘와 명확히 일치하는 내용은 실행 취소 옵션과 함께 자동으로 학습되며, 확실하지 않은 단어 쌍은 승인을 기다립니다. 교정 단어 쌍과 몇 개의 문맥 단어만 로컬에 저장됩니다."
+      },
+      "chineseScript": {
+        "title": "중국어 간체/번체",
+        "description": "표준 중국어와 광둥어 전사를 간체 또는 번체로 표기합니다. 다른 언어는 변경되지 않습니다.",
+        "options": {
+          "asTranscribed": "전사된 그대로",
+          "simplified": "간체",
+          "traditional": "번체"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "무시",
     "correctionQuestion": "{{wrong}}을(를) 항상 {{right}}(으)로 바꿀까요?",
     "correctionNext": "다음",
-    "correctionRemaining": "{{count}}개 더"
+    "correctionRemaining": "{{count}}개 더",
+    "loadingModel": "모델 로딩 중..."
   },
   "whatsNew": {
     "title": "Handy v{{version}}의 새 소식"

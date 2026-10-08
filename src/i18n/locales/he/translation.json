@@ -417,6 +417,15 @@
         "duplicate": "כבר קיימת רשומה עבור \"{{wrong}}\"",
         "captureLabel": "למידה מעריכות (macOS)",
         "captureDescription": "לאחר ש-Handy מדביק טקסט, הוא עוקב לזמן קצר אחר הטקסט הסמוך. התאמות ברורות לאוצר המילים שלימדתם את Handy נלמדות אוטומטית עם אפשרות ביטול; זוגות לא ודאיים ממתינים לאישורכם. רק זוגות תיקון ומילות הקשר ספורות נשמרים מקומית."
+      },
+      "chineseScript": {
+        "title": "כתב סיני",
+        "description": "כותב תמלולים במנדרינית ובקנטונזית בתווים מפושטים או מסורתיים. שפות אחרות נשארות ללא שינוי.",
+        "options": {
+          "asTranscribed": "כפי שתומלל",
+          "simplified": "מפושט",
+          "traditional": "מסורתי"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "התעלם",
     "correctionQuestion": "להחליף תמיד את {{wrong}} ב-{{right}}?",
     "correctionNext": "הבא",
-    "correctionRemaining": "עוד {{count}}"
+    "correctionRemaining": "עוד {{count}}",
+    "loadingModel": "טוען מודל..."
   },
   "whatsNew": {
     "title": "חדש ב-Handy v{{version}}"

@@ -417,6 +417,15 @@
         "duplicate": "An entry for \"{{wrong}}\" already exists",
         "captureLabel": "Learn from edits (macOS)",
         "captureDescription": "After Handy pastes, it briefly watches nearby text. Clear matches to vocabulary you taught Handy are learned automatically with Undo; uncertain pairs wait for your approval. Only correction pairs and a few context words are stored locally."
+      },
+      "chineseScript": {
+        "title": "Chinese Script",
+        "description": "Writes Mandarin and Cantonese transcriptions in Simplified or Traditional characters. Other languages are left unchanged.",
+        "options": {
+          "asTranscribed": "As Transcribed",
+          "simplified": "Simplified",
+          "traditional": "Traditional"
+        }
       }
     },
     "postProcessing": {
@@ -768,7 +777,8 @@
     "learned": "Suggested: {{wrong}} → {{right}}",
     "undo": "Ignore",
     "autoLearned": "Learned: {{wrong}} → {{right}}",
-    "autoUndo": "Undo"
+    "autoUndo": "Undo",
+    "loadingModel": "Loading model..."
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} may be blocking 1 shortcut",

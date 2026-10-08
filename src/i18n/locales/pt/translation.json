@@ -417,6 +417,15 @@
         "duplicate": "Já existe uma entrada para \"{{wrong}}\"",
         "captureLabel": "Aprender com edições (macOS)",
         "captureDescription": "Depois que o Handy cola o texto, ele observa brevemente o texto próximo. Correspondências claras com o vocabulário que você ensinou ao Handy são aprendidas automaticamente com a opção de desfazer; pares incertos aguardam sua aprovação. Somente os pares de correção e algumas palavras de contexto são salvos localmente."
+      },
+      "chineseScript": {
+        "title": "Escrita chinesa",
+        "description": "Escreve as transcrições em mandarim e cantonês com caracteres simplificados ou tradicionais. Os outros idiomas não são alterados.",
+        "options": {
+          "asTranscribed": "Como transcrito",
+          "simplified": "Simplificado",
+          "traditional": "Tradicional"
+        }
       }
     },
     "postProcessing": {
@@ -765,7 +774,8 @@
     "undo": "Ignorar",
     "correctionQuestion": "Substituir sempre {{wrong}} por {{right}}?",
     "correctionNext": "Próximo",
-    "correctionRemaining": "Mais {{count}}"
+    "correctionRemaining": "Mais {{count}}",
+    "loadingModel": "Carregando modelo..."
   },
   "whatsNew": {
     "title": "Novidades no Handy v{{version}}"

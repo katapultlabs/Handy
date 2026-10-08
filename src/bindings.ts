@@ -499,6 +499,14 @@ async changeFillerWordRemovalEnabledSetting(enabled: boolean) : Promise<Result<n
     else return { status: "error", error: e  as any };
 }
 },
+async changeChineseScriptSetting(script: ChineseScript) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_chinese_script_setting", { script }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async changeAppLanguageSetting(language: string) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_app_language_setting", { language }) };
@@ -1114,7 +1122,12 @@ dictionary_capture_enabled?: boolean; dictionary_entries?: DictionaryEntry[]; mo
  * after the target app actually reads the transcript, instead of after a
  * fixed delay. See `paste_tx`. macOS and Windows only.
  */
-reliable_paste?: boolean; typing_tool?: TypingTool; external_script_path?: string | null; filler_word_removal_enabled?: boolean; custom_filler_words?: string[] | null; transcribe_accelerator?: TranscribeAcceleratorSetting; ort_accelerator?: OrtAcceleratorSetting; 
+reliable_paste?: boolean; typing_tool?: TypingTool; external_script_path?: string | null; filler_word_removal_enabled?: boolean; custom_filler_words?: string[] | null; 
+/**
+ * Fresh installs default from the OS locale; existing stores are migrated
+ * in `apply_settings_migrations`.
+ */
+chinese_script?: ChineseScript; transcribe_accelerator?: TranscribeAcceleratorSetting; ort_accelerator?: OrtAcceleratorSetting; 
 /**
  * Stable transcribe.cpp device selector. This is derived from the backend's
  * `device_id` when available (or its name for backends such as Metal),
@@ -1149,6 +1162,15 @@ export type CaseMode =
  * match sits at a sentence start, the first letter is capitalized.
  */
 "exact"
+/**
+ * Script applied to Mandarin and Cantonese output. Other languages are never
+ * converted.
+ */
+export type ChineseScript = 
+/**
+ * Keep whatever script the model produced.
+ */
+"as_transcribed" | "simplified" | "traditional"
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
 export type CorrectionNotice = { token: number; entry: DictionaryRow; remaining_ms: number; pending_count: number; busy: boolean }
 export type CorrectionNoticeAction = "accept" | "reject"
