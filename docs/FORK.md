@@ -31,6 +31,13 @@ correctly: `0.9.7-katapult.3` is newer than `0.9.7-katapult.2`, and
 updater ignores everything after `+`. `v0.9.7+katapult.1` was the last
 release with that form.
 
+`v0.9.7+katapult.1` and older builds also read upstream's feed with
+upstream's key. They offer every new upstream release as an update. Upstream
+Handy cannot open a database that has the Dictionary migrations, so it stops
+at start with `DatabaseTooFarAhead`. The data is not changed. To recover,
+install the newest fork release by hand over the upstream app. Tell each
+person who still runs one of these builds to do this.
+
 ### 2.1 Cut a release
 
 1. On `main`, set `version` in `src-tauri/tauri.conf.json` to the new
