@@ -38,6 +38,10 @@ at start with `DatabaseTooFarAhead`. The data is not changed. To recover,
 install the newest fork release by hand over the upstream app. Tell each
 person who still runs one of these builds to do this.
 
+From 0.9.8-katapult.2, the Dictionary has its own file, `dictionary.db`, and
+`history.db` keeps upstream's schema. Upstream Handy then starts on fork data;
+only the Dictionary is missing until a fork build runs again.
+
 ### 2.1 Cut a release
 
 1. On `main`, set `version` in `src-tauri/tauri.conf.json` to the new
@@ -103,6 +107,10 @@ from the branch). These conflicts repeat and have fixed answers:
   and the fork has no Windows `signCommand`.
 - `.github/workflows/build.yml`: keep the `sign-updater` input and the
   two `TAURI_SIGNING_*` lines that read it.
+- `src-tauri/src/managers/history.rs`: take upstream's `MIGRATIONS`
+  exactly. The fork adds only the `dictionary_db::move_out_of_history` call.
+  Never put a fork migration in this file; Dictionary migrations go in
+  `src-tauri/src/dictionary_db.rs`.
 - `src/i18n/locales/*/translation.json`: keep both sides, then run
   `bun run check:translations`. A new upstream locale needs every
   fork-only key added before the check passes.

@@ -1,6 +1,6 @@
 //! Dictionary store: the SQLite table that owns every entry.
 //!
-//! One table in the History database (migration in `managers/history.rs`).
+//! One table in `dictionary.db` (schema and migrations in `dictionary_db.rs`).
 //! Every producer writes through [`DictionaryManager`]. The consumer (the
 //! transcription pipeline) never touches the database: it reads
 //! [`active_entries`], an in-memory matcher that this module rebuilds after
@@ -127,14 +127,17 @@ pub struct DictionaryManager {
 }
 
 impl DictionaryManager {
-    /// Opens the store. `HistoryManager::new` must have run first: it owns the
-    /// migrations. Imports entries left in settings by earlier test builds,
-    /// then builds the hot-path snapshot.
+    /// Opens the store and applies its migrations. `HistoryManager::new` must
+    /// have run first: it moves entries out of `history.db` from older builds.
+    /// Imports entries left in settings by earlier test builds, then builds
+    /// the hot-path snapshot.
     pub fn new(app_handle: &AppHandle) -> Result<Self> {
         let app_data_dir = crate::portable::app_data_dir(app_handle)?;
+        let db_path = app_data_dir.join(crate::dictionary_db::FILE_NAME);
+        drop(crate::dictionary_db::open(&db_path)?);
         let manager = Self {
             app_handle: app_handle.clone(),
-            db_path: app_data_dir.join("history.db"),
+            db_path,
             mutation_lock: Mutex::new(()),
         };
         if let Err(err) = manager.import_from_settings() {

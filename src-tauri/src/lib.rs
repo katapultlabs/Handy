@@ -12,6 +12,7 @@ mod commands;
 mod correction_notices;
 mod dictionary;
 mod dictionary_capture;
+mod dictionary_db;
 mod dictionary_learning;
 mod dictionary_matcher;
 mod dictionary_store;
@@ -212,7 +213,7 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     );
     let history_manager =
         Arc::new(HistoryManager::new(app_handle).expect("Failed to initialize history manager"));
-    // After HistoryManager: it runs the migrations that create the table.
+    // After HistoryManager: it moves the table out of history.db.
     let dictionary_manager = Arc::new(
         dictionary_store::DictionaryManager::new(app_handle)
             .expect("Failed to initialize dictionary manager"),

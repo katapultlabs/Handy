@@ -75,9 +75,20 @@ The Dictionary screen writes entries directly. It does not need `learn()`.
 
 ## 5. Data model
 
-The entries live in the SQLite database that History uses.
-Use a new migration in `managers/history.rs` `MIGRATIONS`.
-`rusqlite_migration` applies it.
+The entries live in their own SQLite file, `dictionary.db`, next to
+`history.db`. The migrations are in `dictionary_db.rs` `MIGRATIONS`.
+`rusqlite_migration` applies them.
+
+Do not add a migration to `managers/history.rs`. `history.db` must keep
+upstream's schema version. Upstream Handy stops at start when the version is
+higher than its own migration count (`DatabaseTooFarAhead`). A person who
+installs upstream Handy over a fork build must get a working app without the
+Dictionary.
+
+Fork builds up to 0.9.8-katapult.1 kept the table in `history.db` as
+migrations 5 to 7. At start, `dictionary_db::move_out_of_history` copies those
+rows to `dictionary.db`, drops the table, and sets `history.db` back to
+version 4. It runs once, before the History migrations.
 
 ```sql
 CREATE TABLE dictionary (
@@ -369,8 +380,10 @@ and matcher compilation run off the paste path. No model call is made.
   guard. Toggling its enabled checkbox preserves the guard.
 - The Dictionary screen separates Suggested, Your corrections, and a collapsed
   Ignored group. Ignored pairs can be explicitly approved later.
-- Migration 6 moves older automatically active learned entries to Suggested
-  once. Migration 7 adds automatic metadata without changing existing choices.
+- Dictionary migration 2 (history.db migration 6 in older builds) moves older
+  automatically active learned entries to Suggested once. Dictionary migration 3
+  (history.db migration 7) adds automatic metadata without changing existing
+  choices.
   No stored pairs are deleted.
 
 ### 9.1 Correction notices (dict.11)
@@ -495,7 +508,8 @@ Avoid:
 
 Keep:
 
-- The SQLite table in `history.db` through the existing `MIGRATIONS` array.
+- A SQLite table with `rusqlite_migration`. The fork first used `history.db`
+  and its `MIGRATIONS` array; it now uses `dictionary.db` (section 5).
 - `app.try_state::<Arc<Manager>>()` in the pipeline. The pipeline degrades if the manager is absent.
 - `HistoryUpdatePayload::Updated` emitted after a history edit.
 - JSON-schema structured output when the provider supports it. Reasoning effort forced to `none` for the extraction call.
@@ -575,7 +589,7 @@ This project trims memory after each dictation (`memory.rs`, `FinishGuard`). The
 
 ### 16.5 Startup
 
-- Do not open or migrate the dictionary table on the startup path before the tray appears. `HistoryManager` already owns the database; the Dictionary migration runs with the existing migration pass.
+- Keep startup work small. `DictionaryManager::new` applies the `dictionary.db` migrations and reads the entries once. The one-time move out of `history.db` runs inside `HistoryManager::new`.
 - Build the first matcher lazily, on the first transcription, not at startup.
 
 ### 16.6 What to measure before merge
