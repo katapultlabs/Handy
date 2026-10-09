@@ -217,6 +217,18 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
             newState.microphone = "granted";
           }
 
+          // The grant happened in a system dialog or in System Settings, and
+          // macOS leaves that app in front. Bring Handy back so the user can
+          // continue here without hunting for the window.
+          if (
+            newState.accessibility !== prev.accessibility ||
+            newState.microphone !== prev.microphone
+          ) {
+            commands.showMainWindowCommand().catch((e) => {
+              console.warn("Failed to refocus after permission grant:", e);
+            });
+          }
+
           return newState;
         });
 
