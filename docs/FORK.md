@@ -74,10 +74,14 @@ copy stays with the fork owner, outside the repository. If the key is
 lost, installed builds cannot update, and everybody must install the
 next build by hand.
 
-The fork has no Apple or Microsoft code signing certificate:
+Code signing by platform:
 
-- macOS builds are ad-hoc signed. First start needs right-click -> Open.
-  After each update, macOS asks again for Accessibility and Microphone.
+- macOS builds from 0.9.8-katapult.3 are signed with Katapult's Developer
+  ID and notarized (section 2.4). Permissions stay across updates. The
+  first update from an ad-hoc build asks for Accessibility and Microphone
+  one last time, because the signature changes. Releases before
+  0.9.8-katapult.3 were ad-hoc signed: first start needed right-click ->
+  Open, and every update asked for the permissions again.
 - Windows installers are unsigned. SmartScreen warns on first install.
 - Linux: the `.AppImage`, `.deb`, and `.rpm` packages all update
   themselves.
