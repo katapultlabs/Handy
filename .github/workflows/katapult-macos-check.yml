@@ -22,7 +22,9 @@ jobs:
       build-args: "--target aarch64-apple-darwin"
       sign-binaries: false
       sign-macos: true
-      sign-updater: false
+      # Same as the release. With false, build.yml passes an empty updater key
+      # and Tauri fails to decode it instead of skipping the signature.
+      sign-updater: true
       asset-prefix: "handy-signing-check"
       upload-artifacts: true
     secrets: inherit
