@@ -11,6 +11,10 @@ on: workflow_dispatch
 jobs:
   build:
     if: github.repository == 'katapultlabs/Handy'
+    # build.yml asks for contents: write (it can upload release assets);
+    # a caller must grant it even when no release is involved.
+    permissions:
+      contents: write
     uses: ./.github/workflows/build.yml
     with:
       platform: "macos-26"
