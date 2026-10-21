@@ -187,7 +187,7 @@ about 15 minutes the first time.
    brew install cmake
    ```
 
-2. Get the code and the VAD model:
+2. Get the code (the VAD model is in the repository):
 
    ```bash
    git clone https://github.com/katapultlabs/Handy.git
