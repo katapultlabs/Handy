@@ -33,7 +33,7 @@ One dictation goes through these steps:
 10. The backend saves the text and the audio in the history database.
 
 ```
-Shortcut -> Audio (cpal) -> VAD (Silero) -> ASR engine -> Text filters
+Shortcut -> Audio (handy-recorder) -> VAD (Silero) -> ASR engine -> Text filters
         -> [LLM post-process] -> Paste -> History
 ```
 
@@ -76,7 +76,7 @@ Each manager is one Tauri state object. `lib.rs` creates them at startup.
 | -------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `managers/audio.rs`              | 1,101 | Opens the microphone. Records audio. Lists audio devices.                                                                                                                               |
 | `managers/transcription.rs`      | 2,509 | Loads and unloads the ASR model. Runs batch transcription with `transcribe()`. Runs streaming transcription with `start_stream()` and `finalize_stream()`. Selects the GPU accelerator. |
-| `managers/model.rs`              | 2,988 | Defines `EngineType`. Lists, downloads, and deletes models. Finds model files on disk.                                                                                                  |
+| `managers/model.rs`              | 3,018 | Lists, downloads, and deletes models. Finds model files on disk.                                                                                                                        |
 | `managers/model/download.rs`     | 384   | Downloads model files. Has a test suite in `download/tests.rs`.                                                                                                                         |
 | `managers/model_capabilities.rs` | 270   | Reads what a GGUF model can do, for example which languages.                                                                                                                            |
 | `managers/gguf_meta.rs`          | 494   | Reads the GGUF file header. Has no external dependencies.                                                                                                                               |
@@ -84,29 +84,31 @@ Each manager is one Tauri state object. `lib.rs` creates them at startup.
 
 ### 3.4 ASR engines
 
-`EngineType` in `managers/model.rs` lists the engines:
+All models run on one engine, the `transcribe-cpp` crate. It runs GGML and GGUF models. Examples: Whisper, Parakeet, Voxtral, Qwen3-ASR, Nemotron. The engine detects the architecture from the file. The app has no ONNX Runtime. Users of a retired ONNX model see a screen that moves them to a GGUF model.
 
-- `TranscribeCpp`. This engine uses the `transcribe-cpp` crate. It runs all GGML and GGUF models. Examples: Whisper, Parakeet, Voxtral, Qwen3-ASR, Nemotron. The engine detects the architecture from the file.
-- `Parakeet`, `Moonshine`, `MoonshineStreaming`, `SenseVoice`, `GigaAM`, `Canary`, `Cohere`. These engines use the `transcribe-rs` crate and ONNX Runtime.
+`managers/transcription/` holds the decode paths:
 
-`catalog/mod.rs` (286 lines) holds the model catalog.
-The catalog is a JSON file. The build script `scripts/gen_catalog.py` makes it.
+- `policy.rs` decides between one decode and chunked decode.
+- `chunked.rs` decodes a long recording in chunks. `audio_toolkit/chunking.rs` cuts the chunks at pauses that the VAD finds.
+- `live.rs` decodes while the user speaks, for the live preview.
+
+`catalog/mod.rs` (573 lines) holds the model catalog.
+The catalog is a JSON file from the `@handy-computer/models` package. `scripts/sync-catalog.ts` copies it. It has benchmark results (error rate per language, speed) for each model.
 The application does not download the catalog at run time.
 
 ### 3.5 Audio toolkit (`audio_toolkit/`)
 
 | File                  | Lines | Function                                                                                           |
 | --------------------- | ----- | -------------------------------------------------------------------------------------------------- |
-| `audio/recorder.rs`   | 1,027 | Records audio from `cpal`.                                                                         |
-| `audio/resampler.rs`  | 351   | Resamples audio to 16 kHz with `rubato`.                                                           |
-| `audio/device.rs`     | 52    | Lists audio devices.                                                                               |
+| `audio/sink.rs`       | 197   | Receives audio from the `handy-recorder` crate. Feeds the VAD, the levels, and the live preview.   |
+| `audio/device.rs`     | 40    | Lists output devices.                                                                              |
 | `audio/visualizer.rs` | 162   | Computes audio levels for the overlay.                                                             |
-| `vad/silero.rs`       | 62    | Silero VAD backend.                                                                                |
-| `vad/earshot.rs`      | 116   | Earshot VAD backend.                                                                               |
+| `vad/silero.rs`       | 160   | Silero VAD v6.2 backend. Runs through `transcribe-cpp`, on the CPU.                                |
+| `vad/earshot.rs`      | 131   | Earshot VAD backend.                                                                               |
+| `chunking.rs`         | 616   | Cuts long recordings into chunks at pauses.                                                        |
 | `vad/smoothed.rs`     | 237   | Smooths the VAD output.                                                                            |
 | `text.rs`             | 828   | Text filters. `apply_custom_words()`, `remove_filler_words()`, `normalize_transcription_output()`. |
 | `lang_id.rs`          | 170   | Finds the language of a text. Used only when the model does not report a language.                 |
-| `bin/cli.rs`          | 371   | Standalone CLI binary for tests.                                                                   |
 
 ### 3.6 Post-processing (LLM)
 
@@ -116,7 +118,7 @@ The application does not download the catalog at run time.
 | `apple_intelligence.rs` | 84    | Apple Intelligence provider. macOS on Apple Silicon only.                                                               |
 
 The providers are in `settings.rs`, in `PostProcessProvider`.
-Default providers: OpenAI, Anthropic, Groq, OpenRouter, Z.AI, and a custom OpenAI-compatible endpoint.
+Default providers: OpenAI, Anthropic, Groq, OpenRouter, Z.AI, and a custom endpoint. The custom endpoint accepts the OpenAI or the Anthropic Messages API format.
 API keys are in a `SecretMap`. The settings store keeps them.
 
 ### 3.7 Output

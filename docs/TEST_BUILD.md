@@ -194,8 +194,6 @@ about 15 minutes the first time.
    cd Handy
    git checkout v0.9.7-katapult.2
    bun install
-   mkdir -p src-tauri/resources/models
-   curl -o src-tauri/resources/models/silero_vad_v4.onnx https://blob.handy.computer/silero_vad_v4.onnx
    ```
 
 3. Build the application bundle:
