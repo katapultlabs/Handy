@@ -1,47 +1,35 @@
 //! One-click Accessibility setup (macOS).
 //!
-//! Opens System Settings at Privacy & Security → Accessibility and shows a
-//! small floating tile next to its window. The tile's Handy icon is a real
+//! Opens System Settings at Privacy & Security → Accessibility and turns
+//! Handy's own window into a small tile next to the Settings window, kept
+//! above it while Settings is the active app. The tile's Handy icon is a real
 //! file drag of Handy.app (`tauri-plugin-drag`): dropping it on the list adds
 //! Handy, or registers it again after its signature changed, which removing
-//! and re-adding it with the list's buttons does not always do. The tile
-//! follows the Settings window, turns into "All set" when the permission
-//! arrives, and then hides.
+//! and re-adding it with the list's buttons does not always do. The window
+//! follows Settings, shows "All set" when the permission arrives, and then
+//! returns to its usual size and place.
 
 use serde::Serialize;
 use specta::Type;
 use tauri::AppHandle;
 
-/// Label of the tile window.
-pub const WINDOW_LABEL: &str = "permission_helper";
-
-/// What the tile shows: waiting for the drop, or done.
+/// What the main window shows while the helper runs.
 #[derive(Clone, Copy, Debug, Serialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum PermissionHelperPhase {
+    /// The tile: drag Handy into the list.
     Waiting,
+    /// The tile says "All set" for a moment.
     Granted,
+    /// The window is back to normal.
+    Done,
 }
 
-/// Where the tile sits relative to the Settings window, so its caret can
-/// point at the list.
-#[derive(Clone, Copy, Debug, Serialize, Type, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum PermissionHelperPlacement {
-    /// Under the window: the caret points up.
-    Below,
-    /// Beside the window: the caret points left.
-    Right,
-    /// Over the window's bottom edge: no room outside it, no caret.
-    Inside,
-}
-
-/// Sent to every window: the tile switches its view, the permission banner
-/// checks again.
+/// Sent to every window: the main window switches between the tile and its
+/// usual content, the permission banner checks again.
 #[derive(Clone, Debug, Serialize, Type, tauri_specta::Event)]
 pub struct PermissionHelperEvent {
     pub phase: PermissionHelperPhase,
-    pub placement: PermissionHelperPlacement,
 }
 
 /// The file the tile drags and the image shown under the cursor.
@@ -51,7 +39,7 @@ pub struct PermissionHelperDragItem {
     pub icon_path: String,
 }
 
-/// Opens Accessibility settings and shows the tile next to them.
+/// Opens Accessibility settings and turns the main window into the tile.
 #[tauri::command]
 #[specta::specta]
 pub fn open_accessibility_helper(app: AppHandle) -> Result<(), String> {
@@ -64,7 +52,7 @@ pub fn open_accessibility_helper(app: AppHandle) -> Result<(), String> {
     }
 }
 
-/// Hides the tile (its close button).
+/// Ends the helper and restores the main window (the tile's close button).
 #[tauri::command]
 #[specta::specta]
 pub fn close_accessibility_helper(app: AppHandle) {
@@ -91,11 +79,9 @@ mod macos {
     use super::*;
     use std::path::PathBuf;
     use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Mutex;
     use std::time::{Duration, Instant};
-    use tauri::{LogicalPosition, Manager, WebviewUrl};
-    use tauri_nspanel::{
-        tauri_panel, CollectionBehavior, ManagerExt, PanelBuilder, PanelLevel, StyleMask,
-    };
+    use tauri::{LogicalPosition, LogicalSize, Manager, WebviewWindow};
     use tauri_plugin_opener::OpenerExt;
     use tauri_specta::Event;
 
@@ -103,34 +89,33 @@ mod macos {
         "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
     const SETTINGS_BUNDLE_ID: &str = "com.apple.systempreferences";
 
-    const TILE_WIDTH: f64 = 380.0;
-    /// Includes the transparent band around the card for its shadow and the
-    /// caret on the side facing Settings (see PermissionHelper.tsx).
-    const TILE_HEIGHT: f64 = 100.0;
+    /// The tile's content size. The title bar comes on top.
+    const TILE_WIDTH: f64 = 400.0;
+    const TILE_HEIGHT: f64 = 84.0;
+    /// macOS title bar height, for fitting the whole window on screen.
+    const TITLE_BAR: f64 = 28.0;
     /// Space between the Settings window and the tile.
-    const GAP: f64 = 4.0;
-    /// The tile lines up with the list column, which is the right part of
-    /// the Settings window; this keeps it off the window's rounded corner.
+    const GAP: f64 = 8.0;
+    /// The tile lines up with the list column, the right part of the
+    /// Settings window, and stays clear of its rounded corner.
     const RIGHT_INSET: f64 = 24.0;
     const POLL: Duration = Duration::from_millis(150);
-    /// Settings has this long to open its window before the tile gives up.
+    /// Settings has this long to open its window before the helper gives up.
     const SETTINGS_OPEN_TIMEOUT: Duration = Duration::from_secs(10);
     /// How long "All set" stays on screen.
     const GRANTED_LINGER: Duration = Duration::from_millis(1600);
+    /// The main window's minimum size outside the helper (see `lib.rs`).
+    const MAIN_MIN_SIZE: LogicalSize<f64> = LogicalSize {
+        width: 680.0,
+        height: 570.0,
+    };
 
     /// One follower thread at a time.
     static FOLLOWING: AtomicBool = AtomicBool::new(false);
-    /// Set by the close button; the follower thread hides the tile and ends.
+    /// Set by the close button; the follower thread restores and ends.
     static CLOSE_REQUESTED: AtomicBool = AtomicBool::new(false);
-
-    tauri_panel! {
-        panel!(PermissionHelperPanel {
-            config: {
-                can_become_key_window: false,
-                is_floating_panel: true
-            }
-        })
-    }
+    /// Where the main window was before it became the tile.
+    static SAVED: Mutex<Option<(LogicalPosition<f64>, LogicalSize<f64>)>> = Mutex::new(None);
 
     pub fn open(app: &AppHandle) -> Result<(), String> {
         app.opener()
@@ -139,14 +124,18 @@ mod macos {
 
         CLOSE_REQUESTED.store(false, Ordering::SeqCst);
         if FOLLOWING.swap(true, Ordering::SeqCst) {
-            // Already showing: the running follower picks up the window.
+            // Already the tile: the running follower picks up the window.
             return Ok(());
         }
 
         let handle = app.clone();
         std::thread::spawn(move || {
-            follow_settings_window(&handle);
-            hide_tile(&handle);
+            let granted = follow_settings_window(&handle);
+            leave_tile_mode(&handle);
+            emit(&handle, PermissionHelperPhase::Done);
+            if granted {
+                crate::show_main_window(&handle);
+            }
             FOLLOWING.store(false, Ordering::SeqCst);
         });
         Ok(())
@@ -186,48 +175,47 @@ mod macos {
     }
 
     /// Keeps the tile next to the Settings window until the permission
-    /// arrives, Settings closes, or the user closes the tile.
-    fn follow_settings_window(app: &AppHandle) {
+    /// arrives, Settings closes, or the user closes the tile. Returns whether
+    /// the permission arrived.
+    fn follow_settings_window(app: &AppHandle) -> bool {
         let started = Instant::now();
-        let mut shown = false;
-        let mut last_position: Option<(f64, f64)> = None;
-        let mut placement = PermissionHelperPlacement::Below;
+        let mut tile = false;
+        let mut last_frame: Option<Frame> = None;
 
         loop {
             if CLOSE_REQUESTED.load(Ordering::SeqCst) {
-                return;
+                return false;
             }
 
             if accessibility_granted() {
-                emit(app, PermissionHelperPhase::Granted, placement);
-                if shown {
+                if tile {
+                    emit(app, PermissionHelperPhase::Granted);
                     std::thread::sleep(GRANTED_LINGER);
                 }
-                return;
+                return true;
             }
 
             match settings_window_frame() {
                 Some(frame) => {
-                    let (position, now_placement) = tile_position(app, frame);
-                    if !shown {
-                        show_tile(app, position);
-                        shown = true;
-                    } else if last_position != Some(position) {
-                        move_tile(app, position);
+                    if last_frame != Some(frame) {
+                        let position = tile_position(app, frame);
+                        if !tile {
+                            enter_tile_mode(app, position);
+                            emit(app, PermissionHelperPhase::Waiting);
+                            tile = true;
+                        } else {
+                            move_tile(app, position);
+                        }
+                        last_frame = Some(frame);
                     }
-                    if last_position.is_none() || now_placement != placement {
-                        emit(app, PermissionHelperPhase::Waiting, now_placement);
-                    }
-                    placement = now_placement;
-                    last_position = Some(position);
                 }
                 // Settings was closed (or moved to another Space).
-                None if shown => return,
+                None if tile => return false,
                 None if started.elapsed() > SETTINGS_OPEN_TIMEOUT => {
                     log::warn!(
                         "System Settings window not found; not showing the Accessibility helper"
                     );
-                    return;
+                    return false;
                 }
                 None => {}
             }
@@ -236,8 +224,8 @@ mod macos {
         }
     }
 
-    fn emit(app: &AppHandle, phase: PermissionHelperPhase, placement: PermissionHelperPlacement) {
-        if let Err(e) = (PermissionHelperEvent { phase, placement }).emit(app) {
+    fn emit(app: &AppHandle, phase: PermissionHelperPhase) {
+        if let Err(e) = (PermissionHelperEvent { phase }).emit(app) {
             log::error!("Failed to emit permission helper event: {e}");
         }
     }
@@ -246,9 +234,55 @@ mod macos {
         unsafe { accessibility_sys::AXIsProcessTrusted() }
     }
 
+    fn main_window(app: &AppHandle) -> Option<WebviewWindow> {
+        app.get_webview_window("main")
+    }
+
+    /// Saves the main window's place, shrinks it to the tile, and keeps it
+    /// above Settings (a floating window stays visible while another app is
+    /// active).
+    fn enter_tile_mode(app: &AppHandle, (x, y): (f64, f64)) {
+        let Some(window) = main_window(app) else {
+            return;
+        };
+        let scale = window.scale_factor().unwrap_or(1.0);
+        if let (Ok(position), Ok(size)) = (window.outer_position(), window.inner_size()) {
+            *SAVED.lock().unwrap_or_else(|e| e.into_inner()) =
+                Some((position.to_logical(scale), size.to_logical(scale)));
+        }
+
+        let _ = window.set_min_size(None::<LogicalSize<f64>>);
+        let _ = window.set_resizable(false);
+        let _ = window.set_size(LogicalSize::new(TILE_WIDTH, TILE_HEIGHT));
+        let _ = window.set_position(LogicalPosition::new(x, y));
+        let _ = window.set_always_on_top(true);
+        let _ = window.show();
+    }
+
+    fn move_tile(app: &AppHandle, (x, y): (f64, f64)) {
+        if let Some(window) = main_window(app) {
+            let _ = window.set_position(LogicalPosition::new(x, y));
+        }
+    }
+
+    /// Puts the main window back where and how it was.
+    fn leave_tile_mode(app: &AppHandle) {
+        let Some(window) = main_window(app) else {
+            return;
+        };
+        let saved = SAVED.lock().unwrap_or_else(|e| e.into_inner()).take();
+        let _ = window.set_always_on_top(false);
+        if let Some((position, size)) = saved {
+            let _ = window.set_size(size);
+            let _ = window.set_position(position);
+        }
+        let _ = window.set_min_size(Some(MAIN_MIN_SIZE));
+        let _ = window.set_resizable(true);
+    }
+
     /// The Settings window's frame in global points (top-left origin), the
     /// same space as Tauri's logical positions on macOS.
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Clone, Copy, Debug, PartialEq)]
     struct Frame {
         x: f64,
         y: f64,
@@ -258,32 +292,24 @@ mod macos {
 
     /// Under the list column of the Settings window; to its right when there
     /// is no room below; over its bottom edge when there is room for neither.
-    fn tile_position(app: &AppHandle, frame: Frame) -> ((f64, f64), PermissionHelperPlacement) {
+    fn tile_position(app: &AppHandle, frame: Frame) -> (f64, f64) {
+        let window_height = TILE_HEIGHT + TITLE_BAR;
         let under_list_x = frame.x + frame.width - TILE_WIDTH - RIGHT_INSET;
-        let below = (
-            (under_list_x, frame.y + frame.height + GAP),
-            PermissionHelperPlacement::Below,
-        );
+        let below = (under_list_x, frame.y + frame.height + GAP);
         let Some(screen) = screen_containing(app, frame) else {
             return below;
         };
 
-        if below.0 .1 + TILE_HEIGHT <= screen.y + screen.height {
+        if below.1 + window_height <= screen.y + screen.height {
             return below;
         }
         let right_x = frame.x + frame.width + GAP;
         if right_x + TILE_WIDTH <= screen.x + screen.width {
-            return (
-                (right_x, frame.y + frame.height / 2.0 - TILE_HEIGHT / 2.0),
-                PermissionHelperPlacement::Right,
-            );
+            return (right_x, frame.y + frame.height / 2.0 - window_height / 2.0);
         }
         (
-            (
-                under_list_x,
-                frame.y + frame.height - TILE_HEIGHT - 2.0 * RIGHT_INSET,
-            ),
-            PermissionHelperPlacement::Inside,
+            under_list_x,
+            frame.y + frame.height - window_height - RIGHT_INSET,
         )
     }
 
@@ -304,60 +330,6 @@ mod macos {
                 && cy < screen.y + screen.height)
                 .then_some(screen)
         })
-    }
-
-    fn show_tile(app: &AppHandle, (x, y): (f64, f64)) {
-        let handle = app.clone();
-        let _ = app.run_on_main_thread(move || {
-            if let Ok(panel) = handle.get_webview_panel(WINDOW_LABEL) {
-                if let Some(window) = handle.get_webview_window(WINDOW_LABEL) {
-                    let _ = window.set_position(LogicalPosition { x, y });
-                }
-                panel.show();
-                return;
-            }
-            let built = PanelBuilder::<_, PermissionHelperPanel>::new(&handle, WINDOW_LABEL)
-                .url(WebviewUrl::App("src/permission-helper/index.html".into()))
-                .title("Handy")
-                .position(tauri::Position::Logical(LogicalPosition { x, y }))
-                .size(tauri::Size::Logical(tauri::LogicalSize {
-                    width: TILE_WIDTH,
-                    height: TILE_HEIGHT,
-                }))
-                // Above System Settings, which is the active app while the
-                // tile is up. Panels hide when their app is inactive by
-                // default; this one must not, or it only shows once the
-                // user switches back to Handy.
-                .level(PanelLevel::Status)
-                .hides_on_deactivate(false)
-                .has_shadow(false)
-                .transparent(true)
-                .no_activate(true)
-                .corner_radius(0.0)
-                .style_mask(StyleMask::empty().borderless().nonactivating_panel())
-                .with_window(|w| w.decorations(false).transparent(true).focusable(false))
-                .collection_behavior(CollectionBehavior::new().can_join_all_spaces())
-                .build();
-            match built {
-                Ok(panel) => panel.show(),
-                Err(e) => log::error!("Failed to create the Accessibility helper: {e}"),
-            }
-        });
-    }
-
-    fn move_tile(app: &AppHandle, (x, y): (f64, f64)) {
-        if let Some(window) = app.get_webview_window(WINDOW_LABEL) {
-            let _ = window.set_position(LogicalPosition { x, y });
-        }
-    }
-
-    fn hide_tile(app: &AppHandle) {
-        let handle = app.clone();
-        let _ = app.run_on_main_thread(move || {
-            if let Ok(panel) = handle.get_webview_panel(WINDOW_LABEL) {
-                panel.hide();
-            }
-        });
     }
 
     // --- Finding the Settings window -------------------------------------

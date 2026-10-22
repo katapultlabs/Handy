@@ -23,10 +23,6 @@ export default defineConfig(async () => ({
       input: {
         main: resolve(__dirname, "index.html"),
         overlay: resolve(__dirname, "src/overlay/index.html"),
-        "permission-helper": resolve(
-          __dirname,
-          "src/permission-helper/index.html",
-        ),
       },
     },
   },

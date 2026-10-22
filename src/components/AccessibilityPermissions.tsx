@@ -65,7 +65,7 @@ const AccessibilityPermissions: React.FC = () => {
   useEffect(() => {
     if (!isMacOS) return;
     const unlisten = events.permissionHelperEvent.listen((event) => {
-      if (event.payload.phase === "granted") {
+      if (event.payload.phase !== "waiting") {
         checkAccessibilityPermission().then((granted) => {
           setHasAccessibility(granted);
           if (granted) setPermissionState("granted");

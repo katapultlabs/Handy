@@ -1065,7 +1065,7 @@ async isLaptop() : Promise<Result<boolean, string>> {
 }
 },
 /**
- * Opens Accessibility settings and shows the tile next to them.
+ * Opens Accessibility settings and turns the main window into the tile.
  */
 async openAccessibilityHelper() : Promise<Result<null, string>> {
     try {
@@ -1076,7 +1076,7 @@ async openAccessibilityHelper() : Promise<Result<null, string>> {
 }
 },
 /**
- * Hides the tile (its close button).
+ * Ends the helper and restores the main window (the tile's close button).
  */
 async closeAccessibilityHelper() : Promise<void> {
     await TAURI_INVOKE("close_accessibility_helper");
@@ -1330,31 +1330,26 @@ export type PermissionAccess = "allowed" | "denied" | "unknown"
  */
 export type PermissionHelperDragItem = { app_path: string; icon_path: string }
 /**
- * Sent to every window: the tile switches its view, the permission banner
- * checks again.
+ * Sent to every window: the main window switches between the tile and its
+ * usual content, the permission banner checks again.
  */
-export type PermissionHelperEvent = { phase: PermissionHelperPhase; placement: PermissionHelperPlacement }
+export type PermissionHelperEvent = { phase: PermissionHelperPhase }
 /**
- * What the tile shows: waiting for the drop, or done.
+ * What the main window shows while the helper runs.
  */
-export type PermissionHelperPhase = "waiting" | "granted"
+export type PermissionHelperPhase = 
 /**
- * Where the tile sits relative to the Settings window, so its caret can
- * point at the list.
+ * The tile: drag Handy into the list.
  */
-export type PermissionHelperPlacement = 
+"waiting" | 
 /**
- * Under the window: the caret points up.
+ * The tile says "All set" for a moment.
  */
-"below" | 
+"granted" | 
 /**
- * Beside the window: the caret points left.
+ * The window is back to normal.
  */
-"right" | 
-/**
- * Over the window's bottom edge: no room outside it, no caret.
- */
-"inside"
+"done"
 /**
  * Request format a post-processing endpoint speaks. Built-in providers have a
  * fixed format; only the custom provider lets the user change it.

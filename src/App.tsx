@@ -29,6 +29,7 @@ import {
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { WhatsNewGate } from "./components/whats-new";
+import { PermissionHelper } from "./components/permission-helper/PermissionHelper";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useUiStore } from "./stores/uiStore";
@@ -467,6 +468,7 @@ function App() {
     <>
       {toaster}
       {content}
+      <PermissionHelper />
     </>
   );
 }
