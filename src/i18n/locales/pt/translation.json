@@ -178,6 +178,10 @@
           "push_to_talk": "Grava enquanto você mantém o atalho pressionado",
           "toggle": "Toque no atalho para começar a gravar, toque novamente para parar"
         }
+      },
+      "doubleTapLock": {
+        "label": "Toque duplo para travar",
+        "description": "Toque duas vezes no atalho para continuar gravando depois de soltá-lo. Pressione-o novamente para parar."
       }
     },
     "models": {

@@ -37,6 +37,14 @@ async changeHoldThresholdMsSetting(ms: number) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async changeDoubleTapLockSetting(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_double_tap_lock_setting", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async changeAudioFeedbackSetting(enabled: boolean) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_audio_feedback_setting", { enabled }) };
@@ -1110,10 +1118,15 @@ bindings?: Partial<{ [key in string]: ShortcutBinding }>;
  */
 shortcut_activation?: ShortcutActivation; 
 /**
- * Hold-or-toggle only: a press held at least this long is push-to-talk,
- * anything shorter is a tap that locks recording on.
+ * Hold-or-toggle: a press held at least this long is push-to-talk,
+ * anything shorter is a tap that locks recording on. Push-to-talk with
+ * `double_tap_lock`: a press shorter than this is a tap.
  */
-hold_threshold_ms?: number; audio_feedback?: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; show_whats_new_on_update?: boolean; 
+hold_threshold_ms?: number; 
+/**
+ * Push-to-talk only: a double tap locks recording on until the next press.
+ */
+double_tap_lock?: boolean; audio_feedback?: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; show_whats_new_on_update?: boolean; 
 /**
  * The app version whose What's New the user has already seen. Fresh installs
  * default to the current version (nothing is "new" to them). Existing users

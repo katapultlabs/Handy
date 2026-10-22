@@ -178,6 +178,10 @@
           "push_to_talk": "Optager, mens du holder genvejen nede",
           "toggle": "Tryk på genvejen for at starte optagelsen, tryk igen for at stoppe"
         }
+      },
+      "doubleTapLock": {
+        "label": "Dobbelttryk for at låse",
+        "description": "Tryk to gange på genvejen for at fortsætte optagelsen, når du slipper. Tryk på den igen for at stoppe."
       }
     },
     "models": {

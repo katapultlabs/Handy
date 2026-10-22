@@ -389,10 +389,14 @@ pub struct AppSettings {
     /// migrated from it in `apply_settings_migrations`.
     #[serde(default)]
     pub shortcut_activation: ShortcutActivation,
-    /// Hold-or-toggle only: a press held at least this long is push-to-talk,
-    /// anything shorter is a tap that locks recording on.
+    /// Hold-or-toggle: a press held at least this long is push-to-talk,
+    /// anything shorter is a tap that locks recording on. Push-to-talk with
+    /// `double_tap_lock`: a press shorter than this is a tap.
     #[serde(default = "default_hold_threshold_ms")]
     pub hold_threshold_ms: u64,
+    /// Push-to-talk only: a double tap locks recording on until the next press.
+    #[serde(default = "default_double_tap_lock")]
+    pub double_tap_lock: bool,
     #[serde(default)]
     pub audio_feedback: bool,
     #[serde(default = "default_audio_feedback_volume")]
@@ -567,6 +571,10 @@ fn default_always_on_microphone() -> bool {
 
 fn default_translate_to_english() -> bool {
     false
+}
+
+fn default_double_tap_lock() -> bool {
+    true
 }
 
 fn default_start_hidden() -> bool {
@@ -993,6 +1001,7 @@ pub fn get_default_settings() -> AppSettings {
         bindings,
         shortcut_activation: ShortcutActivation::default(),
         hold_threshold_ms: default_hold_threshold_ms(),
+        double_tap_lock: default_double_tap_lock(),
         audio_feedback: false,
         audio_feedback_volume: default_audio_feedback_volume(),
         sound_theme: default_sound_theme(),

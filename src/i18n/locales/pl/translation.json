@@ -205,6 +205,10 @@
           "push_to_talk": "Nagrywa, dopóki trzymasz skrót",
           "toggle": "Dotknij skrótu, aby rozpocząć nagrywanie, dotknij ponownie, aby zatrzymać"
         }
+      },
+      "doubleTapLock": {
+        "label": "Podwójne dotknięcie blokuje",
+        "description": "Dotknij skrótu dwukrotnie, aby nagrywanie trwało dalej po jego puszczeniu. Naciśnij go ponownie, aby zatrzymać."
       }
     },
     "sound": {

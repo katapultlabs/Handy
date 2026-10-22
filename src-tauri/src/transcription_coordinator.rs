@@ -10,6 +10,11 @@ use tauri::{AppHandle, Manager};
 
 const DEBOUNCE: Duration = Duration::from_millis(30);
 const RELEASE_GRACE: Duration = Duration::from_millis(50);
+/// Push-to-talk with double-tap lock: the longest gap from a tap's key-up to
+/// the next key-down that still counts as a double tap. The gap must also be
+/// longer than `RELEASE_GRACE`, which no person can beat; a faster re-press is
+/// X11 auto-repeat and keeps the hold going instead.
+const DOUBLE_TAP_WINDOW: Duration = Duration::from_millis(350);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PttAction {
@@ -32,6 +37,19 @@ struct PendingRelease {
     /// Holds at least this long stop recording; shorter ones lock it on.
     /// Push-to-talk passes zero so every release stops.
     hold_threshold: Duration,
+    /// Push-to-talk with double-tap lock: a press shorter than this is a tap,
+    /// and its release waits for a second tap instead of stopping.
+    double_tap_max_hold: Option<Duration>,
+}
+
+/// Push-to-talk with double-tap lock: a tap was released and recording goes
+/// on until `deadline`. A press of the same key before then locks the session
+/// (the next press stops it); otherwise the tap's release stops recording.
+struct AwaitingSecondTap {
+    binding_id: String,
+    hotkey_string: String,
+    released_at: Instant,
+    deadline: Instant,
 }
 
 /// A press that arrived while the pipeline was still busy processing the
@@ -139,6 +157,8 @@ struct InputEvent {
     /// They fire on every edge by design and must never be debounced —
     /// dropping one desyncs toggle parity and wedges recording on.
     external: bool,
+    /// Push-to-talk: a double tap locks recording on until the next press.
+    double_tap_lock: bool,
 }
 
 impl InputEvent {
@@ -149,6 +169,13 @@ impl InputEvent {
             // Every release stops; toggle never defers releases at all.
             ShortcutActivation::PushToTalk | ShortcutActivation::Toggle => Duration::ZERO,
         }
+    }
+
+    /// The press length below which a push-to-talk release waits for a second
+    /// tap, or `None` when double-tap lock does not apply.
+    fn double_tap_max_hold(&self) -> Option<Duration> {
+        (self.mode == ShortcutActivation::PushToTalk && self.double_tap_lock)
+            .then_some(self.hold_threshold)
     }
 }
 
@@ -222,6 +249,7 @@ struct CoordinatorState {
     last_press: Option<Instant>,
     pending_release: Option<PendingRelease>,
     pending_press: Option<PendingPress>,
+    awaiting_second_tap: Option<AwaitingSecondTap>,
 }
 
 impl CoordinatorState {
@@ -232,12 +260,19 @@ impl CoordinatorState {
             last_press: None,
             pending_release: None,
             pending_press: None,
+            awaiting_second_tap: None,
         }
     }
 
-    /// Deadline of the deferred release, if any — drives `recv_timeout`.
+    /// Deadline of the deferred release or of the wait for a second tap, if
+    /// any — drives `recv_timeout`.
     fn grace_deadline(&self) -> Option<Instant> {
-        self.pending_release.as_ref().map(|p| p.deadline)
+        let release = self.pending_release.as_ref().map(|p| p.deadline);
+        let second_tap = self.awaiting_second_tap.as_ref().map(|a| a.deadline);
+        match (release, second_tap) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        }
     }
 
     /// Whether the current session (recording, or remembered for the drain)
@@ -248,6 +283,27 @@ impl CoordinatorState {
     }
 
     fn on_input(&mut self, input: InputEvent, now: Instant) -> Option<Effect> {
+        // The second tap of a push-to-talk double tap: recording never
+        // stopped, so lock it on until the next press.
+        if input.is_pressed {
+            if let Some(awaiting) = self
+                .awaiting_second_tap
+                .take_if(|a| a.binding_id == input.binding_id)
+            {
+                if let (Stage::Recording(id), Some(hold)) = (&self.stage, &mut self.hold) {
+                    if *id == awaiting.binding_id {
+                        debug!(
+                            "Double tap for '{}': recording locked on until the next press",
+                            input.binding_id
+                        );
+                        hold.locked = true;
+                        self.last_press = Some(now);
+                        return None;
+                    }
+                }
+            }
+        }
+
         let pending_release_binding = self
             .pending_release
             .as_ref()
@@ -273,6 +329,7 @@ impl CoordinatorState {
             PttAction::DeferRelease => {
                 self.pending_release = Some(PendingRelease {
                     hold_threshold: input.effective_hold_threshold(),
+                    double_tap_max_hold: input.double_tap_max_hold(),
                     binding_id: input.binding_id,
                     hotkey_string: input.hotkey_string,
                     deadline: now + RELEASE_GRACE,
@@ -385,20 +442,59 @@ impl CoordinatorState {
     /// resolve the deferred release against whatever that binding's key was
     /// holding — the live recording, or a press remembered while busy.
     fn on_grace_expired(&mut self) -> Option<Effect> {
-        let pending = self.pending_release.take()?;
+        let Some(pending) = self.pending_release.take() else {
+            // No second tap came: the tap's release stops recording.
+            let awaiting = self.awaiting_second_tap.take()?;
+            return match &self.stage {
+                Stage::Recording(id) if *id == awaiting.binding_id => self.finish_hold(
+                    awaiting.binding_id,
+                    awaiting.hotkey_string,
+                    awaiting.released_at,
+                    Duration::ZERO,
+                ),
+                _ => None,
+            };
+        };
         match &self.stage {
-            Stage::Recording(id) if *id == pending.binding_id => self.finish_hold(
-                pending.binding_id,
-                pending.hotkey_string,
-                pending.released_at,
-                pending.hold_threshold,
-            ),
+            Stage::Recording(id) if *id == pending.binding_id => {
+                if self.starts_double_tap_wait(&pending) {
+                    debug!(
+                        "Tap for '{}': waiting {DOUBLE_TAP_WINDOW:?} for a second tap",
+                        pending.binding_id
+                    );
+                    self.awaiting_second_tap = Some(AwaitingSecondTap {
+                        deadline: pending.released_at + DOUBLE_TAP_WINDOW,
+                        binding_id: pending.binding_id,
+                        hotkey_string: pending.hotkey_string,
+                        released_at: pending.released_at,
+                    });
+                    return None;
+                }
+                self.finish_hold(
+                    pending.binding_id,
+                    pending.hotkey_string,
+                    pending.released_at,
+                    pending.hold_threshold,
+                )
+            }
             Stage::Processing => {
                 self.finish_pending_hold(&pending);
                 None
             }
             _ => None,
         }
+    }
+
+    /// Whether a push-to-talk release ended a press short enough to be the
+    /// first tap of a double tap.
+    fn starts_double_tap_wait(&self, release: &PendingRelease) -> bool {
+        let (Some(max_hold), Some(hold)) = (release.double_tap_max_hold, &self.hold) else {
+            return false;
+        };
+        release
+            .released_at
+            .saturating_duration_since(hold.pressed_at)
+            < max_hold
     }
 
     /// A press remembered while the pipeline was busy has been released for
@@ -460,6 +556,7 @@ impl CoordinatorState {
 
     fn on_cancel(&mut self, recording_was_active: bool) {
         self.pending_release = None;
+        self.awaiting_second_tap = None;
         // An explicit cancel abandons any remembered start too — the user
         // asked for silence, not a deferred recording.
         self.pending_press = None;
@@ -509,6 +606,7 @@ impl CoordinatorState {
     ) -> Effect {
         self.stage = Stage::Recording(binding_id.clone());
         self.hold = Some(Hold { pressed_at, locked });
+        self.awaiting_second_tap = None;
         Effect::Start {
             binding_id,
             hotkey_string,
@@ -518,6 +616,7 @@ impl CoordinatorState {
     fn begin_processing(&mut self, binding_id: String, hotkey_string: String) -> Effect {
         self.stage = Stage::Processing;
         self.hold = None;
+        self.awaiting_second_tap = None;
         Effect::Stop {
             binding_id,
             hotkey_string,
@@ -592,7 +691,8 @@ impl TranscriptionCoordinator {
     }
 
     /// Send a keyboard input event for a transcribe binding. `hold_threshold`
-    /// only matters for [`ShortcutActivation::HoldOrToggle`].
+    /// is the tap/hold boundary for [`ShortcutActivation::HoldOrToggle`] and,
+    /// with `double_tap_lock`, for push-to-talk double taps.
     pub fn send_input(
         &self,
         binding_id: &str,
@@ -600,6 +700,7 @@ impl TranscriptionCoordinator {
         is_pressed: bool,
         mode: ShortcutActivation,
         hold_threshold: Duration,
+        double_tap_lock: bool,
     ) {
         self.send(
             binding_id,
@@ -608,6 +709,7 @@ impl TranscriptionCoordinator {
             mode,
             hold_threshold,
             false,
+            double_tap_lock,
         );
     }
 
@@ -621,6 +723,7 @@ impl TranscriptionCoordinator {
             ShortcutActivation::Toggle,
             Duration::ZERO,
             true,
+            false,
         );
     }
 
@@ -632,6 +735,7 @@ impl TranscriptionCoordinator {
         mode: ShortcutActivation,
         hold_threshold: Duration,
         external: bool,
+        double_tap_lock: bool,
     ) {
         if self
             .tx
@@ -642,6 +746,7 @@ impl TranscriptionCoordinator {
                 mode,
                 hold_threshold,
                 external,
+                double_tap_lock,
             }))
             .is_err()
         {
@@ -896,6 +1001,7 @@ mod tests {
             mode: ShortcutActivation::PushToTalk,
             hold_threshold: Duration::ZERO,
             external: false,
+            double_tap_lock: false,
         }
     }
 
@@ -981,6 +1087,136 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------
+    // Push-to-talk double-tap lock, driven through the real machine with
+    // explicit timestamps.
+    // ---------------------------------------------------------------------
+
+    const TAP_THRESHOLD: Duration = Duration::from_millis(300);
+
+    fn double_tap_input(is_pressed: bool, double_tap_lock: bool) -> InputEvent {
+        InputEvent {
+            binding_id: BINDING.to_string(),
+            hotkey_string: BINDING.to_string(),
+            is_pressed,
+            mode: ShortcutActivation::PushToTalk,
+            hold_threshold: TAP_THRESHOLD,
+            external: false,
+            double_tap_lock,
+        }
+    }
+
+    #[test]
+    fn double_tap_locks_recording_until_next_press() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        let effect = state.on_input(double_tap_input(true, true), t0);
+        assert!(matches!(effect, Some(Effect::Start { .. })));
+        assert!(state
+            .on_input(double_tap_input(false, true), t0 + ms(100))
+            .is_none());
+        // Grace ends: a tap, so recording keeps going and waits for a second tap.
+        assert!(state.on_grace_expired().is_none());
+        assert_eq!(
+            state.grace_deadline(),
+            Some(t0 + ms(100) + DOUBLE_TAP_WINDOW)
+        );
+
+        // Second tap 150 ms after the first release: locked, recording never stopped.
+        assert!(state
+            .on_input(double_tap_input(true, true), t0 + ms(250))
+            .is_none());
+        assert!(state.is_locked());
+        assert_eq!(state.grace_deadline(), None);
+        // Letting go does nothing while locked.
+        assert!(state
+            .on_input(double_tap_input(false, true), t0 + ms(350))
+            .is_none());
+        assert_eq!(state.stage, Stage::Recording(BINDING.to_string()));
+
+        // The next press stops and transcribes.
+        let effect = state.on_input(double_tap_input(true, true), t0 + ms(5000));
+        assert!(matches!(effect, Some(Effect::Stop { .. })));
+        assert_eq!(state.stage, Stage::Processing);
+    }
+
+    #[test]
+    fn single_tap_stops_when_no_second_tap_comes() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        state.on_input(double_tap_input(true, true), t0);
+        state.on_input(double_tap_input(false, true), t0 + ms(100));
+        assert!(state.on_grace_expired().is_none());
+        // The double-tap window ends without a press: stop, as push-to-talk does.
+        let effect = state.on_grace_expired();
+        assert!(matches!(effect, Some(Effect::Stop { .. })));
+        assert_eq!(state.stage, Stage::Processing);
+    }
+
+    #[test]
+    fn long_hold_stops_without_waiting_for_a_second_tap() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        state.on_input(double_tap_input(true, true), t0);
+        state.on_input(double_tap_input(false, true), t0 + ms(2000));
+        let effect = state.on_grace_expired();
+        assert!(matches!(effect, Some(Effect::Stop { .. })));
+        assert!(state.awaiting_second_tap.is_none());
+    }
+
+    #[test]
+    fn autorepeat_during_a_hold_does_not_lock() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        state.on_input(double_tap_input(true, true), t0);
+        // X11 auto-repeat after a short repeat delay: release and press 2 ms
+        // apart, inside RELEASE_GRACE. The hold goes on, unlocked.
+        assert!(state
+            .on_input(double_tap_input(false, true), t0 + ms(250))
+            .is_none());
+        assert!(state
+            .on_input(double_tap_input(true, true), t0 + ms(252))
+            .is_none());
+        assert!(!state.is_locked());
+
+        // The genuine key-up stops recording.
+        state.on_input(double_tap_input(false, true), t0 + ms(1500));
+        let effect = state.on_grace_expired();
+        assert!(matches!(effect, Some(Effect::Stop { .. })));
+    }
+
+    #[test]
+    fn tap_stops_after_grace_when_double_tap_lock_is_off() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        state.on_input(double_tap_input(true, false), t0);
+        state.on_input(double_tap_input(false, false), t0 + ms(100));
+        let effect = state.on_grace_expired();
+        assert!(matches!(effect, Some(Effect::Stop { .. })));
+    }
+
+    #[test]
+    fn cancel_while_waiting_for_second_tap_clears_the_wait() {
+        let mut state = CoordinatorState::new();
+        let t0 = Instant::now();
+
+        state.on_input(double_tap_input(true, true), t0);
+        state.on_input(double_tap_input(false, true), t0 + ms(100));
+        state.on_grace_expired();
+        state.on_cancel(true);
+        assert_eq!(state.stage, Stage::Idle);
+        assert_eq!(state.grace_deadline(), None);
+        // A later press starts a fresh recording instead of locking a dead one.
+        let effect = state.on_input(double_tap_input(true, true), t0 + ms(300));
+        assert!(matches!(effect, Some(Effect::Start { .. })));
+        assert!(!state.is_locked());
+    }
+
+    // ---------------------------------------------------------------------
     // Sequence-level coverage of the busy-pipeline and cancel paths, driven
     // through the real machine.
     // ---------------------------------------------------------------------
@@ -1034,6 +1270,7 @@ mod tests {
                     mode: ShortcutActivation::Toggle,
                     hold_threshold: Duration::ZERO,
                     external: true,
+                    double_tap_lock: false,
                 },
                 at,
             )
@@ -1096,6 +1333,7 @@ mod tests {
             mode: ShortcutActivation::Toggle,
             hold_threshold: Duration::ZERO,
             external,
+            double_tap_lock: false,
         }
     }
 
@@ -1221,6 +1459,7 @@ mod tests {
             mode,
             hold_threshold: HOLD_THRESHOLD,
             external: false,
+            double_tap_lock: false,
         }
     }
 

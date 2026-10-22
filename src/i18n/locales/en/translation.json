@@ -178,6 +178,10 @@
           "push_to_talk": "Records while you hold the shortcut",
           "toggle": "Tap the shortcut to start recording, tap again to stop"
         }
+      },
+      "doubleTapLock": {
+        "label": "Double-Tap to Lock",
+        "description": "Double-tap the shortcut to keep recording after you let go. Press it again to stop."
       }
     },
     "models": {

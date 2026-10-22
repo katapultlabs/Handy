@@ -205,6 +205,10 @@
           "push_to_talk": "Nahrává, dokud držíte zkratku",
           "toggle": "Klepněte na zkratku pro zahájení nahrávání, klepněte znovu pro zastavení"
         }
+      },
+      "doubleTapLock": {
+        "label": "Dvojité klepnutí pro uzamčení",
+        "description": "Klepněte na zkratku dvakrát, aby nahrávání pokračovalo i po jejím uvolnění. Dalším stisknutím zkratky nahrávání zastavíte."
       }
     },
     "sound": {

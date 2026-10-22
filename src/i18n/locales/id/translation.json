@@ -178,6 +178,10 @@
           "push_to_talk": "Merekam selama Anda menahan pintasan",
           "toggle": "Ketuk pintasan untuk mulai merekam, lalu ketuk lagi untuk berhenti"
         }
+      },
+      "doubleTapLock": {
+        "label": "Ketuk Dua Kali untuk Mengunci",
+        "description": "Ketuk pintasan dua kali agar perekaman tetap berjalan setelah Anda melepasnya. Tekan lagi untuk berhenti."
       }
     },
     "models": {

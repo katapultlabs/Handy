@@ -178,6 +178,10 @@
           "push_to_talk": "Spelar in så länge du håller genvägen nedtryckt",
           "toggle": "Tryck på genvägen för att starta inspelningen, tryck igen för att stoppa"
         }
+      },
+      "doubleTapLock": {
+        "label": "Dubbeltryck för att låsa",
+        "description": "Tryck två gånger på genvägen för att fortsätta spela in efter att du släppt. Tryck på den igen för att stoppa."
       }
     },
     "models": {

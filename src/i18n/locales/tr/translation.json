@@ -205,6 +205,10 @@
           "push_to_talk": "Kısayolu basılı tuttuğunuz sürece kaydeder",
           "toggle": "Kaydı başlatmak için kısayola dokunun, durdurmak için tekrar dokunun"
         }
+      },
+      "doubleTapLock": {
+        "label": "Kilitlemek için çift dokunun",
+        "description": "Bıraktıktan sonra da kayda devam etmek için kısayola iki kez dokunun. Durdurmak için tekrar basın."
       }
     },
     "sound": {
