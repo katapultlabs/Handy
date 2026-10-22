@@ -774,8 +774,8 @@
     "dismiss": "閉じる"
   },
   "permissionHelper": {
-    "title": "Handyをリストにドラッグしてください",
-    "description": "システム設定のリストにアイコンをドロップして、オンになっていることを確認してください。",
+    "title": "私をリストにドラッグしてください",
+    "description": "そのあとオンにしてください。",
     "close": "閉じる",
     "granted": {
       "title": "準備完了",

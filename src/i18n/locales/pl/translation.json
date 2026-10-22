@@ -774,8 +774,8 @@
     "dismiss": "Odrzuć"
   },
   "permissionHelper": {
-    "title": "Przeciągnij Handy na listę",
-    "description": "Upuść ikonę na liście w Ustawieniach systemowych i upewnij się, że jest włączona.",
+    "title": "Przeciągnij mnie na listę",
+    "description": "Potem to włącz.",
     "close": "Zamknij",
     "granted": {
       "title": "Gotowe",

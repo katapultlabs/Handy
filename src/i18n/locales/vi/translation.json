@@ -774,8 +774,8 @@
     "dismiss": "Bỏ qua"
   },
   "permissionHelper": {
-    "title": "Kéo Handy vào danh sách",
-    "description": "Thả biểu tượng vào danh sách trong Cài đặt hệ thống và đảm bảo đã bật.",
+    "title": "Kéo tôi vào danh sách",
+    "description": "Rồi bật lên nhé.",
     "close": "Đóng",
     "granted": {
       "title": "Đã sẵn sàng",

@@ -774,8 +774,8 @@
     "dismiss": "Ignorer"
   },
   "permissionHelper": {
-    "title": "Faites glisser Handy dans la liste",
-    "description": "Déposez l'icône sur la liste dans Réglages Système et vérifiez qu'elle est activée.",
+    "title": "Faites-moi glisser dans la liste",
+    "description": "Puis activez-moi.",
     "close": "Fermer",
     "granted": {
       "title": "Tout est prêt",

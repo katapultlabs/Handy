@@ -774,8 +774,8 @@
     "dismiss": "Tutup"
   },
   "permissionHelper": {
-    "title": "Seret Handy ke dalam daftar",
-    "description": "Letakkan ikon di daftar pada Pengaturan Sistem dan pastikan sudah diaktifkan.",
+    "title": "Seret saya ke daftar",
+    "description": "Lalu aktifkan.",
     "close": "Tutup",
     "granted": {
       "title": "Semua siap",

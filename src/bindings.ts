@@ -1326,6 +1326,18 @@ export type PaginatedHistory = { entries: HistoryEntry[]; has_more: boolean }
 export type PasteMethod = "ctrl_v" | "direct" | "none" | "shift_insert" | "ctrl_shift_v" | "external_script"
 export type PermissionAccess = "allowed" | "denied" | "unknown"
 /**
+ * Which way the Settings list is from the tile, for the drag animation.
+ */
+export type PermissionHelperDirection = 
+/**
+ * The tile is under the list (or over the window's bottom edge).
+ */
+"up" | 
+/**
+ * The tile is to the right of the Settings window.
+ */
+"left"
+/**
  * The file the tile drags and the image shown under the cursor.
  */
 export type PermissionHelperDragItem = { app_path: string; icon_path: string }
@@ -1333,7 +1345,7 @@ export type PermissionHelperDragItem = { app_path: string; icon_path: string }
  * Sent to every window: the main window switches between the tile and its
  * usual content, the permission banner checks again.
  */
-export type PermissionHelperEvent = { phase: PermissionHelperPhase }
+export type PermissionHelperEvent = { phase: PermissionHelperPhase; direction: PermissionHelperDirection }
 /**
  * What the main window shows while the helper runs.
  */

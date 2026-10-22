@@ -774,8 +774,8 @@
     "dismiss": "Descarta"
   },
   "permissionHelper": {
-    "title": "Arrossegueu Handy a la llista",
-    "description": "Deixeu anar la icona a la llista de Configuració del sistema i assegureu-vos que estigui activada.",
+    "title": "Arrossegueu-me a la llista",
+    "description": "Després activeu-me.",
     "close": "Tanca",
     "granted": {
       "title": "Tot a punt",

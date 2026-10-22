@@ -774,8 +774,8 @@
     "dismiss": "Zavřít"
   },
   "permissionHelper": {
-    "title": "Přetáhněte Handy do seznamu",
-    "description": "Pusťte ikonu na seznam v Nastavení systému a ujistěte se, že je zapnutá.",
+    "title": "Přetáhněte mě do seznamu",
+    "description": "Pak to zapněte.",
     "close": "Zavřít",
     "granted": {
       "title": "Hotovo",

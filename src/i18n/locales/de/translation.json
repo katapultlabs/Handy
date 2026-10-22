@@ -774,8 +774,8 @@
     "dismiss": "Ausblenden"
   },
   "permissionHelper": {
-    "title": "Zieh Handy in die Liste",
-    "description": "Lege das Symbol auf der Liste in Systemeinstellungen ab und stelle sicher, dass es aktiviert ist.",
+    "title": "Zieh mich in die Liste",
+    "description": "Dann schalt es ein.",
     "close": "Schließen",
     "granted": {
       "title": "Alles bereit",

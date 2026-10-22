@@ -774,8 +774,8 @@
     "dismiss": "Descartar"
   },
   "permissionHelper": {
-    "title": "Arrastra Handy a la lista",
-    "description": "Suelta el icono sobre la lista en Ajustes del Sistema y asegúrate de que esté activado.",
+    "title": "Arrástrame a la lista",
+    "description": "Luego actívalo.",
     "close": "Cerrar",
     "granted": {
       "title": "Todo listo",

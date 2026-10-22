@@ -1,0 +1,154 @@
+/* The Accessibility tile shows the gesture instead of describing it: a
+   ghost of the Handy icon keeps lifting off toward the Settings list (out
+   of the window's top or left edge) while the chevrons light up in the same
+   direction, and the real icon nudges now and then. Everything pauses while
+   the user drags, and motion stops for "reduce motion". */
+
+.ph-ghost {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  animation-duration: 2.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-iteration-count: infinite;
+}
+.ph-ghost[data-direction="up"] {
+  animation-name: ph-ghost-up;
+}
+.ph-ghost[data-direction="left"] {
+  animation-name: ph-ghost-left;
+}
+
+@keyframes ph-ghost-up {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 0.35;
+    transform: translateY(-64px) scale(0.85);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-84px) scale(0.8);
+  }
+}
+
+@keyframes ph-ghost-left {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateX(0) scale(1);
+  }
+  25% {
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 0.35;
+    transform: translateX(-64px) scale(0.85);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-84px) scale(0.8);
+  }
+}
+
+.ph-icon {
+  animation: ph-nudge 2.4s ease-in-out infinite;
+}
+.ph-icon[data-direction="left"] {
+  animation-name: ph-nudge-left;
+}
+
+@keyframes ph-nudge {
+  0%,
+  8%,
+  30%,
+  100% {
+    transform: translateY(0);
+  }
+  16% {
+    transform: translateY(-5px);
+  }
+  23% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes ph-nudge-left {
+  0%,
+  8%,
+  30%,
+  100% {
+    transform: translateX(0);
+  }
+  16% {
+    transform: translateX(-5px);
+  }
+  23% {
+    transform: translateX(-2px);
+  }
+}
+
+/* Three chevrons; the light runs toward the list. */
+.ph-chevron {
+  opacity: 0.15;
+  animation: ph-chevron 1.2s ease-in-out infinite;
+}
+/* The first chevron is the one farthest from the list (the container is
+   reversed), so the light starts there and runs toward the list. */
+.ph-chevron:nth-child(1) {
+  animation-delay: 0s;
+}
+.ph-chevron:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ph-chevron:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes ph-chevron {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* "All set": the check draws itself. */
+.ph-check path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: ph-draw 0.45s 0.1s ease-out forwards;
+}
+
+@keyframes ph-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ph-paused,
+.ph-paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-ghost {
+    display: none;
+  }
+  .ph-icon,
+  .ph-chevron {
+    animation: none;
+  }
+  .ph-chevron {
+    opacity: 0.6;
+  }
+}

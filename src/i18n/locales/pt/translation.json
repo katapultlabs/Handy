@@ -774,8 +774,8 @@
     "dismiss": "Dispensar"
   },
   "permissionHelper": {
-    "title": "Arraste o Handy para a lista",
-    "description": "Solte o ícone na lista em Ajustes do Sistema e confirme que está ativado.",
+    "title": "Arraste-me para a lista",
+    "description": "Depois é só ativar.",
     "close": "Fechar",
     "granted": {
       "title": "Tudo pronto",

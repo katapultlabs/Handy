@@ -774,8 +774,8 @@
     "dismiss": "关闭"
   },
   "permissionHelper": {
-    "title": "将 Handy 拖入列表",
-    "description": "将图标拖放到系统设置的列表上，并确保已打开。",
+    "title": "将我拖入列表",
+    "description": "然后打开开关。",
     "close": "关闭",
     "granted": {
       "title": "一切就绪",

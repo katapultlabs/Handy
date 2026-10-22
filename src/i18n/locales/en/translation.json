@@ -774,8 +774,8 @@
     "dismiss": "Dismiss"
   },
   "permissionHelper": {
-    "title": "Drag Handy into the list",
-    "description": "Drop the icon on the list in System Settings and make sure it's switched on.",
+    "title": "Drag me into the list",
+    "description": "Then switch it on.",
     "close": "Close",
     "granted": {
       "title": "All set",

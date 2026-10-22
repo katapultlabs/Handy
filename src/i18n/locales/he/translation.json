@@ -774,8 +774,8 @@
     "dismiss": "התעלם"
   },
   "permissionHelper": {
-    "title": "גררו את Handy לרשימה",
-    "description": "שחררו את הסמל על הרשימה בהגדרות המערכת וודאו שהוא מופעל.",
+    "title": "גררו אותי לרשימה",
+    "description": "ואז הפעילו את המתג.",
     "close": "סגור",
     "granted": {
       "title": "הכול מוכן",

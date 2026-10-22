@@ -774,8 +774,8 @@
     "dismiss": "Afvis"
   },
   "permissionHelper": {
-    "title": "Træk Handy ind på listen",
-    "description": "Slip ikonet på listen i Systemindstillinger, og sørg for, at det er slået til.",
+    "title": "Træk mig ind på listen",
+    "description": "Slå den så til.",
     "close": "Luk",
     "granted": {
       "title": "Alt er klar",

@@ -25,11 +25,22 @@ pub enum PermissionHelperPhase {
     Done,
 }
 
+/// Which way the Settings list is from the tile, for the drag animation.
+#[derive(Clone, Copy, Debug, Serialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum PermissionHelperDirection {
+    /// The tile is under the list (or over the window's bottom edge).
+    Up,
+    /// The tile is to the right of the Settings window.
+    Left,
+}
+
 /// Sent to every window: the main window switches between the tile and its
 /// usual content, the permission banner checks again.
 #[derive(Clone, Debug, Serialize, Type, tauri_specta::Event)]
 pub struct PermissionHelperEvent {
     pub phase: PermissionHelperPhase,
+    pub direction: PermissionHelperDirection,
 }
 
 /// The file the tile drags and the image shown under the cursor.
@@ -77,11 +88,15 @@ pub fn accessibility_helper_drag_item(app: AppHandle) -> Result<PermissionHelper
 #[cfg(target_os = "macos")]
 mod macos {
     use super::*;
+    use objc2_app_kit::{
+        NSScreen, NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility,
+    };
+    use objc2_foundation::{MainThreadMarker, NSPoint, NSRect, NSSize};
     use std::path::PathBuf;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Mutex;
     use std::time::{Duration, Instant};
-    use tauri::{LogicalPosition, LogicalSize, Manager, WebviewWindow};
+    use tauri::{Manager, WebviewWindow};
     use tauri_plugin_opener::OpenerExt;
     use tauri_specta::Event;
 
@@ -89,11 +104,9 @@ mod macos {
         "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
     const SETTINGS_BUNDLE_ID: &str = "com.apple.systempreferences";
 
-    /// The tile's content size. The title bar comes on top.
+    /// The tile's size. It has no title bar: the content fills the window.
     const TILE_WIDTH: f64 = 400.0;
-    const TILE_HEIGHT: f64 = 84.0;
-    /// macOS title bar height, for fitting the whole window on screen.
-    const TITLE_BAR: f64 = 28.0;
+    const TILE_HEIGHT: f64 = 96.0;
     /// Space between the Settings window and the tile.
     const GAP: f64 = 8.0;
     /// The tile lines up with the list column, the right part of the
@@ -105,7 +118,7 @@ mod macos {
     /// How long "All set" stays on screen.
     const GRANTED_LINGER: Duration = Duration::from_millis(1600);
     /// The main window's minimum size outside the helper (see `lib.rs`).
-    const MAIN_MIN_SIZE: LogicalSize<f64> = LogicalSize {
+    const MAIN_MIN_SIZE: NSSize = NSSize {
         width: 680.0,
         height: 570.0,
     };
@@ -114,8 +127,8 @@ mod macos {
     static FOLLOWING: AtomicBool = AtomicBool::new(false);
     /// Set by the close button; the follower thread restores and ends.
     static CLOSE_REQUESTED: AtomicBool = AtomicBool::new(false);
-    /// Where the main window was before it became the tile.
-    static SAVED: Mutex<Option<(LogicalPosition<f64>, LogicalSize<f64>)>> = Mutex::new(None);
+    /// The main window's frame (AppKit coordinates) before it became the tile.
+    static SAVED: Mutex<Option<NSRect>> = Mutex::new(None);
 
     pub fn open(app: &AppHandle) -> Result<(), String> {
         app.opener()
@@ -132,7 +145,11 @@ mod macos {
         std::thread::spawn(move || {
             let granted = follow_settings_window(&handle);
             leave_tile_mode(&handle);
-            emit(&handle, PermissionHelperPhase::Done);
+            emit(
+                &handle,
+                PermissionHelperPhase::Done,
+                PermissionHelperDirection::Up,
+            );
             if granted {
                 crate::show_main_window(&handle);
             }
@@ -181,6 +198,7 @@ mod macos {
         let started = Instant::now();
         let mut tile = false;
         let mut last_frame: Option<Frame> = None;
+        let mut direction = PermissionHelperDirection::Up;
 
         loop {
             if CLOSE_REQUESTED.load(Ordering::SeqCst) {
@@ -189,7 +207,7 @@ mod macos {
 
             if accessibility_granted() {
                 if tile {
-                    emit(app, PermissionHelperPhase::Granted);
+                    emit(app, PermissionHelperPhase::Granted, direction);
                     std::thread::sleep(GRANTED_LINGER);
                 }
                 return true;
@@ -198,14 +216,17 @@ mod macos {
             match settings_window_frame() {
                 Some(frame) => {
                     if last_frame != Some(frame) {
-                        let position = tile_position(app, frame);
+                        let (position, now_direction) = tile_position(app, frame);
                         if !tile {
                             enter_tile_mode(app, position);
-                            emit(app, PermissionHelperPhase::Waiting);
                             tile = true;
                         } else {
                             move_tile(app, position);
                         }
+                        if last_frame.is_none() || now_direction != direction {
+                            emit(app, PermissionHelperPhase::Waiting, now_direction);
+                        }
+                        direction = now_direction;
                         last_frame = Some(frame);
                     }
                 }
@@ -224,8 +245,8 @@ mod macos {
         }
     }
 
-    fn emit(app: &AppHandle, phase: PermissionHelperPhase) {
-        if let Err(e) = (PermissionHelperEvent { phase }).emit(app) {
+    fn emit(app: &AppHandle, phase: PermissionHelperPhase, direction: PermissionHelperDirection) {
+        if let Err(e) = (PermissionHelperEvent { phase, direction }).emit(app) {
             log::error!("Failed to emit permission helper event: {e}");
         }
     }
@@ -238,46 +259,111 @@ mod macos {
         app.get_webview_window("main")
     }
 
-    /// Saves the main window's place, shrinks it to the tile, and keeps it
-    /// above Settings (a floating window stays visible while another app is
-    /// active).
-    fn enter_tile_mode(app: &AppHandle, (x, y): (f64, f64)) {
+    /// Runs `f` on the main thread with the main window's `NSWindow`.
+    fn with_ns_window(
+        app: &AppHandle,
+        f: impl FnOnce(&NSWindow, MainThreadMarker) + Send + 'static,
+    ) {
         let Some(window) = main_window(app) else {
             return;
         };
-        let scale = window.scale_factor().unwrap_or(1.0);
-        if let (Ok(position), Ok(size)) = (window.outer_position(), window.inner_size()) {
-            *SAVED.lock().unwrap_or_else(|e| e.into_inner()) =
-                Some((position.to_logical(scale), size.to_logical(scale)));
-        }
-
-        let _ = window.set_min_size(None::<LogicalSize<f64>>);
-        let _ = window.set_resizable(false);
-        let _ = window.set_size(LogicalSize::new(TILE_WIDTH, TILE_HEIGHT));
-        let _ = window.set_position(LogicalPosition::new(x, y));
-        let _ = window.set_always_on_top(true);
-        let _ = window.show();
+        let _ = app.run_on_main_thread(move || {
+            let (Some(mtm), Ok(ptr)) = (MainThreadMarker::new(), window.ns_window()) else {
+                return;
+            };
+            // SAFETY: Tauri's main window is an NSWindow that outlives this
+            // call, and we are on the main thread.
+            let ns_window = unsafe { &*(ptr as *const NSWindow) };
+            f(ns_window, mtm);
+        });
     }
 
-    fn move_tile(app: &AppHandle, (x, y): (f64, f64)) {
+    /// A top-left logical position (Tauri's space) as an AppKit frame, whose
+    /// origin is the bottom-left of the primary screen.
+    fn appkit_frame(mtm: MainThreadMarker, (x, y): (f64, f64), width: f64, height: f64) -> NSRect {
+        let primary_height = NSScreen::screens(mtm)
+            .firstObject()
+            .map(|screen| screen.frame().size.height)
+            .unwrap_or(0.0);
+        NSRect::new(
+            NSPoint::new(x, primary_height - y - height),
+            NSSize::new(width, height),
+        )
+    }
+
+    /// Saves the main window's frame, then turns it into the tile: no title
+    /// bar or traffic lights (rounded corners and shadow stay), not
+    /// resizable, kept above Settings (a floating window stays visible while
+    /// another app is active), and gliding to `position`.
+    fn enter_tile_mode(app: &AppHandle, position: (f64, f64)) {
         if let Some(window) = main_window(app) {
-            let _ = window.set_position(LogicalPosition::new(x, y));
+            let _ = window.show();
+            let _ = window.set_always_on_top(true);
         }
+        with_ns_window(app, move |ns_window, mtm| {
+            *SAVED.lock().unwrap_or_else(|e| e.into_inner()) = Some(ns_window.frame());
+            set_chrome(ns_window, false);
+            ns_window.setContentMinSize(NSSize::new(0.0, 0.0));
+            ns_window.setFrame_display_animate(
+                appkit_frame(mtm, position, TILE_WIDTH, TILE_HEIGHT),
+                true,
+                true,
+            );
+        });
     }
 
-    /// Puts the main window back where and how it was.
+    fn move_tile(app: &AppHandle, position: (f64, f64)) {
+        with_ns_window(app, move |ns_window, mtm| {
+            ns_window.setFrame_display_animate(
+                appkit_frame(mtm, position, TILE_WIDTH, TILE_HEIGHT),
+                true,
+                false,
+            );
+        });
+    }
+
+    /// Glides the main window back to its saved frame and gives it its title
+    /// bar, size limits, and normal level again.
     fn leave_tile_mode(app: &AppHandle) {
-        let Some(window) = main_window(app) else {
-            return;
-        };
-        let saved = SAVED.lock().unwrap_or_else(|e| e.into_inner()).take();
-        let _ = window.set_always_on_top(false);
-        if let Some((position, size)) = saved {
-            let _ = window.set_size(size);
-            let _ = window.set_position(position);
+        if let Some(window) = main_window(app) {
+            let _ = window.set_always_on_top(false);
         }
-        let _ = window.set_min_size(Some(MAIN_MIN_SIZE));
-        let _ = window.set_resizable(true);
+        with_ns_window(app, |ns_window, _| {
+            let saved = SAVED.lock().unwrap_or_else(|e| e.into_inner()).take();
+            set_chrome(ns_window, true);
+            ns_window.setContentMinSize(MAIN_MIN_SIZE);
+            if let Some(frame) = saved {
+                ns_window.setFrame_display_animate(frame, true, true);
+            }
+        });
+    }
+
+    /// The usual window chrome (title bar, traffic lights, resizing) on or off.
+    fn set_chrome(ns_window: &NSWindow, on: bool) {
+        let mut mask = ns_window.styleMask();
+        if on {
+            mask.remove(NSWindowStyleMask::FullSizeContentView);
+            mask.insert(NSWindowStyleMask::Resizable);
+        } else {
+            mask.insert(NSWindowStyleMask::FullSizeContentView);
+            mask.remove(NSWindowStyleMask::Resizable);
+        }
+        ns_window.setStyleMask(mask);
+        ns_window.setTitlebarAppearsTransparent(!on);
+        ns_window.setTitleVisibility(if on {
+            NSWindowTitleVisibility::Visible
+        } else {
+            NSWindowTitleVisibility::Hidden
+        });
+        for kind in [
+            NSWindowButton::CloseButton,
+            NSWindowButton::MiniaturizeButton,
+            NSWindowButton::ZoomButton,
+        ] {
+            if let Some(button) = ns_window.standardWindowButton(kind) {
+                button.setHidden(!on);
+            }
+        }
     }
 
     /// The Settings window's frame in global points (top-left origin), the
@@ -292,24 +378,33 @@ mod macos {
 
     /// Under the list column of the Settings window; to its right when there
     /// is no room below; over its bottom edge when there is room for neither.
-    fn tile_position(app: &AppHandle, frame: Frame) -> (f64, f64) {
-        let window_height = TILE_HEIGHT + TITLE_BAR;
+    /// Also says which way the list is from there.
+    fn tile_position(app: &AppHandle, frame: Frame) -> ((f64, f64), PermissionHelperDirection) {
         let under_list_x = frame.x + frame.width - TILE_WIDTH - RIGHT_INSET;
-        let below = (under_list_x, frame.y + frame.height + GAP);
+        let below = (
+            (under_list_x, frame.y + frame.height + GAP),
+            PermissionHelperDirection::Up,
+        );
         let Some(screen) = screen_containing(app, frame) else {
             return below;
         };
 
-        if below.1 + window_height <= screen.y + screen.height {
+        if below.0 .1 + TILE_HEIGHT <= screen.y + screen.height {
             return below;
         }
         let right_x = frame.x + frame.width + GAP;
         if right_x + TILE_WIDTH <= screen.x + screen.width {
-            return (right_x, frame.y + frame.height / 2.0 - window_height / 2.0);
+            return (
+                (right_x, frame.y + frame.height / 2.0 - TILE_HEIGHT / 2.0),
+                PermissionHelperDirection::Left,
+            );
         }
         (
-            under_list_x,
-            frame.y + frame.height - window_height - RIGHT_INSET,
+            (
+                under_list_x,
+                frame.y + frame.height - TILE_HEIGHT - RIGHT_INSET,
+            ),
+            PermissionHelperDirection::Up,
         )
     }
 

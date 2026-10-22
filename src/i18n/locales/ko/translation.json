@@ -774,8 +774,8 @@
     "dismiss": "닫기"
   },
   "permissionHelper": {
-    "title": "Handy를 목록으로 드래그하세요",
-    "description": "시스템 설정의 목록에 아이콘을 놓고 켜져 있는지 확인하세요.",
+    "title": "저를 목록으로 드래그하세요",
+    "description": "그다음 켜 주세요.",
     "close": "닫기",
     "granted": {
       "title": "준비 완료",

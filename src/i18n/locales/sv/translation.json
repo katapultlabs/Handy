@@ -774,8 +774,8 @@
     "dismiss": "Avfärda"
   },
   "permissionHelper": {
-    "title": "Dra Handy till listan",
-    "description": "Släpp ikonen på listan i Systeminställningar och se till att den är påslagen.",
+    "title": "Dra mig till listan",
+    "description": "Slå sedan på den.",
     "close": "Stäng",
     "granted": {
       "title": "Allt klart",

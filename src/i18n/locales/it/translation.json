@@ -774,8 +774,8 @@
     "dismiss": "Ignora"
   },
   "permissionHelper": {
-    "title": "Trascina Handy nell'elenco",
-    "description": "Rilascia l'icona sull'elenco in Impostazioni di Sistema e assicurati che sia attivata.",
+    "title": "Trascinami nell'elenco",
+    "description": "Poi attivami.",
     "close": "Chiudi",
     "granted": {
       "title": "Tutto pronto",

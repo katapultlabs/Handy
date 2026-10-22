@@ -774,8 +774,8 @@
     "dismiss": "Sluiten"
   },
   "permissionHelper": {
-    "title": "Sleep Handy naar de lijst",
-    "description": "Zet het symbool neer op de lijst in Systeeminstellingen en zorg dat het aanstaat.",
+    "title": "Sleep mij naar de lijst",
+    "description": "Zet me daarna aan.",
     "close": "Sluiten",
     "granted": {
       "title": "Klaar",
