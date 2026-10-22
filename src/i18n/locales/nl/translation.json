@@ -178,6 +178,10 @@
           "push_to_talk": "Neemt op zolang je de sneltoets ingedrukt houdt",
           "toggle": "Tik op de sneltoets om de opname te starten, tik opnieuw om te stoppen"
         }
+      },
+      "doubleTapLock": {
+        "label": "Dubbeltik om te vergrendelen",
+        "description": "Tik twee keer op de sneltoets om door te blijven opnemen nadat je loslaat. Druk er nogmaals op om te stoppen."
       }
     },
     "models": {

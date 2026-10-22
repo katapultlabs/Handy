@@ -43,6 +43,7 @@ pub fn handle_shortcut_event(
                 is_pressed,
                 settings.shortcut_activation,
                 std::time::Duration::from_millis(settings.hold_threshold_ms),
+                settings.double_tap_lock,
             );
         } else {
             warn!("TranscriptionCoordinator is not initialized");

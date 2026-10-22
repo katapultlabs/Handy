@@ -205,6 +205,10 @@
           "push_to_talk": "Graba mientras mantienes pulsado el atajo",
           "toggle": "Toca el atajo para empezar a grabar, tócalo de nuevo para detener"
         }
+      },
+      "doubleTapLock": {
+        "label": "Doble toque para bloquear",
+        "description": "Toca dos veces el atajo para seguir grabando después de soltarlo. Púlsalo de nuevo para detener."
       }
     },
     "sound": {

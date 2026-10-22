@@ -205,6 +205,10 @@
           "push_to_talk": "Ghi âm trong lúc bạn giữ phím tắt",
           "toggle": "Nhấn phím tắt để bắt đầu ghi âm, nhấn lại để dừng"
         }
+      },
+      "doubleTapLock": {
+        "label": "Nhấn đúp để khóa",
+        "description": "Nhấn đúp phím tắt để tiếp tục ghi âm sau khi bạn thả ra. Nhấn lại để dừng."
       }
     },
     "sound": {

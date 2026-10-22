@@ -205,6 +205,10 @@
           "push_to_talk": "Nimmt auf, solange die Tastenkombination gedrückt bleibt",
           "toggle": "Tastenkombination antippen, um die Aufnahme zu starten, erneut antippen zum Stoppen"
         }
+      },
+      "doubleTapLock": {
+        "label": "Doppeltippen zum Sperren",
+        "description": "Tippe zweimal auf die Tastenkombination, damit die Aufnahme nach dem Loslassen weiterläuft. Drücke sie erneut, um zu stoppen."
       }
     },
     "sound": {

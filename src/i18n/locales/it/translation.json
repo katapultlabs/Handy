@@ -205,6 +205,10 @@
           "push_to_talk": "Registra finché tieni premuta la scorciatoia",
           "toggle": "Tocca la scorciatoia per avviare la registrazione, tocca di nuovo per fermarla"
         }
+      },
+      "doubleTapLock": {
+        "label": "Doppio tocco per bloccare",
+        "description": "Tocca due volte la scorciatoia per continuare a registrare dopo averla rilasciata. Premila di nuovo per fermare."
       }
     },
     "sound": {

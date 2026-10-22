@@ -205,6 +205,10 @@
           "push_to_talk": "按住快捷键期间录音",
           "toggle": "轻按快捷键开始录音，再次轻按停止"
         }
+      },
+      "doubleTapLock": {
+        "label": "双击锁定",
+        "description": "双击快捷键，松开后继续录音。再次按下即可停止。"
       }
     },
     "sound": {

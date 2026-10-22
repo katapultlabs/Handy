@@ -205,6 +205,10 @@
           "push_to_talk": "Enregistre tant que le raccourci est maintenu",
           "toggle": "Appuyez sur le raccourci pour démarrer l'enregistrement, appuyez à nouveau pour arrêter"
         }
+      },
+      "doubleTapLock": {
+        "label": "Double appui pour verrouiller",
+        "description": "Appuyez deux fois sur le raccourci pour continuer l’enregistrement après l’avoir relâché. Appuyez à nouveau pour arrêter."
       }
     },
     "sound": {

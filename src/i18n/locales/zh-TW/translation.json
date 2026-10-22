@@ -178,6 +178,10 @@
           "push_to_talk": "按住快捷鍵期間錄音",
           "toggle": "輕按快捷鍵開始錄音，再次輕按停止"
         }
+      },
+      "doubleTapLock": {
+        "label": "雙擊鎖定",
+        "description": "雙擊快捷鍵，放開後繼續錄音。再次按下即可停止。"
       }
     },
     "models": {
