@@ -772,5 +772,16 @@
     "learnMore": "Jak to vyřešit",
     "recorderBlocked": "Zkratky teď nelze nahrát — Secure Input v macOS blokuje události kláves. Nejprve vyřešte upozornění na Secure Input.",
     "dismiss": "Zavřít"
+  },
+  "permissionHelper": {
+    "title": "Přetáhněte Handy do seznamu",
+    "description": "Pusťte ikonu na seznam Zpřístupnění v Nastavení systému.",
+    "toggleHint": "Už je v seznamu, ale nefunguje? Vypněte to a znovu zapněte.",
+    "dragHint": "Přetáhněte mě do seznamu Zpřístupnění",
+    "close": "Zavřít",
+    "granted": {
+      "title": "Hotovo",
+      "description": "Handy teď může psát vaše diktování za vás."
+    }
   }
 }

@@ -772,5 +772,16 @@
     "learnMore": "解決方法",
     "recorderBlocked": "現在ショートカットを記録できません。macOS の Secure Input がキーイベントをブロックしています。先に Secure Input の警告を解消してください。",
     "dismiss": "閉じる"
+  },
+  "permissionHelper": {
+    "title": "Handyをリストにドラッグしてください",
+    "description": "システム設定のアクセシビリティのリストにアイコンをドロップしてください。",
+    "toggleHint": "すでにリストにあるのに動作しない場合は、いったんオフにしてからオンに戻してください。",
+    "dragHint": "アクセシビリティのリストにドラッグしてください",
+    "close": "閉じる",
+    "granted": {
+      "title": "準備完了",
+      "description": "Handyが音声入力の内容を代わりに入力できるようになりました。"
+    }
   }
 }

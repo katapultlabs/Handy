@@ -772,5 +772,16 @@
     "learnMore": "Comment résoudre ce problème",
     "recorderBlocked": "Impossible d'enregistrer un raccourci pour le moment : Secure Input de macOS bloque les événements clavier. Résolvez d'abord l'avertissement Secure Input.",
     "dismiss": "Ignorer"
+  },
+  "permissionHelper": {
+    "title": "Faites glisser Handy dans la liste",
+    "description": "Déposez l'icône sur la liste Accessibilité dans Réglages Système.",
+    "toggleHint": "Déjà dans la liste mais ça ne marche pas ? Désactivez-le puis réactivez-le.",
+    "dragHint": "Faites-moi glisser dans la liste Accessibilité",
+    "close": "Fermer",
+    "granted": {
+      "title": "Tout est prêt",
+      "description": "Handy peut désormais saisir votre dictée à votre place."
+    }
   }
 }

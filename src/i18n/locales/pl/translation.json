@@ -772,5 +772,16 @@
     "learnMore": "Jak to naprawić",
     "recorderBlocked": "Nie można teraz nagrać skrótu — Secure Input w macOS blokuje zdarzenia klawiszy. Najpierw rozwiąż ostrzeżenie o Secure Input.",
     "dismiss": "Odrzuć"
+  },
+  "permissionHelper": {
+    "title": "Przeciągnij Handy na listę",
+    "description": "Upuść ikonę na liście Dostępność w Ustawieniach systemowych.",
+    "toggleHint": "Jest już na liście, ale nie działa? Wyłącz i włącz ponownie.",
+    "dragHint": "Przeciągnij mnie na listę Dostępność",
+    "close": "Zamknij",
+    "granted": {
+      "title": "Gotowe",
+      "description": "Handy może teraz wpisywać Twój dyktowany tekst za Ciebie."
+    }
   }
 }

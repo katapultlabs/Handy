@@ -772,5 +772,16 @@
     "learnMore": "Bu nasıl düzeltilir",
     "recorderBlocked": "Şu anda kısayol kaydedilemiyor — macOS Secure Input tuş olaylarını engelliyor. Önce Secure Input uyarısını giderin.",
     "dismiss": "Kapat"
+  },
+  "permissionHelper": {
+    "title": "Handy'yi listeye sürükleyin",
+    "description": "Simgeyi Sistem Ayarları'ndaki Erişilebilirlik listesine bırakın.",
+    "toggleHint": "Listede zaten var ama çalışmıyor mu? Kapatıp yeniden açın.",
+    "dragHint": "Beni Erişilebilirlik listesine sürükleyin",
+    "close": "Kapat",
+    "granted": {
+      "title": "Her şey hazır",
+      "description": "Handy artık dikte ettiklerinizi sizin yerinize yazabilir."
+    }
   }
 }

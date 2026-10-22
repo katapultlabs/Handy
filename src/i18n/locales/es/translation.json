@@ -772,5 +772,16 @@
     "learnMore": "Cómo solucionarlo",
     "recorderBlocked": "Ahora mismo no se pueden grabar atajos: Secure Input de macOS está bloqueando los eventos de teclado. Resuelve primero el aviso de Secure Input.",
     "dismiss": "Descartar"
+  },
+  "permissionHelper": {
+    "title": "Arrastra Handy a la lista",
+    "description": "Suelta el icono sobre la lista de Accesibilidad en Ajustes del Sistema.",
+    "toggleHint": "¿Ya aparece en la lista pero no funciona? Desactívalo y vuelve a activarlo.",
+    "dragHint": "Arrástrame a la lista de Accesibilidad",
+    "close": "Cerrar",
+    "granted": {
+      "title": "Todo listo",
+      "description": "Handy ya puede escribir tu dictado por ti."
+    }
   }
 }

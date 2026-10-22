@@ -179,6 +179,7 @@ every upstream merge. Remove an item when upstream accepts it.
 | Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                            | Part of the Dictionary pull request                     |
 | Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs`  | Follow-up to the Dictionary pull request                |
 | macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                            | Separate pull request after the Dictionary              |
+| Accessibility drag-to-add tile (macOS)              | `src-tauri/src/permission_helper.rs`, `src/permission-helper/`                   | Not yet sent; needs a Discussion (feature freeze)       |
 | Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                        | Separate Discussion; unrelated to the Dictionary        |
 | Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                              | Sent as documentation pull requests when stable         |
 

@@ -151,6 +151,8 @@ objc2-app-kit = "0.3"
 objc2-service-management = "0.3.2"
 # In-place dictionary capture (AX read-back of the pasted region)
 accessibility-sys = "0.2"
+# Native file drag for the Accessibility helper tile (permission_helper.rs).
+tauri-plugin-drag = "2.1.1"
 core-foundation = "0.10"
 
 [target.'cfg(target_os = "linux")'.dependencies]

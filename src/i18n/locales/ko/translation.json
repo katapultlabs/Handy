@@ -772,5 +772,16 @@
     "learnMore": "해결 방법",
     "recorderBlocked": "지금은 단축키를 등록할 수 없습니다. macOS Secure Input이 키 이벤트를 차단하고 있습니다. Secure Input 경고를 먼저 해결하세요.",
     "dismiss": "닫기"
+  },
+  "permissionHelper": {
+    "title": "Handy를 목록으로 드래그하세요",
+    "description": "시스템 설정의 손쉬운 사용 목록에 아이콘을 놓으세요.",
+    "toggleHint": "이미 목록에 있는데 작동하지 않나요? 껐다가 다시 켜 보세요.",
+    "dragHint": "저를 손쉬운 사용 목록으로 드래그하세요",
+    "close": "닫기",
+    "granted": {
+      "title": "준비 완료",
+      "description": "이제 Handy가 받아쓰기 내용을 대신 입력할 수 있습니다."
+    }
   }
 }

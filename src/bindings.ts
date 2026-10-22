@@ -1063,6 +1063,31 @@ async isLaptop() : Promise<Result<boolean, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+/**
+ * Opens Accessibility settings and shows the tile next to them.
+ */
+async openAccessibilityHelper() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("open_accessibility_helper") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Hides the tile (its close button).
+ */
+async closeAccessibilityHelper() : Promise<void> {
+    await TAURI_INVOKE("close_accessibility_helper");
+},
+async accessibilityHelperDragItem() : Promise<Result<PermissionHelperDragItem, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("accessibility_helper_drag_item") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -1071,10 +1096,12 @@ async isLaptop() : Promise<Result<boolean, string>> {
 
 export const events = __makeEvents__<{
 historyUpdatePayload: HistoryUpdatePayload,
+permissionHelperEvent: PermissionHelperEvent,
 streamPhaseEvent: StreamPhaseEvent,
 streamTextEvent: StreamTextEvent
 }>({
 historyUpdatePayload: "history-update-payload",
+permissionHelperEvent: "permission-helper-event",
 streamPhaseEvent: "stream-phase-event",
 streamTextEvent: "stream-text-event"
 })
@@ -1298,6 +1325,19 @@ export type OverlayStyle = "none" | "minimal" | "live"
 export type PaginatedHistory = { entries: HistoryEntry[]; has_more: boolean }
 export type PasteMethod = "ctrl_v" | "direct" | "none" | "shift_insert" | "ctrl_shift_v" | "external_script"
 export type PermissionAccess = "allowed" | "denied" | "unknown"
+/**
+ * The file the tile drags and the image shown under the cursor.
+ */
+export type PermissionHelperDragItem = { app_path: string; icon_path: string }
+/**
+ * Sent to every window: the tile switches its view, the permission banner
+ * checks again.
+ */
+export type PermissionHelperEvent = { phase: PermissionHelperPhase }
+/**
+ * What the tile shows: waiting for the drop, or done.
+ */
+export type PermissionHelperPhase = "waiting" | "granted"
 /**
  * Request format a post-processing endpoint speaks. Built-in providers have a
  * fixed format; only the custom provider lets the user change it.

@@ -772,5 +772,16 @@
     "learnMore": "How to fix",
     "recorderBlocked": "Can't record shortcuts right now — macOS Secure Input is blocking key events. Resolve the Secure Input warning first.",
     "dismiss": "Dismiss"
+  },
+  "permissionHelper": {
+    "title": "Drag Handy into the list",
+    "description": "Drop the icon on the Accessibility list in System Settings.",
+    "toggleHint": "Already listed but not working? Turn it off and on again.",
+    "dragHint": "Drag me into the Accessibility list",
+    "close": "Close",
+    "granted": {
+      "title": "All set",
+      "description": "Handy can now type your dictation for you."
+    }
   }
 }
