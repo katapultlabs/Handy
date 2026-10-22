@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "permission-helper",
+  "description": "The Accessibility helper: drag Handy.app from the main window into System Settings",
+  "platforms": ["macOS"],
+  "windows": ["main"],
+  "permissions": ["drag:default"]
+}

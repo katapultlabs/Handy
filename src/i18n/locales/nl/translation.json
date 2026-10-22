@@ -772,5 +772,14 @@
     "learnMore": "Hoe je dit oplost",
     "recorderBlocked": "Sneltoetsen kunnen nu niet worden opgenomen — Secure Input van macOS blokkeert toetsgebeurtenissen. Los eerst de Secure Input-waarschuwing op.",
     "dismiss": "Sluiten"
+  },
+  "permissionHelper": {
+    "title": "Sleep mij naar de lijst",
+    "description": "Zet me daarna aan.",
+    "close": "Sluiten",
+    "granted": {
+      "title": "Klaar",
+      "description": "Handy kan nu je dictaat voor je typen."
+    }
   }
 }

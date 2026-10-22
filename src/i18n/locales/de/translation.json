@@ -772,5 +772,14 @@
     "learnMore": "So behebst du das",
     "recorderBlocked": "Tastenkürzel können gerade nicht aufgezeichnet werden — macOS Secure Input blockiert Tastenereignisse. Behebe zuerst die Secure-Input-Warnung.",
     "dismiss": "Ausblenden"
+  },
+  "permissionHelper": {
+    "title": "Zieh mich in die Liste",
+    "description": "Dann schalt es ein.",
+    "close": "Schließen",
+    "granted": {
+      "title": "Alles bereit",
+      "description": "Handy kann jetzt dein Diktat für dich eintippen."
+    }
   }
 }

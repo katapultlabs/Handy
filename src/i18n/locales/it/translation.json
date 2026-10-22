@@ -772,5 +772,14 @@
     "learnMore": "Come risolvere",
     "recorderBlocked": "Non è possibile registrare scorciatoie in questo momento: Secure Input di macOS sta bloccando gli eventi dei tasti. Risolvi prima l'avviso di Secure Input.",
     "dismiss": "Ignora"
+  },
+  "permissionHelper": {
+    "title": "Trascinami nell'elenco",
+    "description": "Poi attivami.",
+    "close": "Chiudi",
+    "granted": {
+      "title": "Tutto pronto",
+      "description": "Ora Handy può digitare il tuo dettato al posto tuo."
+    }
   }
 }

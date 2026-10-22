@@ -24,6 +24,7 @@ mod managers;
 mod memory;
 mod overlay;
 mod paste_tx;
+mod permission_helper;
 pub mod portable;
 mod secure_input;
 mod settings;
@@ -805,11 +806,15 @@ pub fn run(cli_args: CliArgs) {
             commands::history::update_history_limit,
             commands::history::update_recording_retention_period,
             helpers::clamshell::is_laptop,
+            permission_helper::open_accessibility_helper,
+            permission_helper::close_accessibility_helper,
+            permission_helper::accessibility_helper_drag_item,
         ])
         .events(collect_events![
             managers::history::HistoryUpdatePayload,
             managers::transcription::StreamTextEvent,
             managers::transcription::StreamPhaseEvent,
+            permission_helper::PermissionHelperEvent,
         ]);
 
     #[cfg(debug_assertions)] // <- Only export on non-release builds
@@ -881,7 +886,9 @@ pub fn run(cli_args: CliArgs) {
 
     #[cfg(target_os = "macos")]
     {
-        builder = builder.plugin(tauri_nspanel::init());
+        builder = builder
+            .plugin(tauri_nspanel::init())
+            .plugin(tauri_plugin_drag::init());
     }
 
     // Single-instance forwards CLI args to an already-running Handy and exits.

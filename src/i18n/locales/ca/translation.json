@@ -772,5 +772,14 @@
     "learnMore": "Com es resol",
     "recorderBlocked": "Ara no se'n poden enregistrar dreceres: l'entrada segura del macOS bloca els esdeveniments de tecla. Resol primer l'avís d'entrada segura.",
     "dismiss": "Descarta"
+  },
+  "permissionHelper": {
+    "title": "Arrossegueu-me a la llista",
+    "description": "Després activeu-me.",
+    "close": "Tanca",
+    "granted": {
+      "title": "Tot a punt",
+      "description": "Ara Handy pot escriure el vostre dictat per vosaltres."
+    }
   }
 }

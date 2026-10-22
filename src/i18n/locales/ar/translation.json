@@ -772,5 +772,14 @@
     "learnMore": "كيفية الإصلاح",
     "recorderBlocked": "لا يمكن تسجيل الاختصارات الآن — يحجب Secure Input في macOS أحداث المفاتيح. عالج تحذير Secure Input أولاً.",
     "dismiss": "تجاهل"
+  },
+  "permissionHelper": {
+    "title": "اسحبني إلى القائمة",
+    "description": "ثم شغّل المفتاح.",
+    "close": "إغلاق",
+    "granted": {
+      "title": "كل شيء جاهز",
+      "description": "يستطيع Handy الآن كتابة إملائك نيابةً عنك."
+    }
   }
 }

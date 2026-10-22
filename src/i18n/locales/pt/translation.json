@@ -772,5 +772,14 @@
     "learnMore": "Como resolver isso",
     "recorderBlocked": "Não é possível gravar atalhos agora — o Secure Input do macOS está bloqueando os eventos de tecla. Resolva primeiro o aviso do Secure Input.",
     "dismiss": "Dispensar"
+  },
+  "permissionHelper": {
+    "title": "Arraste-me para a lista",
+    "description": "Depois é só ativar.",
+    "close": "Fechar",
+    "granted": {
+      "title": "Tudo pronto",
+      "description": "Agora o Handy pode digitar seu ditado para você."
+    }
   }
 }

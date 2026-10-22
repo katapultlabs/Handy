@@ -772,5 +772,14 @@
     "learnMore": "Så här löser du det",
     "recorderBlocked": "Det går inte att spela in kortkommandon just nu — macOS Secure Input blockerar tangenthändelser. Lös varningen om Secure Input först.",
     "dismiss": "Avfärda"
+  },
+  "permissionHelper": {
+    "title": "Dra mig till listan",
+    "description": "Slå sedan på den.",
+    "close": "Stäng",
+    "granted": {
+      "title": "Allt klart",
+      "description": "Handy kan nu skriva ditt dikterade åt dig."
+    }
   }
 }

@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { platform } from "@tauri-apps/plugin-os";
 import {
   checkAccessibilityPermission,
-  requestAccessibilityPermission,
   checkMicrophonePermission,
   requestMicrophonePermission,
 } from "tauri-plugin-macos-permissions-api";
+import { openAccessibilitySetup } from "@/lib/accessibilitySetup";
 import { toast } from "sonner";
 import { commands } from "@/bindings";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -275,7 +275,7 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
     if (preview) return;
 
     try {
-      await requestAccessibilityPermission();
+      await openAccessibilitySetup();
       setPermissions((prev) => ({ ...prev, accessibility: "waiting" }));
       startPolling();
     } catch (error) {

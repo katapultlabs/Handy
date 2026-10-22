@@ -772,5 +772,14 @@
     "learnMore": "Bu nasıl düzeltilir",
     "recorderBlocked": "Şu anda kısayol kaydedilemiyor — macOS Secure Input tuş olaylarını engelliyor. Önce Secure Input uyarısını giderin.",
     "dismiss": "Kapat"
+  },
+  "permissionHelper": {
+    "title": "Beni listeye sürükleyin",
+    "description": "Sonra açın.",
+    "close": "Kapat",
+    "granted": {
+      "title": "Her şey hazır",
+      "description": "Handy artık dikte ettiklerinizi sizin yerinize yazabilir."
+    }
   }
 }

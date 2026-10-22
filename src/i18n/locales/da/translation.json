@@ -772,5 +772,14 @@
     "learnMore": "Sådan løser du det",
     "recorderBlocked": "Genveje kan ikke optages lige nu — macOS Secure Input blokerer tastehændelser. Løs advarslen om Secure Input først.",
     "dismiss": "Afvis"
+  },
+  "permissionHelper": {
+    "title": "Træk mig ind på listen",
+    "description": "Slå den så til.",
+    "close": "Luk",
+    "granted": {
+      "title": "Alt er klar",
+      "description": "Handy kan nu skrive dit diktat for dig."
+    }
   }
 }

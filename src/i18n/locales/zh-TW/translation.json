@@ -772,5 +772,14 @@
     "learnMore": "如何解決",
     "recorderBlocked": "目前無法錄製快捷鍵——macOS 的 Secure Input 正在阻擋按鍵事件。請先解決 Secure Input 警告。",
     "dismiss": "關閉"
+  },
+  "permissionHelper": {
+    "title": "將我拖入清單",
+    "description": "然後打開開關。",
+    "close": "關閉",
+    "granted": {
+      "title": "一切就緒",
+      "description": "Handy 現在可以為你輸入聽寫內容了。"
+    }
   }
 }

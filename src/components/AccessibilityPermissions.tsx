@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type } from "@tauri-apps/plugin-os";
-import {
-  checkAccessibilityPermission,
-  requestAccessibilityPermission,
-} from "tauri-plugin-macos-permissions-api";
+import { checkAccessibilityPermission } from "tauri-plugin-macos-permissions-api";
+import { events } from "@/bindings";
+import { openAccessibilitySetup } from "@/lib/accessibilitySetup";
 
 // Define permission state type
 type PermissionState = "request" | "verify" | "granted";
@@ -36,8 +35,8 @@ const AccessibilityPermissions: React.FC = () => {
   const handleButtonClick = async (): Promise<void> => {
     if (permissionState === "request") {
       try {
-        await requestAccessibilityPermission();
-        // After system prompt, transition to verification state
+        await openAccessibilitySetup();
+        // After the settings open, transition to verification state
         setPermissionState("verify");
       } catch (error) {
         console.error("Error requesting permissions:", error);
@@ -60,6 +59,22 @@ const AccessibilityPermissions: React.FC = () => {
     };
 
     initialSetup();
+  }, [isMacOS]);
+
+  // The Accessibility helper reports the grant: hide the banner at once.
+  useEffect(() => {
+    if (!isMacOS) return;
+    const unlisten = events.permissionHelperEvent.listen((event) => {
+      if (event.payload.phase !== "waiting") {
+        checkAccessibilityPermission().then((granted) => {
+          setHasAccessibility(granted);
+          if (granted) setPermissionState("granted");
+        });
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
   }, [isMacOS]);
 
   // Skip rendering on non-macOS platforms or if permission is already granted

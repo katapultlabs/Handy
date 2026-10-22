@@ -772,5 +772,14 @@
     "learnMore": "Cách khắc phục",
     "recorderBlocked": "Hiện không thể ghi phím tắt — Secure Input của macOS đang chặn các sự kiện phím. Hãy xử lý cảnh báo Secure Input trước.",
     "dismiss": "Bỏ qua"
+  },
+  "permissionHelper": {
+    "title": "Kéo tôi vào danh sách",
+    "description": "Rồi bật lên nhé.",
+    "close": "Đóng",
+    "granted": {
+      "title": "Đã sẵn sàng",
+      "description": "Handy giờ có thể gõ phần đọc chính tả của bạn thay bạn."
+    }
   }
 }

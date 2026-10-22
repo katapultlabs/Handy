@@ -772,5 +772,14 @@
     "learnMore": "Cara memperbaiki",
     "recorderBlocked": "Pintasan tidak dapat direkam saat ini — macOS Secure Input memblokir peristiwa tombol. Selesaikan peringatan Secure Input terlebih dahulu.",
     "dismiss": "Tutup"
+  },
+  "permissionHelper": {
+    "title": "Seret saya ke daftar",
+    "description": "Lalu aktifkan.",
+    "close": "Tutup",
+    "granted": {
+      "title": "Semua siap",
+      "description": "Handy kini dapat mengetikkan dikte Anda untuk Anda."
+    }
   }
 }
