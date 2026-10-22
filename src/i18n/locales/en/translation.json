@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Drag Handy into the list",
-    "description": "Drop the icon on the Accessibility list in System Settings.",
-    "toggleHint": "Already listed but not working? Turn it off and on again.",
-    "dragHint": "Drag me into the Accessibility list",
+    "description": "Drop the icon on the list in System Settings and make sure it's switched on.",
     "close": "Close",
     "granted": {
       "title": "All set",

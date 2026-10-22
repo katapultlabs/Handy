@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Zieh Handy in die Liste",
-    "description": "Lege das Symbol in Systemeinstellungen auf der Liste „Bedienungshilfen“ ab.",
-    "toggleHint": "Schon in der Liste, aber es funktioniert nicht? Schalte es aus und wieder ein.",
-    "dragHint": "Zieh mich in die Liste „Bedienungshilfen“",
+    "description": "Lege das Symbol auf der Liste in Systemeinstellungen ab und stelle sicher, dass es aktiviert ist.",
     "close": "Schließen",
     "granted": {
       "title": "Alles bereit",

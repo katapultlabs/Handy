@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Arrastra Handy a la lista",
-    "description": "Suelta el icono sobre la lista de Accesibilidad en Ajustes del Sistema.",
-    "toggleHint": "¿Ya aparece en la lista pero no funciona? Desactívalo y vuelve a activarlo.",
-    "dragHint": "Arrástrame a la lista de Accesibilidad",
+    "description": "Suelta el icono sobre la lista en Ajustes del Sistema y asegúrate de que esté activado.",
     "close": "Cerrar",
     "granted": {
       "title": "Todo listo",

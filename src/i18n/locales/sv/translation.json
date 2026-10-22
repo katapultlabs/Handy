@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Dra Handy till listan",
-    "description": "Släpp ikonen på listan Hjälpmedel i Systeminställningar.",
-    "toggleHint": "Finns den redan i listan men fungerar inte? Stäng av den och slå på den igen.",
-    "dragHint": "Dra mig till listan Hjälpmedel",
+    "description": "Släpp ikonen på listan i Systeminställningar och se till att den är påslagen.",
     "close": "Stäng",
     "granted": {
       "title": "Allt klart",

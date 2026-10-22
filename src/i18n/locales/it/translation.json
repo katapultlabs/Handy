@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Trascina Handy nell'elenco",
-    "description": "Rilascia l'icona sull'elenco Accessibilità in Impostazioni di Sistema.",
-    "toggleHint": "È già nell'elenco ma non funziona? Disattivalo e riattivalo.",
-    "dragHint": "Trascinami nell'elenco Accessibilità",
+    "description": "Rilascia l'icona sull'elenco in Impostazioni di Sistema e assicurati che sia attivata.",
     "close": "Chiudi",
     "granted": {
       "title": "Tutto pronto",

@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Træk Handy ind på listen",
-    "description": "Slip ikonet på listen Tilgængelighed i Systemindstillinger.",
-    "toggleHint": "Allerede på listen, men virker det ikke? Slå det fra og til igen.",
-    "dragHint": "Træk mig ind på listen Tilgængelighed",
+    "description": "Slip ikonet på listen i Systemindstillinger, og sørg for, at det er slået til.",
     "close": "Luk",
     "granted": {
       "title": "Alt er klar",

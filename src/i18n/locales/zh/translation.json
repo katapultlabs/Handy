@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "将 Handy 拖入列表",
-    "description": "将图标拖放到系统设置中的“辅助功能”列表上。",
-    "toggleHint": "已在列表中但无法使用？请先关闭再重新打开。",
-    "dragHint": "将我拖入“辅助功能”列表",
+    "description": "将图标拖放到系统设置的列表上，并确保已打开。",
     "close": "关闭",
     "granted": {
       "title": "一切就绪",

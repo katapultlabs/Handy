@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Sleep Handy naar de lijst",
-    "description": "Zet het symbool neer op de lijst Toegankelijkheid in Systeeminstellingen.",
-    "toggleHint": "Staat het al in de lijst maar werkt het niet? Zet het uit en weer aan.",
-    "dragHint": "Sleep mij naar de lijst Toegankelijkheid",
+    "description": "Zet het symbool neer op de lijst in Systeeminstellingen en zorg dat het aanstaat.",
     "close": "Sluiten",
     "granted": {
       "title": "Klaar",

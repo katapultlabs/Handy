@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Přetáhněte Handy do seznamu",
-    "description": "Pusťte ikonu na seznam Zpřístupnění v Nastavení systému.",
-    "toggleHint": "Už je v seznamu, ale nefunguje? Vypněte to a znovu zapněte.",
-    "dragHint": "Přetáhněte mě do seznamu Zpřístupnění",
+    "description": "Pusťte ikonu na seznam v Nastavení systému a ujistěte se, že je zapnutá.",
     "close": "Zavřít",
     "granted": {
       "title": "Hotovo",

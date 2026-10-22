@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Handy를 목록으로 드래그하세요",
-    "description": "시스템 설정의 손쉬운 사용 목록에 아이콘을 놓으세요.",
-    "toggleHint": "이미 목록에 있는데 작동하지 않나요? 껐다가 다시 켜 보세요.",
-    "dragHint": "저를 손쉬운 사용 목록으로 드래그하세요",
+    "description": "시스템 설정의 목록에 아이콘을 놓고 켜져 있는지 확인하세요.",
     "close": "닫기",
     "granted": {
       "title": "준비 완료",

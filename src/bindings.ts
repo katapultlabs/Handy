@@ -1333,11 +1333,28 @@ export type PermissionHelperDragItem = { app_path: string; icon_path: string }
  * Sent to every window: the tile switches its view, the permission banner
  * checks again.
  */
-export type PermissionHelperEvent = { phase: PermissionHelperPhase }
+export type PermissionHelperEvent = { phase: PermissionHelperPhase; placement: PermissionHelperPlacement }
 /**
  * What the tile shows: waiting for the drop, or done.
  */
 export type PermissionHelperPhase = "waiting" | "granted"
+/**
+ * Where the tile sits relative to the Settings window, so its caret can
+ * point at the list.
+ */
+export type PermissionHelperPlacement = 
+/**
+ * Under the window: the caret points up.
+ */
+"below" | 
+/**
+ * Beside the window: the caret points left.
+ */
+"right" | 
+/**
+ * Over the window's bottom edge: no room outside it, no caret.
+ */
+"inside"
 /**
  * Request format a post-processing endpoint speaks. Built-in providers have a
  * fixed format; only the custom provider lets the user change it.

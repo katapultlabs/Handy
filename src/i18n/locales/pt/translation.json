@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Arraste o Handy para a lista",
-    "description": "Solte o ícone na lista de Acessibilidade em Ajustes do Sistema.",
-    "toggleHint": "Já está na lista, mas não funciona? Desative e ative novamente.",
-    "dragHint": "Arraste-me para a lista de Acessibilidade",
+    "description": "Solte o ícone na lista em Ajustes do Sistema e confirme que está ativado.",
     "close": "Fechar",
     "granted": {
       "title": "Tudo pronto",

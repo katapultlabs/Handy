@@ -23,11 +23,25 @@ pub enum PermissionHelperPhase {
     Granted,
 }
 
+/// Where the tile sits relative to the Settings window, so its caret can
+/// point at the list.
+#[derive(Clone, Copy, Debug, Serialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum PermissionHelperPlacement {
+    /// Under the window: the caret points up.
+    Below,
+    /// Beside the window: the caret points left.
+    Right,
+    /// Over the window's bottom edge: no room outside it, no caret.
+    Inside,
+}
+
 /// Sent to every window: the tile switches its view, the permission banner
 /// checks again.
 #[derive(Clone, Debug, Serialize, Type, tauri_specta::Event)]
 pub struct PermissionHelperEvent {
     pub phase: PermissionHelperPhase,
+    pub placement: PermissionHelperPlacement,
 }
 
 /// The file the tile drags and the image shown under the cursor.
@@ -89,10 +103,15 @@ mod macos {
         "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
     const SETTINGS_BUNDLE_ID: &str = "com.apple.systempreferences";
 
-    const TILE_WIDTH: f64 = 360.0;
-    const TILE_HEIGHT: f64 = 104.0;
+    const TILE_WIDTH: f64 = 380.0;
+    /// Includes the transparent band around the card for its shadow and the
+    /// caret on the side facing Settings (see PermissionHelper.tsx).
+    const TILE_HEIGHT: f64 = 100.0;
     /// Space between the Settings window and the tile.
-    const GAP: f64 = 12.0;
+    const GAP: f64 = 4.0;
+    /// The tile lines up with the list column, which is the right part of
+    /// the Settings window; this keeps it off the window's rounded corner.
+    const RIGHT_INSET: f64 = 24.0;
     const POLL: Duration = Duration::from_millis(150);
     /// Settings has this long to open its window before the tile gives up.
     const SETTINGS_OPEN_TIMEOUT: Duration = Duration::from_secs(10);
@@ -172,6 +191,7 @@ mod macos {
         let started = Instant::now();
         let mut shown = false;
         let mut last_position: Option<(f64, f64)> = None;
+        let mut placement = PermissionHelperPlacement::Below;
 
         loop {
             if CLOSE_REQUESTED.load(Ordering::SeqCst) {
@@ -179,25 +199,26 @@ mod macos {
             }
 
             if accessibility_granted() {
+                emit(app, PermissionHelperPhase::Granted, placement);
                 if shown {
-                    emit(app, PermissionHelperPhase::Granted);
                     std::thread::sleep(GRANTED_LINGER);
-                } else {
-                    emit(app, PermissionHelperPhase::Granted);
                 }
                 return;
             }
 
             match settings_window_frame() {
                 Some(frame) => {
-                    let position = tile_position(app, frame);
+                    let (position, now_placement) = tile_position(app, frame);
                     if !shown {
                         show_tile(app, position);
-                        emit(app, PermissionHelperPhase::Waiting);
                         shown = true;
                     } else if last_position != Some(position) {
                         move_tile(app, position);
                     }
+                    if last_position.is_none() || now_placement != placement {
+                        emit(app, PermissionHelperPhase::Waiting, now_placement);
+                    }
+                    placement = now_placement;
                     last_position = Some(position);
                 }
                 // Settings was closed (or moved to another Space).
@@ -215,8 +236,8 @@ mod macos {
         }
     }
 
-    fn emit(app: &AppHandle, phase: PermissionHelperPhase) {
-        if let Err(e) = (PermissionHelperEvent { phase }).emit(app) {
+    fn emit(app: &AppHandle, phase: PermissionHelperPhase, placement: PermissionHelperPlacement) {
+        if let Err(e) = (PermissionHelperEvent { phase, placement }).emit(app) {
             log::error!("Failed to emit permission helper event: {e}");
         }
     }
@@ -235,23 +256,35 @@ mod macos {
         height: f64,
     }
 
-    /// Below the Settings window, centred; to its right when there is no room
-    /// below; over its bottom edge when there is room for neither.
-    fn tile_position(app: &AppHandle, frame: Frame) -> (f64, f64) {
-        let centre_x = frame.x + (frame.width - TILE_WIDTH) / 2.0;
-        let below_y = frame.y + frame.height + GAP;
+    /// Under the list column of the Settings window; to its right when there
+    /// is no room below; over its bottom edge when there is room for neither.
+    fn tile_position(app: &AppHandle, frame: Frame) -> ((f64, f64), PermissionHelperPlacement) {
+        let under_list_x = frame.x + frame.width - TILE_WIDTH - RIGHT_INSET;
+        let below = (
+            (under_list_x, frame.y + frame.height + GAP),
+            PermissionHelperPlacement::Below,
+        );
         let Some(screen) = screen_containing(app, frame) else {
-            return (centre_x, below_y);
+            return below;
         };
 
-        if below_y + TILE_HEIGHT <= screen.y + screen.height {
-            return (centre_x, below_y);
+        if below.0 .1 + TILE_HEIGHT <= screen.y + screen.height {
+            return below;
         }
         let right_x = frame.x + frame.width + GAP;
         if right_x + TILE_WIDTH <= screen.x + screen.width {
-            return (right_x, frame.y + frame.height - TILE_HEIGHT);
+            return (
+                (right_x, frame.y + frame.height / 2.0 - TILE_HEIGHT / 2.0),
+                PermissionHelperPlacement::Right,
+            );
         }
-        (centre_x, frame.y + frame.height - TILE_HEIGHT - GAP)
+        (
+            (
+                under_list_x,
+                frame.y + frame.height - TILE_HEIGHT - 2.0 * RIGHT_INSET,
+            ),
+            PermissionHelperPlacement::Inside,
+        )
     }
 
     /// The monitor that holds the centre of `frame`, in logical points.
@@ -291,11 +324,16 @@ mod macos {
                     width: TILE_WIDTH,
                     height: TILE_HEIGHT,
                 }))
-                .level(PanelLevel::Floating)
-                .has_shadow(true)
+                // Above System Settings, which is the active app while the
+                // tile is up. Panels hide when their app is inactive by
+                // default; this one must not, or it only shows once the
+                // user switches back to Handy.
+                .level(PanelLevel::Status)
+                .hides_on_deactivate(false)
+                .has_shadow(false)
                 .transparent(true)
                 .no_activate(true)
-                .corner_radius(12.0)
+                .corner_radius(0.0)
                 .style_mask(StyleMask::empty().borderless().nonactivating_panel())
                 .with_window(|w| w.decorations(false).transparent(true).focusable(false))
                 .collection_behavior(CollectionBehavior::new().can_join_all_spaces())

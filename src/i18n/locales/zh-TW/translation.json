@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "將 Handy 拖入清單",
-    "description": "將圖示拖放到系統設定中的「輔助使用」清單上。",
-    "toggleHint": "已在清單中但無法使用？請先關閉再重新開啟。",
-    "dragHint": "將我拖入「輔助使用」清單",
+    "description": "將圖示拖放到系統設定的清單上，並確認已開啟。",
     "close": "關閉",
     "granted": {
       "title": "一切就緒",

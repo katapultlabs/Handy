@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Seret Handy ke dalam daftar",
-    "description": "Letakkan ikon di daftar Aksesibilitas pada Pengaturan Sistem.",
-    "toggleHint": "Sudah ada di daftar tetapi tidak berfungsi? Matikan lalu nyalakan kembali.",
-    "dragHint": "Seret saya ke daftar Aksesibilitas",
+    "description": "Letakkan ikon di daftar pada Pengaturan Sistem dan pastikan sudah diaktifkan.",
     "close": "Tutup",
     "granted": {
       "title": "Semua siap",

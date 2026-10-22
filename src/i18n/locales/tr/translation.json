@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Handy'yi listeye sürükleyin",
-    "description": "Simgeyi Sistem Ayarları'ndaki Erişilebilirlik listesine bırakın.",
-    "toggleHint": "Listede zaten var ama çalışmıyor mu? Kapatıp yeniden açın.",
-    "dragHint": "Beni Erişilebilirlik listesine sürükleyin",
+    "description": "Simgeyi Sistem Ayarları'ndaki listeye bırakın ve açık olduğundan emin olun.",
     "close": "Kapat",
     "granted": {
       "title": "Her şey hazır",

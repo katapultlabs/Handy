@@ -775,9 +775,7 @@
   },
   "permissionHelper": {
     "title": "Kéo Handy vào danh sách",
-    "description": "Thả biểu tượng vào danh sách Trợ năng trong Cài đặt hệ thống.",
-    "toggleHint": "Đã có trong danh sách nhưng không hoạt động? Hãy tắt rồi bật lại.",
-    "dragHint": "Kéo tôi vào danh sách Trợ năng",
+    "description": "Thả biểu tượng vào danh sách trong Cài đặt hệ thống và đảm bảo đã bật.",
     "close": "Đóng",
     "granted": {
       "title": "Đã sẵn sàng",
