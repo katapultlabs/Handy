@@ -145,6 +145,19 @@ pub enum OverlayStyle {
     Live,
 }
 
+/// What ⌘Q does on macOS while the tray icon is available. Without a tray
+/// icon, ⌘Q always quits.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum QuitShortcutAction {
+    /// Ask the user, who can make the answer the default.
+    #[default]
+    Ask,
+    /// Hide the window and keep running in the menu bar.
+    MenuBar,
+    Quit,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelUnloadTimeout {
@@ -545,6 +558,8 @@ pub struct AppSettings {
     /// `overlay_position` (position `none` → style `None`).
     #[serde(default = "default_overlay_style")]
     pub overlay_style: OverlayStyle,
+    #[serde(default)]
+    pub quit_shortcut_action: QuitShortcutAction,
 }
 
 fn default_model() -> String {
@@ -1055,6 +1070,7 @@ pub fn get_default_settings() -> AppSettings {
         vad_backend: VadBackend::default(),
         long_form_chunking: default_long_form_chunking(),
         overlay_style: default_overlay_style(),
+        quit_shortcut_action: QuitShortcutAction::default(),
     }
 }
 

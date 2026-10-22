@@ -181,6 +181,7 @@ every upstream merge. Remove an item when upstream accepts it.
 | macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                            | Separate pull request after the Dictionary              |
 | Accessibility drag-to-add tile (macOS)              | `src-tauri/src/permission_helper.rs`, `src/components/permission-helper/`        | Not yet sent; needs a Discussion (feature freeze)       |
 | Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                        | Separate Discussion; unrelated to the Dictionary        |
+| ⌘Q keeps Handy in the menu bar (macOS)              | `src-tauri/src/quit_shortcut.rs`, `src/components/quit-prompt/`                  | Not yet sent; needs a Discussion (feature freeze)       |
 | Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                              | Sent as documentation pull requests when stable         |
 
 ## 5. Upstream pull request order

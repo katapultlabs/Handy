@@ -398,6 +398,15 @@
           "simplified": "Förenklad",
           "traditional": "Traditionell"
         }
+      },
+      "quitShortcut": {
+        "title": "När du trycker på ⌘Q",
+        "description": "Avsluta Handy, eller låt det köra i menyraden så att din diktatgenväg fortsätter fungera.",
+        "options": {
+          "ask": "Fråga varje gång",
+          "menuBar": "Låt det köra i menyraden",
+          "quit": "Avsluta Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "Allt klart",
       "description": "Handy kan nu skriva ditt dikterade åt dig."
     }
+  },
+  "quitPrompt": {
+    "title": "Behålla Handy i menyraden?",
+    "description": "Din diktatgenväg fungerar bara medan Handy körs. Handy kan ligga kvar i menyraden utan att vara i vägen.",
+    "keep": "Behåll i menyraden",
+    "quit": "Avsluta Handy",
+    "cancel": "Avbryt",
+    "remember": "Fråga inte igen",
+    "settingsHint": "Du kan ändra detta när som helst under Inställningar → Avancerat."
   }
 }

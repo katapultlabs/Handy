@@ -398,6 +398,15 @@
           "simplified": "Forenklet",
           "traditional": "Traditionel"
         }
+      },
+      "quitShortcut": {
+        "title": "Når du trykker på ⌘Q",
+        "description": "Afslut Handy, eller lad det køre i menulinjen, så din diktatgenvej fortsat virker.",
+        "options": {
+          "ask": "Spørg hver gang",
+          "menuBar": "Lad det køre i menulinjen",
+          "quit": "Afslut Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "Alt er klar",
       "description": "Handy kan nu skrive dit diktat for dig."
     }
+  },
+  "quitPrompt": {
+    "title": "Skal Handy blive i menulinjen?",
+    "description": "Din diktatgenvej virker kun, mens Handy kører. Handy kan blive i menulinjen uden at være i vejen.",
+    "keep": "Behold i menulinjen",
+    "quit": "Afslut Handy",
+    "cancel": "Annuller",
+    "remember": "Spørg ikke igen",
+    "settingsHint": "Du kan til enhver tid ændre dette under Indstillinger → Avanceret."
   }
 }

@@ -398,6 +398,15 @@
           "simplified": "Semplificato",
           "traditional": "Tradizionale"
         }
+      },
+      "quitShortcut": {
+        "title": "Quando premi ⌘Q",
+        "description": "Esci da Handy, oppure lascialo attivo nella barra dei menu così la scorciatoia di dettatura continua a funzionare.",
+        "options": {
+          "ask": "Chiedi ogni volta",
+          "menuBar": "Lascia attivo nella barra dei menu",
+          "quit": "Esci da Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "Tutto pronto",
       "description": "Ora Handy può digitare il tuo dettato al posto tuo."
     }
+  },
+  "quitPrompt": {
+    "title": "Tenere Handy nella barra dei menu?",
+    "description": "La scorciatoia di dettatura funziona solo mentre Handy è in esecuzione. Handy può restare nella barra dei menu senza intralciarti.",
+    "keep": "Tieni nella barra dei menu",
+    "quit": "Esci da Handy",
+    "cancel": "Annulla",
+    "remember": "Non chiedere più",
+    "settingsHint": "Puoi cambiare questa scelta in qualsiasi momento in Impostazioni → Avanzate."
   }
 }

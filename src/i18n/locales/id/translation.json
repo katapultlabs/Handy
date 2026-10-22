@@ -398,6 +398,15 @@
           "simplified": "Sederhana",
           "traditional": "Tradisional"
         }
+      },
+      "quitShortcut": {
+        "title": "Saat Anda Menekan ⌘Q",
+        "description": "Keluar dari Handy, atau biarkan tetap berjalan di bilah menu agar pintasan dikte Anda tetap berfungsi.",
+        "options": {
+          "ask": "Tanya setiap kali",
+          "menuBar": "Biarkan berjalan di bilah menu",
+          "quit": "Keluar dari Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "Semua siap",
       "description": "Handy kini dapat mengetikkan dikte Anda untuk Anda."
     }
+  },
+  "quitPrompt": {
+    "title": "Biarkan Handy di bilah menu?",
+    "description": "Pintasan dikte Anda hanya berfungsi selama Handy berjalan. Handy dapat tetap berada di bilah menu tanpa mengganggu.",
+    "keep": "Tetap di Bilah Menu",
+    "quit": "Keluar dari Handy",
+    "cancel": "Batal",
+    "remember": "Jangan tanya lagi",
+    "settingsHint": "Anda dapat mengubahnya kapan saja di Pengaturan → Lanjutan."
   }
 }

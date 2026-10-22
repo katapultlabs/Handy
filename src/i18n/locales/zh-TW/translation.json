@@ -398,6 +398,15 @@
           "simplified": "簡體",
           "traditional": "繁體"
         }
+      },
+      "quitShortcut": {
+        "title": "按下 ⌘Q 時",
+        "description": "結束 Handy，或讓它繼續在選單列中執行，這樣聽寫快速鍵才能繼續使用。",
+        "options": {
+          "ask": "每次詢問",
+          "menuBar": "繼續在選單列中執行",
+          "quit": "結束 Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "一切就緒",
       "description": "Handy 現在可以為你輸入聽寫內容了。"
     }
+  },
+  "quitPrompt": {
+    "title": "讓 Handy 保留在選單列中？",
+    "description": "聽寫快速鍵只有在 Handy 執行時才能使用。Handy 可以留在選單列中，不會打擾你。",
+    "keep": "保留在選單列",
+    "quit": "結束 Handy",
+    "cancel": "取消",
+    "remember": "不再詢問",
+    "settingsHint": "你可以隨時在「設定 → 進階」中更改。"
   }
 }

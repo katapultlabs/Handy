@@ -398,6 +398,15 @@
           "simplified": "Simplificado",
           "traditional": "Tradicional"
         }
+      },
+      "quitShortcut": {
+        "title": "Al pulsar ⌘Q",
+        "description": "Salir de Handy o mantenerlo en ejecución en la barra de menús para que tu atajo de dictado siga funcionando.",
+        "options": {
+          "ask": "Preguntar cada vez",
+          "menuBar": "Mantener en la barra de menús",
+          "quit": "Salir de Handy"
+        }
       }
     },
     "postProcessing": {
@@ -781,5 +790,14 @@
       "title": "Todo listo",
       "description": "Handy ya puede escribir tu dictado por ti."
     }
+  },
+  "quitPrompt": {
+    "title": "¿Mantener Handy en la barra de menús?",
+    "description": "Tu atajo de dictado solo funciona mientras Handy está en ejecución. Handy puede quedarse en la barra de menús sin estorbar.",
+    "keep": "Mantener en la barra de menús",
+    "quit": "Salir de Handy",
+    "cancel": "Cancelar",
+    "remember": "No volver a preguntar",
+    "settingsHint": "Puedes cambiarlo cuando quieras en Configuración → Avanzado."
   }
 }
