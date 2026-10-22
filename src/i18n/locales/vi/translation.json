@@ -398,6 +398,15 @@
           "simplified": "Giản thể",
           "traditional": "Phồn thể"
         }
+      },
+      "quitShortcut": {
+        "title": "Khi bạn nhấn ⌘Q",
+        "description": "Thoát Handy, hoặc để Handy tiếp tục chạy trên thanh menu để phím tắt đọc chính tả vẫn hoạt động.",
+        "options": {
+          "ask": "Hỏi mỗi lần",
+          "menuBar": "Tiếp tục chạy trên thanh menu",
+          "quit": "Thoát Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Cách khắc phục",
     "recorderBlocked": "Hiện không thể ghi phím tắt — Secure Input của macOS đang chặn các sự kiện phím. Hãy xử lý cảnh báo Secure Input trước.",
     "dismiss": "Bỏ qua"
+  },
+  "quitPrompt": {
+    "title": "Giữ Handy trên thanh menu?",
+    "description": "Phím tắt đọc chính tả chỉ hoạt động khi Handy đang chạy. Handy có thể nằm trên thanh menu mà không vướng víu.",
+    "keep": "Giữ trên thanh menu",
+    "quit": "Thoát Handy",
+    "cancel": "Hủy",
+    "remember": "Không hỏi lại",
+    "settingsHint": "Bạn có thể thay đổi bất cứ lúc nào trong Cài đặt → Nâng cao."
   }
 }

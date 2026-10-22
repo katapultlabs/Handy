@@ -398,6 +398,15 @@
           "simplified": "간체",
           "traditional": "번체"
         }
+      },
+      "quitShortcut": {
+        "title": "⌘Q를 누를 때",
+        "description": "Handy를 종료하거나, 받아쓰기 단축키가 계속 작동하도록 메뉴 막대에서 계속 실행합니다.",
+        "options": {
+          "ask": "매번 묻기",
+          "menuBar": "메뉴 막대에서 계속 실행",
+          "quit": "Handy 종료"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "해결 방법",
     "recorderBlocked": "지금은 단축키를 등록할 수 없습니다. macOS Secure Input이 키 이벤트를 차단하고 있습니다. Secure Input 경고를 먼저 해결하세요.",
     "dismiss": "닫기"
+  },
+  "quitPrompt": {
+    "title": "Handy를 메뉴 막대에 유지할까요?",
+    "description": "받아쓰기 단축키는 Handy가 실행 중일 때만 작동합니다. Handy는 방해되지 않게 메뉴 막대에 머물 수 있습니다.",
+    "keep": "메뉴 막대에 유지",
+    "quit": "Handy 종료",
+    "cancel": "취소",
+    "remember": "다시 묻지 않기",
+    "settingsHint": "설정 → 고급에서 언제든지 변경할 수 있습니다."
   }
 }

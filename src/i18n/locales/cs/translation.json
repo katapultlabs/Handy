@@ -398,6 +398,15 @@
           "simplified": "Zjednodušené",
           "traditional": "Tradiční"
         }
+      },
+      "quitShortcut": {
+        "title": "Když stisknete ⌘Q",
+        "description": "Ukončit Handy, nebo ho nechat běžet v liště nabídek, aby zkratka pro diktování dál fungovala.",
+        "options": {
+          "ask": "Zeptat se pokaždé",
+          "menuBar": "Ponechat spuštěné v liště nabídek",
+          "quit": "Ukončit Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Jak to vyřešit",
     "recorderBlocked": "Zkratky teď nelze nahrát — Secure Input v macOS blokuje události kláves. Nejprve vyřešte upozornění na Secure Input.",
     "dismiss": "Zavřít"
+  },
+  "quitPrompt": {
+    "title": "Ponechat Handy v liště nabídek?",
+    "description": "Zkratka pro diktování funguje, jen když Handy běží. Handy může zůstat v liště nabídek a nepřekážet.",
+    "keep": "Ponechat v liště nabídek",
+    "quit": "Ukončit Handy",
+    "cancel": "Zrušit",
+    "remember": "Příště se neptat",
+    "settingsHint": "Tuto volbu můžete kdykoli změnit v části Nastavení → Pokročilé."
   }
 }

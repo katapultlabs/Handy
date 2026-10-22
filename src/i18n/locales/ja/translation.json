@@ -398,6 +398,15 @@
           "simplified": "簡体字",
           "traditional": "繁体字"
         }
+      },
+      "quitShortcut": {
+        "title": "⌘Q を押したとき",
+        "description": "Handy を終了するか、音声入力ショートカットが使えるようメニューバーで実行し続けます。",
+        "options": {
+          "ask": "毎回確認する",
+          "menuBar": "メニューバーで実行し続ける",
+          "quit": "Handy を終了"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "解決方法",
     "recorderBlocked": "現在ショートカットを記録できません。macOS の Secure Input がキーイベントをブロックしています。先に Secure Input の警告を解消してください。",
     "dismiss": "閉じる"
+  },
+  "quitPrompt": {
+    "title": "Handy をメニューバーに残しますか？",
+    "description": "音声入力ショートカットは Handy が起動している間のみ使えます。Handy はメニューバーに残り、作業の邪魔になりません。",
+    "keep": "メニューバーに残す",
+    "quit": "Handy を終了",
+    "cancel": "キャンセル",
+    "remember": "今後は確認しない",
+    "settingsHint": "この設定は「設定」→「詳細設定」でいつでも変更できます。"
   }
 }

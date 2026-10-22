@@ -398,6 +398,15 @@
           "simplified": "简体",
           "traditional": "繁体"
         }
+      },
+      "quitShortcut": {
+        "title": "按下 ⌘Q 时",
+        "description": "退出 Handy，或让它继续在菜单栏中运行，这样听写快捷键才能继续使用。",
+        "options": {
+          "ask": "每次询问",
+          "menuBar": "继续在菜单栏中运行",
+          "quit": "退出 Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "如何解决",
     "recorderBlocked": "当前无法录制快捷键——macOS 的 Secure Input 正在阻止按键事件。请先解决 Secure Input 警告。",
     "dismiss": "关闭"
+  },
+  "quitPrompt": {
+    "title": "让 Handy 保留在菜单栏中？",
+    "description": "听写快捷键只有在 Handy 运行时才能使用。Handy 可以留在菜单栏中，不会打扰你。",
+    "keep": "保留在菜单栏",
+    "quit": "退出 Handy",
+    "cancel": "取消",
+    "remember": "不再询问",
+    "settingsHint": "你可以随时在“设置 → 高级”中更改。"
   }
 }

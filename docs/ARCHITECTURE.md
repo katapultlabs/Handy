@@ -139,6 +139,7 @@ API keys are in a `SecretMap`. The settings store keeps them.
 | `overlay.rs`            | 834   | Creates the overlay window. Platform-specific. On Linux it uses GTK layer shell.                                                                    |
 | `correction_notices.rs` | —     | Queues Dictionary decisions from capture and History. Coordinates render acknowledgement, reading time, inline actions, and recording interruption. |
 | `tray.rs`               | 744   | Creates the tray icon and menu. `set_tray_state()` updates the icon.                                                                                |
+| `quit_shortcut.rs`      | —     | macOS app menu. Its ⌘Q item asks, hides Handy to the menu bar, or quits, as the `quit_shortcut_action` setting says. Dock and tray Quit still quit. |
 | `tray_i18n.rs`          | 82    | Translates the tray menu.                                                                                                                           |
 | `audio_feedback.rs`     | 142   | Plays start and stop sounds with `rodio`.                                                                                                           |
 | `helpers/clamshell.rs`  | 86    | Detects a closed laptop lid. Switches the microphone.                                                                                               |
@@ -184,7 +185,7 @@ Total: approximately 15,000 lines of TypeScript.
 
 `lib.rs` registers the commands in `collect_commands![...]`.
 `lib.rs` registers the events in `collect_events![...]`.
-Current events: `HistoryUpdatePayload`, `StreamTextEvent`, `StreamPhaseEvent`.
+Current events: `HistoryUpdatePayload`, `StreamTextEvent`, `StreamPhaseEvent`, `QuitShortcutPromptEvent`.
 
 ## 6. Procedures
 

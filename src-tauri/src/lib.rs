@@ -25,6 +25,7 @@ mod memory;
 mod overlay;
 mod paste_tx;
 pub mod portable;
+mod quit_shortcut;
 mod secure_input;
 mod settings;
 mod shortcut;
@@ -132,6 +133,36 @@ fn show_main_window(app: &AppHandle) {
         "Main window not found. Webview labels: {:?}",
         webview_labels
     );
+}
+
+/// Hides the main window, as its close button does.
+fn hide_main_window(app: &AppHandle) {
+    if let Some(main_window) = app.get_webview_window("main") {
+        if let Err(e) = main_window.hide() {
+            log::error!("Failed to hide webview window: {}", e);
+        }
+    }
+    live_in_tray(app);
+}
+
+/// After the window is hidden: with a tray icon, remove the Dock icon so
+/// Handy lives in the tray only. Without one, the Dock icon stays as the way
+/// back in.
+fn live_in_tray(app: &AppHandle) {
+    #[cfg(target_os = "macos")]
+    if tray_available(app) {
+        if let Err(e) = app.set_activation_policy(tauri::ActivationPolicy::Accessory) {
+            log::error!("Failed to set activation policy: {}", e);
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = app;
+}
+
+/// The tray icon is on (setting) and was not turned off with `--no-tray`.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+fn tray_available(app: &AppHandle) -> bool {
+    get_settings(app).show_tray_icon && !app.state::<CliArgs>().no_tray
 }
 
 /// Choose the macOS activation policy the process *launches* with.
@@ -805,11 +836,14 @@ pub fn run(cli_args: CliArgs) {
             commands::history::update_history_limit,
             commands::history::update_recording_retention_period,
             helpers::clamshell::is_laptop,
+            quit_shortcut::change_quit_shortcut_action_setting,
+            quit_shortcut::resolve_quit_shortcut,
         ])
         .events(collect_events![
             managers::history::HistoryUpdatePayload,
             managers::transcription::StreamTextEvent,
             managers::transcription::StreamPhaseEvent,
+            quit_shortcut::QuitShortcutPromptEvent,
         ]);
 
     #[cfg(debug_assertions)] // <- Only export on non-release builds
@@ -881,7 +915,14 @@ pub fn run(cli_args: CliArgs) {
 
     #[cfg(target_os = "macos")]
     {
-        builder = builder.plugin(tauri_nspanel::init());
+        builder = builder
+            .plugin(tauri_nspanel::init())
+            .menu(quit_shortcut::build_app_menu)
+            .on_menu_event(|app, event| {
+                if event.id().as_ref() == quit_shortcut::QUIT_MENU_ID {
+                    quit_shortcut::handle_quit_shortcut(app);
+                }
+            });
     }
 
     // Single-instance forwards CLI args to an already-running Handy and exits.
@@ -1103,23 +1144,7 @@ pub fn run(cli_args: CliArgs) {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
                 let _res = window.hide();
-
-                #[cfg(target_os = "macos")]
-                {
-                    let settings = get_settings(window.app_handle());
-                    let tray_visible =
-                        settings.show_tray_icon && !window.app_handle().state::<CliArgs>().no_tray;
-                    if tray_visible {
-                        // Tray is available: hide the dock icon, app lives in the tray
-                        let res = window
-                            .app_handle()
-                            .set_activation_policy(tauri::ActivationPolicy::Accessory);
-                        if let Err(e) = res {
-                            log::error!("Failed to set activation policy: {}", e);
-                        }
-                    }
-                    // No tray: keep the dock icon visible so the user can reopen
-                }
+                live_in_tray(window.app_handle());
             }
             tauri::WindowEvent::ThemeChanged(theme) => {
                 log::info!("Theme changed to: {:?}", theme);

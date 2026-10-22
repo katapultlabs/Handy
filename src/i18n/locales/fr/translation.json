@@ -398,6 +398,15 @@
           "simplified": "Simplifié",
           "traditional": "Traditionnel"
         }
+      },
+      "quitShortcut": {
+        "title": "Quand vous appuyez sur ⌘Q",
+        "description": "Quitter Handy, ou le laisser actif dans la barre des menus pour que votre raccourci de dictée continue de fonctionner.",
+        "options": {
+          "ask": "Demander à chaque fois",
+          "menuBar": "Garder dans la barre des menus",
+          "quit": "Quitter Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Comment résoudre ce problème",
     "recorderBlocked": "Impossible d'enregistrer un raccourci pour le moment : Secure Input de macOS bloque les événements clavier. Résolvez d'abord l'avertissement Secure Input.",
     "dismiss": "Ignorer"
+  },
+  "quitPrompt": {
+    "title": "Garder Handy dans la barre des menus ?",
+    "description": "Votre raccourci de dictée ne fonctionne que lorsque Handy est actif. Handy peut rester dans la barre des menus, sans vous gêner.",
+    "keep": "Garder dans la barre des menus",
+    "quit": "Quitter Handy",
+    "cancel": "Annuler",
+    "remember": "Ne plus demander",
+    "settingsHint": "Vous pouvez modifier ce choix à tout moment dans Paramètres → Avancé."
   }
 }

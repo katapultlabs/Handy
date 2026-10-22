@@ -398,6 +398,15 @@
           "simplified": "Simplificat",
           "traditional": "Tradicional"
         }
+      },
+      "quitShortcut": {
+        "title": "Quan premes ⌘Q",
+        "description": "Surt del Handy o deixa'l en execució a la barra de menús perquè la drecera de dictat continuï funcionant.",
+        "options": {
+          "ask": "Pregunta cada vegada",
+          "menuBar": "Mantén-lo a la barra de menús",
+          "quit": "Surt del Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Com es resol",
     "recorderBlocked": "Ara no se'n poden enregistrar dreceres: l'entrada segura del macOS bloca els esdeveniments de tecla. Resol primer l'avís d'entrada segura.",
     "dismiss": "Descarta"
+  },
+  "quitPrompt": {
+    "title": "Vols mantenir el Handy a la barra de menús?",
+    "description": "La drecera de dictat només funciona mentre el Handy està en execució. El Handy pot quedar-se a la barra de menús sense destorbar.",
+    "keep": "Mantén a la barra de menús",
+    "quit": "Surt del Handy",
+    "cancel": "Cancel·la",
+    "remember": "No ho tornis a preguntar",
+    "settingsHint": "Pots canviar-ho en qualsevol moment a Configuració → Avançat."
   }
 }

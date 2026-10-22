@@ -9,6 +9,7 @@ import type {
   TranscribeAcceleratorSetting,
   ShortcutActivation,
   VadBackend,
+  QuitShortcutAction,
 } from "@/bindings";
 import { commands } from "@/bindings";
 import { toast } from "sonner";
@@ -197,6 +198,8 @@ const settingUpdaters: {
     commands.changeChineseScriptSetting(value as ChineseScript),
   show_tray_icon: (value) =>
     commands.changeShowTrayIconSetting(value as boolean),
+  quit_shortcut_action: (value) =>
+    commands.changeQuitShortcutActionSetting(value as QuitShortcutAction),
   transcribe_accelerator: (value) =>
     commands.changeTranscribeAcceleratorSetting(
       value as TranscribeAcceleratorSetting,

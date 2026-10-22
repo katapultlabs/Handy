@@ -398,6 +398,15 @@
           "simplified": "Forenklet",
           "traditional": "Traditionel"
         }
+      },
+      "quitShortcut": {
+        "title": "Når du trykker på ⌘Q",
+        "description": "Afslut Handy, eller lad det køre i menulinjen, så din diktatgenvej fortsat virker.",
+        "options": {
+          "ask": "Spørg hver gang",
+          "menuBar": "Lad det køre i menulinjen",
+          "quit": "Afslut Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Sådan løser du det",
     "recorderBlocked": "Genveje kan ikke optages lige nu — macOS Secure Input blokerer tastehændelser. Løs advarslen om Secure Input først.",
     "dismiss": "Afvis"
+  },
+  "quitPrompt": {
+    "title": "Skal Handy blive i menulinjen?",
+    "description": "Din diktatgenvej virker kun, mens Handy kører. Handy kan blive i menulinjen uden at være i vejen.",
+    "keep": "Behold i menulinjen",
+    "quit": "Afslut Handy",
+    "cancel": "Annuller",
+    "remember": "Spørg ikke igen",
+    "settingsHint": "Du kan til enhver tid ændre dette under Indstillinger → Avanceret."
   }
 }

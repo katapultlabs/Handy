@@ -398,6 +398,15 @@
           "simplified": "Uproszczone",
           "traditional": "Tradycyjne"
         }
+      },
+      "quitShortcut": {
+        "title": "Po naciśnięciu ⌘Q",
+        "description": "Zamknij Handy albo pozostaw go uruchomionego na pasku menu, aby skrót do dyktowania nadal działał.",
+        "options": {
+          "ask": "Pytaj za każdym razem",
+          "menuBar": "Pozostaw na pasku menu",
+          "quit": "Zamknij Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Jak to naprawić",
     "recorderBlocked": "Nie można teraz nagrać skrótu — Secure Input w macOS blokuje zdarzenia klawiszy. Najpierw rozwiąż ostrzeżenie o Secure Input.",
     "dismiss": "Odrzuć"
+  },
+  "quitPrompt": {
+    "title": "Zostawić Handy na pasku menu?",
+    "description": "Skrót do dyktowania działa tylko wtedy, gdy Handy jest uruchomiony. Handy może zostać na pasku menu i nie przeszkadzać.",
+    "keep": "Zostaw na pasku menu",
+    "quit": "Zamknij Handy",
+    "cancel": "Anuluj",
+    "remember": "Nie pytaj ponownie",
+    "settingsHint": "Możesz to zmienić w dowolnym momencie w sekcji Ustawienia → Zaawansowane."
   }
 }

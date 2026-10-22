@@ -180,6 +180,7 @@ every upstream merge. Remove an item when upstream accepts it.
 | Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs`  | Follow-up to the Dictionary pull request                |
 | macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                            | Separate pull request after the Dictionary              |
 | Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                        | Separate Discussion; unrelated to the Dictionary        |
+| ⌘Q keeps Handy in the menu bar (macOS)              | `src-tauri/src/quit_shortcut.rs`, `src/components/quit-prompt/`                  | Not yet sent; needs a Discussion (feature freeze)       |
 | Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                              | Sent as documentation pull requests when stable         |
 
 ## 5. Upstream pull request order

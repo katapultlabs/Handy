@@ -29,6 +29,7 @@ import {
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { WhatsNewGate } from "./components/whats-new";
+import { QuitPrompt } from "./components/quit-prompt/QuitPrompt";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useUiStore } from "./stores/uiStore";
@@ -466,6 +467,7 @@ function App() {
   return (
     <>
       {toaster}
+      <QuitPrompt />
       {content}
     </>
   );

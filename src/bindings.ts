@@ -1063,6 +1063,26 @@ async isLaptop() : Promise<Result<boolean, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async changeQuitShortcutActionSetting(action: QuitShortcutAction) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_quit_shortcut_action_setting", { action }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Carries out the answer to the quit prompt. With `remember`, the answer
+ * becomes the setting and the prompt does not show again.
+ */
+async resolveQuitShortcut(action: QuitShortcutAction, remember: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("resolve_quit_shortcut", { action, remember }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -1071,10 +1091,12 @@ async isLaptop() : Promise<Result<boolean, string>> {
 
 export const events = __makeEvents__<{
 historyUpdatePayload: HistoryUpdatePayload,
+quitShortcutPromptEvent: QuitShortcutPromptEvent,
 streamPhaseEvent: StreamPhaseEvent,
 streamTextEvent: StreamTextEvent
 }>({
 historyUpdatePayload: "history-update-payload",
+quitShortcutPromptEvent: "quit-shortcut-prompt-event",
 streamPhaseEvent: "stream-phase-event",
 streamTextEvent: "stream-text-event"
 })
@@ -1168,7 +1190,7 @@ long_form_chunking?: boolean;
  * not gated on this — that follows model capability. Migrated from the old
  * `overlay_position` (position `none` → style `None`).
  */
-overlay_style?: OverlayStyle }
+overlay_style?: OverlayStyle; quit_shortcut_action?: QuitShortcutAction }
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AvailableAccelerators = { transcribe: string[]; gpu_devices: GpuDeviceOption[] }
@@ -1312,6 +1334,23 @@ export type PostProcessApiFormat =
  */
 "anthropic"
 export type PostProcessProvider = { id: string; label: string; base_url: string; allow_base_url_edit?: boolean; models_endpoint?: string | null; supports_structured_output?: boolean; api_format?: PostProcessApiFormat }
+/**
+ * What ⌘Q does on macOS while the tray icon is available. Without a tray
+ * icon, ⌘Q always quits.
+ */
+export type QuitShortcutAction = 
+/**
+ * Ask the user, who can make the answer the default.
+ */
+"ask" | 
+/**
+ * Hide the window and keep running in the menu bar.
+ */
+"menu_bar" | "quit"
+/**
+ * Asks the main window to show the quit prompt.
+ */
+export type QuitShortcutPromptEvent = null
 export type RecordingRetentionPeriod = "never" | "preserve_limit" | "days_3" | "weeks_2" | "months_3"
 /**
  * A retired ONNX model found on disk.

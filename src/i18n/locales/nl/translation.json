@@ -398,6 +398,15 @@
           "simplified": "Vereenvoudigd",
           "traditional": "Traditioneel"
         }
+      },
+      "quitShortcut": {
+        "title": "Wanneer je op ⌘Q drukt",
+        "description": "Handy afsluiten, of laten draaien in de menubalk zodat je dicteersneltoets blijft werken.",
+        "options": {
+          "ask": "Elke keer vragen",
+          "menuBar": "Laten draaien in de menubalk",
+          "quit": "Handy afsluiten"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Hoe je dit oplost",
     "recorderBlocked": "Sneltoetsen kunnen nu niet worden opgenomen — Secure Input van macOS blokkeert toetsgebeurtenissen. Los eerst de Secure Input-waarschuwing op.",
     "dismiss": "Sluiten"
+  },
+  "quitPrompt": {
+    "title": "Handy in de menubalk houden?",
+    "description": "Je dicteersneltoets werkt alleen zolang Handy draait. Handy kan in de menubalk blijven staan zonder in de weg te zitten.",
+    "keep": "In menubalk houden",
+    "quit": "Handy afsluiten",
+    "cancel": "Annuleren",
+    "remember": "Niet meer vragen",
+    "settingsHint": "Je kunt dit altijd wijzigen via Instellingen → Geavanceerd."
   }
 }

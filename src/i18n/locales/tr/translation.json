@@ -398,6 +398,15 @@
           "simplified": "Basitleştirilmiş",
           "traditional": "Geleneksel"
         }
+      },
+      "quitShortcut": {
+        "title": "⌘Q'ya Bastığınızda",
+        "description": "Handy'den çıkın ya da dikte kısayolunuz çalışmaya devam etsin diye menü çubuğunda çalışmaya devam etmesine izin verin.",
+        "options": {
+          "ask": "Her seferinde sor",
+          "menuBar": "Menü çubuğunda çalışmaya devam etsin",
+          "quit": "Handy'den çık"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Bu nasıl düzeltilir",
     "recorderBlocked": "Şu anda kısayol kaydedilemiyor — macOS Secure Input tuş olaylarını engelliyor. Önce Secure Input uyarısını giderin.",
     "dismiss": "Kapat"
+  },
+  "quitPrompt": {
+    "title": "Handy menü çubuğunda kalsın mı?",
+    "description": "Dikte kısayolunuz yalnızca Handy çalışırken işe yarar. Handy yolunuza çıkmadan menü çubuğunda kalabilir.",
+    "keep": "Menü Çubuğunda Tut",
+    "quit": "Handy'den çık",
+    "cancel": "İptal",
+    "remember": "Bir daha sorma",
+    "settingsHint": "Bunu istediğiniz zaman Ayarlar → Gelişmiş bölümünden değiştirebilirsiniz."
   }
 }

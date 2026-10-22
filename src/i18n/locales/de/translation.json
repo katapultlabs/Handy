@@ -398,6 +398,15 @@
           "simplified": "Vereinfacht",
           "traditional": "Traditionell"
         }
+      },
+      "quitShortcut": {
+        "title": "Beim Drücken von ⌘Q",
+        "description": "Handy beenden oder in der Menüleiste weiterlaufen lassen, damit dein Diktier-Kurzbefehl weiter funktioniert.",
+        "options": {
+          "ask": "Jedes Mal fragen",
+          "menuBar": "In der Menüleiste weiterlaufen lassen",
+          "quit": "Handy beenden"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "So behebst du das",
     "recorderBlocked": "Tastenkürzel können gerade nicht aufgezeichnet werden — macOS Secure Input blockiert Tastenereignisse. Behebe zuerst die Secure-Input-Warnung.",
     "dismiss": "Ausblenden"
+  },
+  "quitPrompt": {
+    "title": "Handy in der Menüleiste behalten?",
+    "description": "Dein Diktier-Kurzbefehl funktioniert nur, solange Handy läuft. Handy kann in der Menüleiste bleiben, ohne zu stören.",
+    "keep": "In der Menüleiste behalten",
+    "quit": "Handy beenden",
+    "cancel": "Abbrechen",
+    "remember": "Nicht mehr fragen",
+    "settingsHint": "Du kannst das jederzeit unter Einstellungen → Erweitert ändern."
   }
 }

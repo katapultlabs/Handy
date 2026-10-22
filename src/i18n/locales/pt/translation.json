@@ -398,6 +398,15 @@
           "simplified": "Simplificado",
           "traditional": "Tradicional"
         }
+      },
+      "quitShortcut": {
+        "title": "Ao pressionar ⌘Q",
+        "description": "Sair do Handy ou mantê-lo em execução na barra de menus para que seu atalho de ditado continue funcionando.",
+        "options": {
+          "ask": "Perguntar sempre",
+          "menuBar": "Manter na barra de menus",
+          "quit": "Sair do Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "Como resolver isso",
     "recorderBlocked": "Não é possível gravar atalhos agora — o Secure Input do macOS está bloqueando os eventos de tecla. Resolva primeiro o aviso do Secure Input.",
     "dismiss": "Dispensar"
+  },
+  "quitPrompt": {
+    "title": "Manter o Handy na barra de menus?",
+    "description": "Seu atalho de ditado só funciona enquanto o Handy está em execução. O Handy pode ficar na barra de menus, sem atrapalhar.",
+    "keep": "Manter na barra de menus",
+    "quit": "Sair do Handy",
+    "cancel": "Cancelar",
+    "remember": "Não perguntar novamente",
+    "settingsHint": "Você pode mudar isso quando quiser em Configurações → Avançado."
   }
 }

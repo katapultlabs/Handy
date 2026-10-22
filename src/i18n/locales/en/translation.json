@@ -398,6 +398,15 @@
           "simplified": "Simplified",
           "traditional": "Traditional"
         }
+      },
+      "quitShortcut": {
+        "title": "When You Press ⌘Q",
+        "description": "Quit Handy, or keep it running in the menu bar so your dictation shortcut keeps working.",
+        "options": {
+          "ask": "Ask every time",
+          "menuBar": "Keep running in the menu bar",
+          "quit": "Quit Handy"
+        }
       }
     },
     "postProcessing": {
@@ -772,5 +781,14 @@
     "learnMore": "How to fix",
     "recorderBlocked": "Can't record shortcuts right now — macOS Secure Input is blocking key events. Resolve the Secure Input warning first.",
     "dismiss": "Dismiss"
+  },
+  "quitPrompt": {
+    "title": "Keep Handy in the menu bar?",
+    "description": "Your dictation shortcut works only while Handy runs. Handy can stay in the menu bar, out of your way.",
+    "keep": "Keep in Menu Bar",
+    "quit": "Quit Handy",
+    "cancel": "Cancel",
+    "remember": "Don't ask again",
+    "settingsHint": "You can change this anytime in Settings → Advanced."
   }
 }
