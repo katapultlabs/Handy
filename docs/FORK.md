@@ -161,29 +161,29 @@ After the merge, run the full check set: `cargo test`, `bun run build`,
 These parts exist in this fork and not upstream. Review this list at
 every upstream merge. Remove an item when upstream accepts it.
 
-| Part                                                | Where                                                                            | Upstream status                                         |
-| --------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Version form `-katapult.N` / `+dict.N`              | `src-tauri/tauri.conf.json`, `src-tauri/tauri.windows.conf.json` (`wix.version`) | Never sent                                              |
-| Updater feed and public key                         | `src-tauri/tauri.conf.json`, `plugins.updater`                                   | Never sent                                              |
-| No Windows `signCommand`                            | `src-tauri/tauri.conf.json`, `bundle.windows`                                    | Never sent                                              |
-| Release workflow                                    | `.github/workflows/katapult-release.yml`                                         | Never sent                                              |
-| `sign-updater` build input                          | `.github/workflows/build.yml`                                                    | Could go upstream as a small CI change                  |
-| `sign-macos` build input                            | `.github/workflows/build.yml`                                                    | Never sent                                              |
-| macOS signing check workflow                        | `.github/workflows/katapult-macos-check.yml`                                     | Never sent                                              |
-| Portable installer fallback link                    | `src/components/update-checker/portableInstaller.ts`                             | Never sent                                              |
-| Tester guide                                        | `docs/TEST_BUILD.md`                                                             | Never sent                                              |
-| This document                                       | `docs/FORK.md`                                                                   | Never sent                                              |
-| Upstream plan and Discussion drafts                 | `docs/UPSTREAM.md`                                                               | Never sent                                              |
-| Pointer to this document                            | `CLAUDE.md`, last line                                                           | Never sent                                              |
-| Dictionary: store, matcher, learning, settings page | `src-tauri/src/dictionary*.rs`, `src/components/settings/dictionary/`            | Not yet sent; needs a Discussion first (feature freeze) |
-| Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                            | Part of the Dictionary pull request                     |
-| Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs`  | Follow-up to the Dictionary pull request                |
-| macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                            | Separate pull request after the Dictionary              |
-| Accessibility drag-to-add tile (macOS)              | `src-tauri/src/permission_helper.rs`, `src/components/permission-helper/`        | Not yet sent; needs a Discussion (feature freeze)       |
-| Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                        | Separate Discussion; unrelated to the Dictionary        |
-| ⌘Q keeps Handy in the menu bar (macOS)              | `src-tauri/src/quit_shortcut.rs`, `src/components/quit-prompt/`                  | Not yet sent; needs a Discussion (feature freeze)       |
-| Double-tap to lock (push-to-talk)                   | `src-tauri/src/transcription_coordinator.rs`, `settings.rs`                      | Not yet sent; needs a Discussion (feature freeze)       |
-| Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                              | Sent as documentation pull requests when stable         |
+| Part                                                | Where                                                                                                                    | Upstream status                                         |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| Version form `-katapult.N` / `+dict.N`              | `src-tauri/tauri.conf.json`, `src-tauri/tauri.windows.conf.json` (`wix.version`)                                         | Never sent                                              |
+| Updater feed and public key                         | `src-tauri/tauri.conf.json`, `plugins.updater`                                                                           | Never sent                                              |
+| No Windows `signCommand`                            | `src-tauri/tauri.conf.json`, `bundle.windows`                                                                            | Never sent                                              |
+| Release workflow                                    | `.github/workflows/katapult-release.yml`                                                                                 | Never sent                                              |
+| `sign-updater` build input                          | `.github/workflows/build.yml`                                                                                            | Could go upstream as a small CI change                  |
+| `sign-macos` build input                            | `.github/workflows/build.yml`                                                                                            | Never sent                                              |
+| macOS signing check workflow                        | `.github/workflows/katapult-macos-check.yml`                                                                             | Never sent                                              |
+| Portable installer fallback link                    | `src/components/update-checker/portableInstaller.ts`                                                                     | Never sent                                              |
+| Tester guide                                        | `docs/TEST_BUILD.md`                                                                                                     | Never sent                                              |
+| This document                                       | `docs/FORK.md`                                                                                                           | Never sent                                              |
+| Upstream plan and Discussion drafts                 | `docs/UPSTREAM.md`                                                                                                       | Never sent                                              |
+| Pointer to this document                            | `CLAUDE.md`, last line                                                                                                   | Never sent                                              |
+| Dictionary: store, matcher, learning, settings page | `src-tauri/src/dictionary*.rs`, `src/components/settings/dictionary/`                                                    | Not yet sent; needs a Discussion first (feature freeze) |
+| Correction notices in the overlay                   | `src-tauri/src/correction_notices.rs`, `src/overlay/`                                                                    | Part of the Dictionary pull request                     |
+| Learn from History edits                            | `src/components/settings/history/HistorySettings.tsx`, `commands/dictionary.rs`                                          | Follow-up to the Dictionary pull request                |
+| macOS in-place capture                              | `src-tauri/src/dictionary_capture.rs`                                                                                    | Separate pull request after the Dictionary              |
+| Accessibility drag-to-add tile (macOS)              | `src-tauri/src/permission_helper.rs`, `src/components/permission-helper/`, `src/components/onboarding/usePermissions.ts` | Not yet sent; needs a Discussion (feature freeze)       |
+| Paste last transcript shortcut                      | `src-tauri/src/actions.rs`, `settings.rs`                                                                                | Separate Discussion; unrelated to the Dictionary        |
+| ⌘Q keeps Handy in the menu bar (macOS)              | `src-tauri/src/quit_shortcut.rs`, `src/components/quit-prompt/`                                                          | Not yet sent; needs a Discussion (feature freeze)       |
+| Double-tap to lock (push-to-talk)                   | `src-tauri/src/transcription_coordinator.rs`, `settings.rs`                                                              | Not yet sent; needs a Discussion (feature freeze)       |
+| Architecture docs and agent guidance                | `docs/ARCHITECTURE.md`, `AGENTS.md`                                                                                      | Sent as documentation pull requests when stable         |
 
 ## 5. Upstream pull request order
 
