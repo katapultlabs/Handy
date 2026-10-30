@@ -267,9 +267,16 @@ fn trim_edges(s: &str) -> &str {
     s.trim_matches(|c: char| EDGE_PUNCT.contains(&c))
 }
 
-/// Normalize a run for similarity tests: lowercase, alphanumeric only.
+/// Normalize a run for similarity tests: lowercase, alphanumeric only, and
+/// accents removed. A Spanish fix usually adds an accent the model left out
+/// ("acylon" -> "asadón"); counting "ó" as a different letter from "o"
+/// failed the edit-distance gate, and the accent also turned off the
+/// phonetic gate, which needs ASCII. Stored and applied text keeps its
+/// accents; only the comparison folds them.
 fn norm_key(s: &str) -> String {
-    s.chars()
+    use unicode_normalization::{char::is_combining_mark, UnicodeNormalization};
+    s.nfd()
+        .filter(|c| !is_combining_mark(*c))
         .filter(|c| c.is_alphanumeric())
         .flat_map(|c| c.to_lowercase())
         .collect()
@@ -712,6 +719,23 @@ mod tests {
         assert_eq!(pairs.len(), 1);
         assert_eq!(pairs[0].wrong, "char gebee");
         assert_eq!(pairs[0].right, "ChargeBee");
+    }
+
+    #[test]
+    fn learn_spanish_fix_that_adds_an_accent() {
+        // From a real capture: accents used to fail both similarity gates.
+        let pairs = learn_pairs(
+            "then I'm going to go grab the acylon to do some work.",
+            "then I'm going to go grab the asadón to do some work.",
+        );
+        assert_eq!(pairs.len(), 1, "{pairs:?}");
+        assert_eq!(pairs[0].wrong, "acylon");
+        assert_eq!(pairs[0].right, "asadón");
+        // An accent-only fix is learned too.
+        let pairs = learn_pairs("vamos a la reunion", "vamos a la reunión");
+        assert_eq!(pairs.len(), 1, "{pairs:?}");
+        // Folding does not loosen the gates: different words stay rejected.
+        assert!(learn_pairs("grab the acylon now", "grab the hammer now").is_empty());
     }
 
     #[test]
