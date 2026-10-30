@@ -375,18 +375,22 @@ mod macos_impl {
         kAXErrorSuccess, kAXValueChangedNotification, AXError, AXObserverAddNotification,
         AXObserverCreate, AXObserverGetRunLoopSource, AXObserverRef, AXObserverRemoveNotification,
         AXUIElementCopyAttributeValue, AXUIElementCopyParameterizedAttributeValue,
-        AXUIElementCreateSystemWide, AXUIElementGetPid, AXUIElementRef,
-        AXUIElementSetMessagingTimeout, AXValueCreate, AXValueGetValue, AXValueRef,
+        AXUIElementCreateApplication, AXUIElementCreateSystemWide, AXUIElementGetPid,
+        AXUIElementRef, AXUIElementSetAttributeValue, AXUIElementSetMessagingTimeout,
+        AXValueCreate, AXValueGetValue, AXValueRef,
     };
     use core_foundation::base::{CFRange, CFRelease, CFTypeRef, TCFType};
+    use core_foundation::boolean::CFBoolean;
     use core_foundation::number::CFNumber;
     use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoop, CFRunLoopSource};
     use core_foundation::string::{CFString, CFStringRef};
     use log::{debug, info, warn};
+    use std::collections::HashSet;
     use std::ffi::c_void;
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::sync::mpsc::{Receiver, Sender};
     use std::sync::Arc;
+    use std::sync::Mutex;
     use std::time::{Duration, Instant};
     use tauri::Manager;
 
@@ -522,6 +526,11 @@ mod macos_impl {
         language: Option<String>,
         created: Instant,
         temporal: CaptureTemporalState,
+        /// Fields that keep changing (a terminal, a live document) repeat the
+        /// same outcome every few hundred milliseconds. Log each one at info
+        /// once per paste, then at debug.
+        noted_unaligned: bool,
+        noted_no_pairs: bool,
     }
 
     pub fn spawn(app: AppHandle) -> Sender<Msg> {
@@ -674,7 +683,67 @@ mod macos_impl {
         Some(s.to_string())
     }
 
+    /// The focused element and its process. Ask the frontmost application
+    /// first: on current macOS the system-wide element answers
+    /// `AXFocusedUIElement` with `kAXErrorCannotComplete`, even for a trusted
+    /// process, while the application's own element answers. The system-wide
+    /// query stays as the fallback.
     fn focused_element() -> Option<(Retained, i32)> {
+        frontmost_pid()
+            .and_then(focused_in_application)
+            .or_else(focused_system_wide)
+    }
+
+    fn frontmost_pid() -> Option<i32> {
+        let app = objc2_app_kit::NSWorkspace::sharedWorkspace().frontmostApplication()?;
+        Some(app.processIdentifier())
+    }
+
+    fn focused_in_application(pid: i32) -> Option<(Retained, i32)> {
+        unsafe {
+            let app = AXUIElementCreateApplication(pid);
+            if app.is_null() {
+                return None;
+            }
+            AXUIElementSetMessagingTimeout(app, 0.1);
+            let app = Retained(app as CFTypeRef);
+            let app_ref = app.0 as AXUIElementRef;
+            let elem = match ax_attr(app_ref, "AXFocusedUIElement") {
+                Some(elem) => elem,
+                // Chromium and Electron apps (Superhuman, Slack) build their
+                // accessibility tree only after a client asks for it. Ask once
+                // per process; the next dictation can then be captured.
+                None if request_manual_accessibility(app_ref, pid) => {
+                    ax_attr(app_ref, "AXFocusedUIElement")?
+                }
+                None => return None,
+            };
+            AXUIElementSetMessagingTimeout(elem.0 as AXUIElementRef, 0.1);
+            Some((elem, pid))
+        }
+    }
+
+    /// Sets `AXManualAccessibility` on `pid` the first time it is seen here.
+    /// True when it was set now, so the caller may ask once more.
+    fn request_manual_accessibility(app: AXUIElementRef, pid: i32) -> bool {
+        static ASKED: Mutex<Option<HashSet<i32>>> = Mutex::new(None);
+        let mut asked = ASKED.lock().unwrap_or_else(|e| e.into_inner());
+        if !asked.get_or_insert_with(HashSet::new).insert(pid) {
+            return false;
+        }
+        let name = CFString::new("AXManualAccessibility");
+        let err = unsafe {
+            AXUIElementSetAttributeValue(
+                app,
+                name.as_concrete_TypeRef(),
+                CFBoolean::true_value().as_CFTypeRef(),
+            )
+        };
+        debug!("capture: asked pid {pid} to expose its accessibility tree (AXError {err})");
+        err == kAXErrorSuccess
+    }
+
+    fn focused_system_wide() -> Option<(Retained, i32)> {
         unsafe {
             let system = AXUIElementCreateSystemWide();
             if system.is_null() {
@@ -816,10 +885,12 @@ mod macos_impl {
             // Keep the fallback active until the observer proves that this
             // application actually delivers AXValueChanged notifications.
             temporal: CaptureTemporalState::new(now, false),
+            noted_unaligned: false,
+            noted_no_pairs: false,
         })
     }
 
-    fn observe_anchor(a: &Anchor) -> SettledObservation {
+    fn observe_anchor(a: &mut Anchor) -> SettledObservation {
         let start = a.caret.saturating_sub(PRE_MARGIN);
         let len = a.pasted_u16 + PRE_MARGIN + POST_MARGIN;
         let window = match read_window(a.element.0 as AXUIElementRef, start, len) {
@@ -843,9 +914,13 @@ mod macos_impl {
         let pasted = a.pasted.trim_end();
         let expected_start_u16 = a.caret.saturating_sub(start);
         let Some(corrected) = align_captured_edit(pasted, &window, expected_start_u16) else {
-            info!(
-                "capture: edit detected but the pasted span could not be aligned safely; keeping anchor"
-            );
+            const MSG: &str =
+                "capture: edit detected but the pasted span could not be aligned safely; keeping anchor";
+            if std::mem::replace(&mut a.noted_unaligned, true) {
+                debug!("{MSG}");
+            } else {
+                info!("{MSG}");
+            }
             return SettledObservation::Unresolved;
         };
         let corrected = corrected.trim();
@@ -883,7 +958,13 @@ mod macos_impl {
                         // A rewrite or incomplete correction can pass AX
                         // alignment but fail the conservative learning gates.
                         // Keep watching without retaining its content.
-                        info!("capture: settled edit produced no learnable pairs; keeping anchor");
+                        const MSG: &str =
+                            "capture: settled edit produced no learnable pairs; keeping anchor";
+                        if std::mem::replace(&mut a.noted_no_pairs, true) {
+                            debug!("{MSG}");
+                        } else {
+                            info!("{MSG}");
+                        }
                         a.temporal.learning_rejected();
                     }
                     StoreOutcome::Done => *anchor = None,
