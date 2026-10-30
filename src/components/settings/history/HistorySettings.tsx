@@ -462,13 +462,13 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       if (added.length === 0 && known.length === 0) {
         toast.info(t("settings.history.dictionary.nothingLearned"));
       } else if (
-        added.length > 0 &&
-        entry.language &&
+        added[0]?.language &&
         (getSetting("spoken_languages") ?? []).length >= 2
       ) {
+        // The backend detects the language when the entry has none.
         toast.success(
           t("settings.history.dictionary.learnedFor", {
-            language: languageName(entry.language, i18n.language),
+            language: languageName(added[0].language, i18n.language),
             pairs: added.map((row) => `${row.wrong} → ${row.right}`).join(", "),
           }),
         );

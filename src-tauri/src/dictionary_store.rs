@@ -102,6 +102,22 @@ fn key(s: &str) -> String {
     s.trim().to_lowercase()
 }
 
+/// The language new entries from an edit apply to. The transcription's own
+/// language when known; otherwise the language of the text, detected with
+/// high confidence among the person's spoken languages. Models that choose
+/// the language themselves often do not report it. Unsure: every language
+/// (`""`).
+fn learned_language(language: Option<&str>, original: &str, spoken: &[String]) -> String {
+    language
+        .map(language_key)
+        .filter(|code| !code.is_empty())
+        .or_else(|| {
+            crate::audio_toolkit::detect_output_language(original, spoken)
+                .map(|code| language_key(&code))
+        })
+        .unwrap_or_default()
+}
+
 /// A language code as the Dictionary stores and compares it: the primary
 /// subtag, lowercase ("en-US" and "EN" are both "en").
 pub fn language_key(code: &str) -> String {
@@ -411,7 +427,9 @@ impl DictionaryManager {
             .lock()
             .map_err(|_| anyhow!("dictionary mutation lock poisoned"))?;
         let mut conn = self.conn()?;
-        let mut trusted_terms: HashSet<String> = crate::settings::get_settings(&self.app_handle)
+        let settings = crate::settings::get_settings(&self.app_handle);
+        let language = learned_language(language, original, &settings.spoken_languages);
+        let mut trusted_terms: HashSet<String> = settings
             .custom_words
             .into_iter()
             .filter_map(|word| {
@@ -426,8 +444,8 @@ impl DictionaryManager {
         // never log them.
         #[cfg(debug_assertions)]
         log::debug!(
-            "dictionary: learn ({source}) original={original:?} corrected={corrected:?} \
-             candidates={:?}",
+            "dictionary: learn ({source}, language {language:?}) original={original:?} \
+             corrected={corrected:?} candidates={:?}",
             candidates
                 .iter()
                 .map(|c| format!("{} -> {}", c.entry.wrong, c.entry.right))
@@ -443,7 +461,6 @@ impl DictionaryManager {
             });
         }
         let tx = conn.transaction()?;
-        let language = language.map(language_key).unwrap_or_default();
         let report = Self::learn_candidates(&tx, &candidates, source, &language)?;
         tx.commit()?;
         self.notify();
@@ -945,6 +962,22 @@ mod tests {
             DictionaryManager::upsert(&conn, &entry("cloud code", "Claude Code"), "manual", true)
                 .unwrap();
         assert_eq!(manual.language, None);
+    }
+
+    #[test]
+    fn unknown_language_is_detected_from_the_text() {
+        let spoken = vec!["en".to_string(), "es".to_string()];
+        // A reported language wins.
+        assert_eq!(learned_language(Some("es-CO"), "anything", &spoken), "es");
+        // Not reported: detect it from the dictation.
+        let english = "This is something that happens right now and I'm going \
+                       to test this and then I'm going to go grab the acylon.";
+        assert_eq!(learned_language(None, english, &spoken), "en");
+        let spanish = "Mañana vamos a almorzar gallina criolla con sancocho \
+                       en la casa de mi abuela, porque es domingo.";
+        assert_eq!(learned_language(None, spanish, &spoken), "es");
+        // Too little text to be sure: every language.
+        assert_eq!(learned_language(None, "ok", &spoken), "");
     }
 
     #[test]
