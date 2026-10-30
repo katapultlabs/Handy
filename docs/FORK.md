@@ -148,7 +148,9 @@ from the branch). These conflicts repeat and have fixed answers:
 - `src-tauri/src/managers/history.rs`: take upstream's `MIGRATIONS`
   exactly. The fork adds only the `dictionary_db::move_out_of_history` call.
   Never put a fork migration in this file; Dictionary migrations go in
-  `src-tauri/src/dictionary_db.rs`.
+  `src-tauri/src/dictionary_db.rs`. There, add a new column to
+  `ADDED_COLUMNS`, not to `MIGRATIONS`: a higher `user_version` stops
+  older fork builds at start.
 - `src/i18n/locales/*/translation.json`: keep both sides, then run
   `bun run check:translations`. A new upstream locale needs every
   fork-only key added before the check passes.

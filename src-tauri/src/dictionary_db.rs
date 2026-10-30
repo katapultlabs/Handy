@@ -13,9 +13,9 @@
 //! Dictionary schema changes go in [`MIGRATIONS`] in this file.
 
 use anyhow::Result;
-use log::info;
+use log::{info, warn};
 use rusqlite::{Connection, OptionalExtension};
-use rusqlite_migration::{Migrations, M};
+use rusqlite_migration::{MigrationDefinitionError, Migrations, M};
 use std::path::Path;
 
 pub const FILE_NAME: &str = "dictionary.db";
@@ -69,18 +69,22 @@ const ADD_AUTO_LEARNING: &str = "ALTER TABLE dictionary
      ALTER TABLE dictionary
          ADD COLUMN context_words TEXT NOT NULL DEFAULT '[]';";
 
-// The spoken language an entry applies to, as a primary language subtag
-// ("en", "es"). `''` means every language, like `app_id`. Learned entries get
-// the language of the transcription they came from; manual entries start
-// as `''`.
-const ADD_LANGUAGE: &str = "ALTER TABLE dictionary
-         ADD COLUMN language TEXT NOT NULL DEFAULT '';";
-
 static MIGRATIONS: &[M] = &[
     M::up(CREATE_TABLE),
     M::up(DEMOTE_LEARNED),
     M::up(ADD_AUTO_LEARNING),
-    M::up(ADD_LANGUAGE),
+];
+
+/// Columns added outside [`MIGRATIONS`], as `(name, definition)`. A higher
+/// `user_version` makes older fork builds refuse `dictionary.db` and stop at
+/// start; an extra column with a default is invisible to them. Prefer this
+/// for any later column.
+const ADDED_COLUMNS: &[(&str, &str)] = &[
+    // The spoken language an entry applies to, as a primary language subtag
+    // ("en", "es"). `''` means every language, like `app_id`. Learned entries
+    // get the language of the transcription they came from; manual entries
+    // start as `''`.
+    ("language", "TEXT NOT NULL DEFAULT ''"),
 ];
 
 /// The columns that `history.db` builds had, in table order. The move copies
@@ -103,7 +107,23 @@ fn migrate(conn: &mut Connection) -> Result<()> {
     migrations
         .validate()
         .expect("Invalid dictionary migrations");
-    migrations.to_latest(conn)?;
+    match migrations.to_latest(conn) {
+        // A newer fork build migrated this file. Its changes only add, so
+        // open it as it is rather than stop Handy at start.
+        Err(rusqlite_migration::Error::MigrationDefinition(
+            MigrationDefinitionError::DatabaseTooFarAhead,
+        )) => warn!("{FILE_NAME} is from a newer version of Handy; opening it without migrating"),
+        other => other?,
+    }
+    for (name, definition) in ADDED_COLUMNS {
+        if !has_column(conn, "dictionary", name)? {
+            conn.execute(
+                &format!("ALTER TABLE dictionary ADD COLUMN {name} {definition}"),
+                [],
+            )?;
+            info!("dictionary: added the {name} column");
+        }
+    }
     Ok(())
 }
 
@@ -289,6 +309,37 @@ mod tests {
         let conn = open(&path).unwrap();
         assert!(has_column(&conn, "dictionary", "context_words").unwrap());
         assert_eq!(version(&conn), MIGRATIONS.len() as i32);
+    }
+
+    #[test]
+    fn added_columns_keep_the_version_older_builds_accept() {
+        let (_dir, path) = temp_dictionary();
+        // A file as 0.9.8-katapult.7 and older leave it: version 3, no language.
+        {
+            let mut conn = Connection::open(&path).unwrap();
+            Migrations::new(MIGRATIONS.to_vec())
+                .to_latest(&mut conn)
+                .unwrap();
+            assert!(!has_column(&conn, "dictionary", "language").unwrap());
+        }
+        let conn = open(&path).unwrap();
+        assert!(has_column(&conn, "dictionary", "language").unwrap());
+        // Older builds still see the version they know, so they still start.
+        assert_eq!(version(&conn), MIGRATIONS.len() as i32);
+        drop(conn);
+        drop(open(&path).unwrap());
+    }
+
+    #[test]
+    fn a_database_from_a_newer_build_still_opens() {
+        let (_dir, path) = temp_dictionary();
+        drop(open(&path).unwrap());
+        Connection::open(&path)
+            .unwrap()
+            .pragma_update(None, "user_version", MIGRATIONS.len() as i32 + 1)
+            .unwrap();
+        let conn = open(&path).unwrap();
+        assert_eq!(version(&conn), MIGRATIONS.len() as i32 + 1);
     }
 
     #[test]
