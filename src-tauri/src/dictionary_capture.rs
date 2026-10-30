@@ -67,6 +67,8 @@ const FALLBACK_WINDOW: usize = 16 * 1024;
 const ALIGNMENT_CELL_BUDGET: usize = 64 * 1024;
 const ALIGNMENT_SUFFIX_CHARS: usize = 24;
 const MAX_ALIGNMENT_EDIT_RATIO: f64 = 0.6;
+/// How far past the best match the end of a fixed last word may lie.
+const MAX_END_EXTENSION_CHARS: usize = 48;
 
 #[derive(Debug, PartialEq, Eq)]
 enum SettledObservation {
@@ -287,15 +289,34 @@ fn align_captured_edit(pasted: &str, window: &str, expected_start_u16: usize) ->
     }
 
     let best_cost = previous.iter().skip(1).copied().min()?;
-    let mut best_ends = previous
+    let best_ends: Vec<usize> = previous
         .iter()
         .enumerate()
         .skip(1)
-        .filter_map(|(end, cost)| (*cost == best_cost).then_some(end));
-    let end = best_ends.next()?;
-    if best_ends.next().is_some() {
-        return None;
-    }
+        .filter_map(|(end, cost)| (*cost == best_cost).then_some(end))
+        .collect();
+    let last = *pasted_chars.last()?;
+    let sentence_end = last.is_ascii_punctuation();
+    let end = match best_ends.as_slice() {
+        [end] if !sentence_end || tail[*end - 1] == last => *end,
+        // A fix that lengthens the last word ("the SLN." -> "the asadón.")
+        // aligns best as a deletion that stops early, often with ties. When
+        // the paste ended in punctuation, its end is the first such mark at a
+        // word boundary after the best match, on the same line. Without that
+        // mark the span stays ambiguous.
+        ends if sentence_end => {
+            let from = *ends.first()?;
+            let limit = (from + MAX_END_EXTENSION_CHARS).min(tail.len());
+            let mark = (from..limit)
+                .take_while(|&index| tail[index] != '\n')
+                .find(|&index| {
+                    tail[index] == last && tail.get(index + 1).map_or(true, |c| c.is_whitespace())
+                })?;
+            mark + 1
+        }
+        _ => return None,
+    };
+    let best_cost = previous[end];
     let longer = pasted_chars.len().max(end);
     if (best_cost as f64) / (longer as f64) > MAX_ALIGNMENT_EDIT_RATIO {
         return None;
@@ -1060,6 +1081,31 @@ mod tests {
         // "ab" (delete c) and "abx" (replace c) are equally close. Without
         // surrounding context there is no safe way to choose the edit span.
         assert_eq!(align_captured_edit("abc", "abx suffix", 0), None);
+    }
+
+    #[test]
+    fn alignment_keeps_a_fix_to_the_last_word() {
+        // From a real capture in Notes: the suffix anchor contains the edit,
+        // and the fallback tied "…asadón" with "…asadón.".
+        let pasted = "We're gonna eat some great lunch and then I'm gonna grab the SLN.";
+        let prefix = "notes: ";
+        let window = format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón.\nNext line");
+        let aligned = align_captured_edit(pasted, &window, prefix.encode_utf16().count());
+        assert_eq!(
+            aligned.as_deref(),
+            Some("We're gonna eat some great lunch and then I'm gonna grab the asadón.")
+        );
+        // At the very end of the field, too.
+        let window =
+            format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón.");
+        let aligned = align_captured_edit(pasted, &window, prefix.encode_utf16().count());
+        assert!(aligned.is_some_and(|text| text.ends_with("asadón.")));
+        // The final mark was removed: never borrow one from the next line.
+        let window = format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón\nNext line.");
+        assert_eq!(
+            align_captured_edit(pasted, &window, prefix.encode_utf16().count()),
+            None
+        );
     }
 
     #[test]
