@@ -397,21 +397,17 @@ mod macos_impl {
         AXObserverCreate, AXObserverGetRunLoopSource, AXObserverRef, AXObserverRemoveNotification,
         AXUIElementCopyAttributeValue, AXUIElementCopyParameterizedAttributeValue,
         AXUIElementCreateApplication, AXUIElementCreateSystemWide, AXUIElementGetPid,
-        AXUIElementRef, AXUIElementSetAttributeValue, AXUIElementSetMessagingTimeout,
-        AXValueCreate, AXValueGetValue, AXValueRef,
+        AXUIElementRef, AXUIElementSetMessagingTimeout, AXValueCreate, AXValueGetValue, AXValueRef,
     };
     use core_foundation::base::{CFRange, CFRelease, CFTypeRef, TCFType};
-    use core_foundation::boolean::CFBoolean;
     use core_foundation::number::CFNumber;
     use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoop, CFRunLoopSource};
     use core_foundation::string::{CFString, CFStringRef};
     use log::{debug, info, warn};
-    use std::collections::HashSet;
     use std::ffi::c_void;
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::sync::mpsc::{Receiver, Sender};
     use std::sync::Arc;
-    use std::sync::Mutex;
     use std::time::{Duration, Instant};
     use tauri::Manager;
 
@@ -729,39 +725,14 @@ mod macos_impl {
             AXUIElementSetMessagingTimeout(app, 0.1);
             let app = Retained(app as CFTypeRef);
             let app_ref = app.0 as AXUIElementRef;
-            let elem = match ax_attr(app_ref, "AXFocusedUIElement") {
-                Some(elem) => elem,
-                // Chromium and Electron apps (Superhuman, Slack) build their
-                // accessibility tree only after a client asks for it. Ask once
-                // per process; the next dictation can then be captured.
-                None if request_manual_accessibility(app_ref, pid) => {
-                    ax_attr(app_ref, "AXFocusedUIElement")?
-                }
-                None => return None,
-            };
+            // Chromium and Electron apps (Slack, Superhuman) answer only after
+            // a client sets AXManualAccessibility. Do not set it: the app then
+            // keeps its full accessibility tree until it quits, which made
+            // Slack visibly slower. Such apps are skipped.
+            let elem = ax_attr(app_ref, "AXFocusedUIElement")?;
             AXUIElementSetMessagingTimeout(elem.0 as AXUIElementRef, 0.1);
             Some((elem, pid))
         }
-    }
-
-    /// Sets `AXManualAccessibility` on `pid` the first time it is seen here.
-    /// True when it was set now, so the caller may ask once more.
-    fn request_manual_accessibility(app: AXUIElementRef, pid: i32) -> bool {
-        static ASKED: Mutex<Option<HashSet<i32>>> = Mutex::new(None);
-        let mut asked = ASKED.lock().unwrap_or_else(|e| e.into_inner());
-        if !asked.get_or_insert_with(HashSet::new).insert(pid) {
-            return false;
-        }
-        let name = CFString::new("AXManualAccessibility");
-        let err = unsafe {
-            AXUIElementSetAttributeValue(
-                app,
-                name.as_concrete_TypeRef(),
-                CFBoolean::true_value().as_CFTypeRef(),
-            )
-        };
-        debug!("capture: asked pid {pid} to expose its accessibility tree (AXError {err})");
-        err == kAXErrorSuccess
     }
 
     fn focused_system_wide() -> Option<(Retained, i32)> {
