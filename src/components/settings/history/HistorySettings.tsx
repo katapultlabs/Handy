@@ -29,6 +29,7 @@ import {
 } from "@/bindings";
 import { useOsType } from "@/hooks/useOsType";
 import { useSettings } from "@/hooks/useSettings";
+import { languageName } from "@/lib/constants/languages";
 import { useUiStore } from "@/stores/uiStore";
 import {
   useTranscriptionJobsStore,
@@ -447,7 +448,12 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       // The backend diffs, applies the learn gates, and stores what passes.
       // Clear matches to trusted vocabulary learn automatically; other pairs
       // wait for approval in Dictionary.
-      const result = await commands.learnDictionaryFromEdit(pastedText, draft);
+      // New entries apply only to the language this entry was in.
+      const result = await commands.learnDictionaryFromEdit(
+        pastedText,
+        draft,
+        entry.language,
+      );
       if (result.status !== "ok") {
         console.error("Failed to learn from edit:", result.error);
         return;
@@ -455,6 +461,17 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       const { added, known } = result.data;
       if (added.length === 0 && known.length === 0) {
         toast.info(t("settings.history.dictionary.nothingLearned"));
+      } else if (
+        added.length > 0 &&
+        entry.language &&
+        (getSetting("spoken_languages") ?? []).length >= 2
+      ) {
+        toast.success(
+          t("settings.history.dictionary.learnedFor", {
+            language: languageName(entry.language, i18n.language),
+            pairs: added.map((row) => `${row.wrong} → ${row.right}`).join(", "),
+          }),
+        );
       }
     } catch (error) {
       console.error("Failed to learn from edit:", error);

@@ -739,7 +739,8 @@
         "added": "Önerildi: {{wrong}} → {{right}}",
         "undo": "Yok say",
         "alreadyKnown": "Zaten incelendi veya önerildi: {{wrong}} → {{right}}",
-        "autoAdded": "Öğrenildi: {{wrong}} → {{right}}"
+        "autoAdded": "Öğrenildi: {{wrong}} → {{right}}",
+        "learnedFor": "{{language}} için öğrenildi: {{pairs}}"
       },
       "notTranscribed": "Transkribe edilmedi. Yeniden deneme simgesini kullanarak transkribe edebilirsiniz.",
       "transcribeFile": "Dosyayı Yazıya Dök",
@@ -966,7 +967,12 @@
       "review": "İncele",
       "automatic": "Otomatik",
       "automaticHint": "Bilinen sözcük dağarcığından öğrenildi. Yalnızca eşleşen bağlamın yakınında uygulanır.",
-      "autoUndo": "Geri al"
+      "autoUndo": "Geri al",
+      "allLanguages": "Tümü",
+      "anyLanguage": "Her dil",
+      "languageFilter": "Düzeltmeleri dile göre filtrele",
+      "languageTitle": "Bu düzeltmenin uygulandığı dil",
+      "languageLabel": "{{wrong}} → {{right}} için dil"
     }
   },
   "footer": {

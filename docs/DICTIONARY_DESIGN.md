@@ -105,6 +105,7 @@ CREATE TABLE dictionary (
   seen_count    INTEGER NOT NULL DEFAULT 1,    -- times a producer proposed this pair
   applied_count INTEGER NOT NULL DEFAULT 0,    -- times the consumer used it
   app_id        TEXT NOT NULL DEFAULT '',      -- '' = all applications (reserved)
+  language      TEXT NOT NULL DEFAULT '',      -- primary subtag ('en'); '' = all languages
   wrong_key     TEXT NOT NULL,                 -- normalized: lowercase wrong, '' for vocabulary
   right_key     TEXT NOT NULL,                 -- normalized: lowercase right
   created_at    INTEGER NOT NULL,
@@ -132,6 +133,8 @@ Rules:
 - `case_mode = 'smart'` keeps the case pattern of the matched text. `'exact'` writes `right` as stored.
 - A producer that proposes a pair that exists increases `seen_count`. It does not make a second row. Use one SQL `UPSERT` in one transaction.
 - A new learned pair can activate only under the strict tests in section 8.3. For an existing pair, learning only increases `seen_count` and preserves state, enabled flag, and context guard.
+- `language` limits an entry to one spoken language. A learned entry gets the language of the transcription it came from (History edit: the History entry's language; capture: the language of the paste). A manual entry, and every entry from before this column, applies to all languages. Learning a pair again keeps its language. The person changes it on the Dictionary screen, which shows the language controls only when `spoken_languages` has two or more languages.
+- At paste time, a known language applies its own entries and the `''` entries. If the pipeline has no language and some entry has one, text-based detection decides. If the language is still unknown, every entry applies.
 - Explicit approval (Always replace) clears automatic metadata and makes the pair globally applicable. A new suggestion or automatic candidate does not demote an active replacement.
 - A user confirmation sets `state = 'active'` directly, at any count.
 - `state = 'rejected'` means the user dismissed the pair. The `UPSERT` still increases `seen_count`, but it never changes `rejected` to another state. Only the user can, in the Dictionary screen.

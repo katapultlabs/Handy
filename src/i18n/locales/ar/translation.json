@@ -469,7 +469,12 @@
       "review": "مراجعة",
       "automatic": "تلقائي",
       "automaticHint": "تعلّم من المفردات المعروفة. لا يُطبَّق إلا بالقرب من سياق مطابق.",
-      "autoUndo": "تراجع"
+      "autoUndo": "تراجع",
+      "allLanguages": "الكل",
+      "anyLanguage": "أي لغة",
+      "languageFilter": "تصفية التصحيحات حسب اللغة",
+      "languageTitle": "اللغة التي ينطبق عليها هذا التصحيح",
+      "languageLabel": "لغة {{wrong}} ← {{right}}"
     },
     "languages": {
       "title": "اللغات"
@@ -769,7 +774,8 @@
         "added": "اقتراح: {{wrong}} → {{right}}",
         "undo": "تجاهل",
         "alreadyKnown": "تمت مراجعته أو اقتراحه بالفعل: {{wrong}} → {{right}}",
-        "autoAdded": "تم التعلّم: {{wrong}} → {{right}}"
+        "autoAdded": "تم التعلّم: {{wrong}} → {{right}}",
+        "learnedFor": "تم التعلّم لـ {{language}}: {{pairs}}"
       },
       "notTranscribed": "لم يتم النسخ. يمكنك نسخه باستخدام أيقونة إعادة المحاولة.",
       "transcribeFile": "نسخ ملف",

@@ -25,7 +25,21 @@
 // other platforms see them as dead code.
 #![cfg_attr(not(target_os = "macos"), allow(dead_code))]
 
+use std::cell::RefCell;
 use tauri::AppHandle;
+
+thread_local! {
+    /// The language of the text this thread pastes next. `clipboard::paste`
+    /// snapshots on the calling thread, so the pasting code sets this just
+    /// before it calls `paste`, and the snapshot takes it.
+    static PASTE_LANGUAGE: RefCell<Option<String>> = const { RefCell::new(None) };
+}
+
+/// Set the language of the next paste on this thread (`None` when unknown).
+/// Entries learned from an edit to that paste apply only to this language.
+pub fn set_paste_language(language: Option<String>) {
+    PASTE_LANGUAGE.with(|cell| *cell.borrow_mut() = language);
+}
 
 const SNAPSHOT_BUDGET_MS: u64 = 100;
 const ANCHOR_TTL_SECS: u64 = 180;
@@ -312,6 +326,7 @@ impl CaptureManager {
     /// Called just before a paste. Blocks for at most [`SNAPSHOT_BUDGET_MS`];
     /// on timeout the paste proceeds and this dictation is not captured.
     pub fn snapshot_before_paste(&self, pasted_text: String) {
+        let language = PASTE_LANGUAGE.with(|cell| cell.borrow_mut().take());
         #[cfg(target_os = "macos")]
         {
             let deadline =
@@ -321,6 +336,7 @@ impl CaptureManager {
                 .tx
                 .send(macos_impl::Msg::Snapshot {
                     pasted: pasted_text,
+                    language,
                     deadline,
                     ack: ack_tx,
                 })
@@ -331,7 +347,7 @@ impl CaptureManager {
         }
         #[cfg(not(target_os = "macos"))]
         {
-            let _ = pasted_text;
+            let _ = (pasted_text, language);
         }
     }
 
@@ -381,6 +397,8 @@ mod macos_impl {
     pub enum Msg {
         Snapshot {
             pasted: String,
+            /// The pasted text's language; see [`super::set_paste_language`].
+            language: Option<String>,
             /// Discard the request past this point: the caller stopped
             /// waiting, the paste went ahead, and a late snapshot would
             /// anchor the wrong caret or application.
@@ -500,6 +518,8 @@ mod macos_impl {
         caret: usize,
         pasted: String,
         pasted_u16: usize,
+        /// The pasted text's language; learned entries apply only to it.
+        language: Option<String>,
         created: Instant,
         temporal: CaptureTemporalState,
     }
@@ -583,6 +603,7 @@ mod macos_impl {
         match msg {
             Msg::Snapshot {
                 pasted,
+                language,
                 deadline,
                 ack,
             } => {
@@ -594,7 +615,7 @@ mod macos_impl {
                     debug!("capture: discarding stale snapshot request");
                     return;
                 }
-                let taken = take_snapshot(pasted);
+                let taken = take_snapshot(pasted, language);
                 // AX calls carry their own messaging timeouts and can outlive
                 // the caller's budget. A late caret can be post-paste, so the
                 // temporary anchor (including observer) must be discarded.
@@ -761,7 +782,7 @@ mod macos_impl {
     // Snapshot and check
     // ------------------------------------------------------------------
 
-    fn take_snapshot(pasted: String) -> Option<Anchor> {
+    fn take_snapshot(pasted: String, language: Option<String>) -> Option<Anchor> {
         let Some((element, pid)) = focused_element() else {
             info!("capture: no focused AX element; skipping this dictation");
             return None;
@@ -790,6 +811,7 @@ mod macos_impl {
             caret: range.location as usize,
             pasted,
             pasted_u16,
+            language,
             created: now,
             // Keep the fallback active until the observer proves that this
             // application actually delivers AXValueChanged notifications.
@@ -851,7 +873,12 @@ mod macos_impl {
                 let Some(a) = anchor.as_mut() else {
                     return;
                 };
-                match store_learned(app, a.pasted.trim_end(), corrected.trim()) {
+                match store_learned(
+                    app,
+                    a.pasted.trim_end(),
+                    corrected.trim(),
+                    a.language.as_deref(),
+                ) {
                     StoreOutcome::NoPairs => {
                         // A rewrite or incomplete correction can pass AX
                         // alignment but fail the conservative learning gates.
@@ -871,7 +898,12 @@ mod macos_impl {
         Done,
     }
 
-    fn store_learned(app: &AppHandle, original: &str, corrected: &str) -> StoreOutcome {
+    fn store_learned(
+        app: &AppHandle,
+        original: &str,
+        corrected: &str,
+        language: Option<&str>,
+    ) -> StoreOutcome {
         let settings = crate::settings::get_settings(app);
         // Authoritative runtime gate: the user may have turned the feature (or
         // Experimental as a whole) off while this anchor was live.
@@ -887,7 +919,7 @@ mod macos_impl {
             warn!("capture: dictionary store not ready; discarding");
             return StoreOutcome::Done;
         };
-        let report = match manager.learn_from_edit(original, corrected, "capture") {
+        let report = match manager.learn_from_edit(original, corrected, "capture", language) {
             Ok(report) => report,
             Err(err) => {
                 warn!("capture: could not store learned pairs: {err}");

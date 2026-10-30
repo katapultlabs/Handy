@@ -739,7 +739,8 @@
         "added": "Suggerimento: {{wrong}} → {{right}}",
         "undo": "Ignora",
         "alreadyKnown": "Già esaminato o suggerito: {{wrong}} → {{right}}",
-        "autoAdded": "Appresa: {{wrong}} → {{right}}"
+        "autoAdded": "Appresa: {{wrong}} → {{right}}",
+        "learnedFor": "Appreso per {{language}}: {{pairs}}"
       },
       "notTranscribed": "Non trascritto. Puoi trascriverlo usando l'icona di ripetizione.",
       "transcribeFile": "Trascrivi file",
@@ -966,7 +967,12 @@
       "review": "Esamina",
       "automatic": "Automatico",
       "automaticHint": "Appresa dal vocabolario conosciuto. Si applica solo vicino a un contesto corrispondente.",
-      "autoUndo": "Annulla"
+      "autoUndo": "Annulla",
+      "allLanguages": "Tutte",
+      "anyLanguage": "Qualsiasi lingua",
+      "languageFilter": "Filtra le correzioni per lingua",
+      "languageTitle": "A quale lingua si applica questa correzione",
+      "languageLabel": "Lingua per {{wrong}} → {{right}}"
     }
   },
   "footer": {

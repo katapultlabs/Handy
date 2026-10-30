@@ -739,7 +739,8 @@
         "added": "सुझाया गया: {{wrong}} → {{right}}",
         "undo": "नज़रअंदाज़ करें",
         "alreadyKnown": "पहले ही समीक्षा की गई या सुझाया गया: {{wrong}} → {{right}}",
-        "autoAdded": "सीखा गया: {{wrong}} → {{right}}"
+        "autoAdded": "सीखा गया: {{wrong}} → {{right}}",
+        "learnedFor": "{{language}} के लिए सीखा गया: {{pairs}}"
       },
       "notTranscribed": "ट्रांसक्राइब नहीं हुआ. आप रीट्राई आइकन से इसे ट्रांसक्राइब कर सकते हैं.",
       "transcribeFile": "फ़ाइल ट्रांसक्राइब करें",
@@ -966,7 +967,12 @@
       "review": "समीक्षा करें",
       "automatic": "स्वचालित",
       "automaticHint": "परिचित शब्दावली से सीखा गया। केवल मेल खाते संदर्भ के पास लागू होता है।",
-      "autoUndo": "पहले जैसा करें"
+      "autoUndo": "पहले जैसा करें",
+      "allLanguages": "सभी",
+      "anyLanguage": "कोई भी भाषा",
+      "languageFilter": "सुधारों को भाषा के अनुसार फ़िल्टर करें",
+      "languageTitle": "यह सुधार किस भाषा पर लागू होता है",
+      "languageLabel": "{{wrong}} → {{right}} की भाषा"
     }
   },
   "footer": {

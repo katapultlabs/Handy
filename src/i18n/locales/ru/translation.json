@@ -739,7 +739,8 @@
         "added": "Предложено: {{wrong}} → {{right}}",
         "undo": "Игнорировать",
         "alreadyKnown": "Уже проверено или предложено: {{wrong}} → {{right}}",
-        "autoAdded": "Изучено: {{wrong}} → {{right}}"
+        "autoAdded": "Изучено: {{wrong}} → {{right}}",
+        "learnedFor": "Выучено для языка {{language}}: {{pairs}}"
       },
       "notTranscribed": "Не транскрибировано. Вы можете транскрибировать, используя значок повтора.",
       "transcribeFile": "Расшифровать файл",
@@ -966,7 +967,12 @@
       "review": "Проверить",
       "automatic": "Автоматически",
       "automaticHint": "Изучено из известного словаря. Применяется только рядом с подходящим контекстом.",
-      "autoUndo": "Отменить"
+      "autoUndo": "Отменить",
+      "allLanguages": "Все",
+      "anyLanguage": "Любой язык",
+      "languageFilter": "Фильтр исправлений по языку",
+      "languageTitle": "К какому языку относится это исправление",
+      "languageLabel": "Язык для {{wrong}} → {{right}}"
     }
   },
   "footer": {

@@ -739,7 +739,8 @@
         "added": "הוצע: {{wrong}} → {{right}}",
         "undo": "התעלם",
         "alreadyKnown": "כבר נבדק או הוצע: {{wrong}} → {{right}}",
-        "autoAdded": "נלמד: {{wrong}} → {{right}}"
+        "autoAdded": "נלמד: {{wrong}} → {{right}}",
+        "learnedFor": "נלמד עבור {{language}}: {{pairs}}"
       },
       "notTranscribed": "לא תומלל. אפשר לתמלל באמצעות אייקון הניסיון החוזר.",
       "transcribeFile": "תמלול קובץ",
@@ -966,7 +967,12 @@
       "review": "בדיקה",
       "automatic": "אוטומטי",
       "automaticHint": "נלמד מאוצר מילים מוכר. חל רק ליד הקשר תואם.",
-      "autoUndo": "ביטול"
+      "autoUndo": "ביטול",
+      "allLanguages": "הכול",
+      "anyLanguage": "כל שפה",
+      "languageFilter": "סינון תיקונים לפי שפה",
+      "languageTitle": "לאיזו שפה התיקון הזה חל",
+      "languageLabel": "שפה עבור {{wrong}} ← {{right}}"
     }
   },
   "footer": {

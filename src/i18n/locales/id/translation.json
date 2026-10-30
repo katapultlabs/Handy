@@ -739,7 +739,8 @@
         "added": "Disarankan: {{wrong}} → {{right}}",
         "undo": "Abaikan",
         "alreadyKnown": "Sudah ditinjau atau disarankan: {{wrong}} → {{right}}",
-        "autoAdded": "Dipelajari: {{wrong}} → {{right}}"
+        "autoAdded": "Dipelajari: {{wrong}} → {{right}}",
+        "learnedFor": "Dipelajari untuk {{language}}: {{pairs}}"
       },
       "notTranscribed": "Belum ditranskripsikan. Anda dapat mentranskripsikannya menggunakan ikon coba lagi.",
       "transcribeFile": "Transkripsikan File",
@@ -966,7 +967,12 @@
       "review": "Tinjau",
       "automatic": "Otomatis",
       "automaticHint": "Dipelajari dari kosakata yang dikenal. Hanya berlaku di dekat konteks yang cocok.",
-      "autoUndo": "Urungkan"
+      "autoUndo": "Urungkan",
+      "allLanguages": "Semua",
+      "anyLanguage": "Bahasa apa pun",
+      "languageFilter": "Saring koreksi menurut bahasa",
+      "languageTitle": "Bahasa yang berlaku untuk koreksi ini",
+      "languageLabel": "Bahasa untuk {{wrong}} → {{right}}"
     }
   },
   "footer": {

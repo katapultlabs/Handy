@@ -739,7 +739,8 @@
         "added": "Đã đề xuất: {{wrong}} → {{right}}",
         "undo": "Bỏ qua",
         "alreadyKnown": "Đã được xem xét hoặc đề xuất: {{wrong}} → {{right}}",
-        "autoAdded": "Đã học: {{wrong}} → {{right}}"
+        "autoAdded": "Đã học: {{wrong}} → {{right}}",
+        "learnedFor": "Đã học cho {{language}}: {{pairs}}"
       },
       "notTranscribed": "Chưa phiên âm. Bạn có thể phiên âm bằng biểu tượng thử lại.",
       "transcribeFile": "Chép lời tệp",
@@ -966,7 +967,12 @@
       "review": "Xem xét",
       "automatic": "Tự động",
       "automaticHint": "Đã học từ vốn từ đã biết. Chỉ áp dụng gần ngữ cảnh phù hợp.",
-      "autoUndo": "Hoàn tác"
+      "autoUndo": "Hoàn tác",
+      "allLanguages": "Tất cả",
+      "anyLanguage": "Mọi ngôn ngữ",
+      "languageFilter": "Lọc sửa lỗi theo ngôn ngữ",
+      "languageTitle": "Ngôn ngữ áp dụng cho sửa lỗi này",
+      "languageLabel": "Ngôn ngữ cho {{wrong}} → {{right}}"
     }
   },
   "footer": {

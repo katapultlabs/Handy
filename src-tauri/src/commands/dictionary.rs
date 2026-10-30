@@ -90,8 +90,24 @@ pub async fn delete_dictionary_entry(
         .map_err(|err| err.to_string())
 }
 
+/// Set the language an entry applies to; `None` for every language.
+#[tauri::command]
+#[specta::specta]
+pub async fn set_dictionary_entry_language(
+    manager: State<'_, Arc<DictionaryManager>>,
+    id: i64,
+    language: Option<String>,
+) -> Result<DictionaryRow, String> {
+    let manager = Arc::clone(&manager);
+    tauri::async_runtime::spawn_blocking(move || manager.set_language(id, language.as_deref()))
+        .await
+        .map_err(|err| format!("Dictionary language task panicked: {err}"))?
+        .map_err(|err| err.to_string())
+}
+
 /// Diff the text Handy pasted against the user's edit (History screen),
-/// then store what the learn gates accept.
+/// then store what the learn gates accept. `language` is the History
+/// entry's language; new entries apply only to it.
 #[tauri::command]
 #[specta::specta]
 pub async fn learn_dictionary_from_edit(
@@ -99,6 +115,7 @@ pub async fn learn_dictionary_from_edit(
     manager: State<'_, Arc<DictionaryManager>>,
     original: String,
     corrected: String,
+    language: Option<String>,
 ) -> Result<LearnReport, String> {
     let manager = Arc::clone(&manager);
     tauri::async_runtime::spawn_blocking(move || -> anyhow::Result<LearnReport> {
@@ -109,7 +126,7 @@ pub async fn learn_dictionary_from_edit(
                 known: Vec::new(),
             });
         }
-        manager.learn_from_edit(&original, &corrected, "history")
+        manager.learn_from_edit(&original, &corrected, "history", language.as_deref())
     })
     .await
     .map_err(|err| format!("Dictionary learning task panicked: {err}"))?

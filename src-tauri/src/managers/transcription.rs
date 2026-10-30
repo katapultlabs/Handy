@@ -1660,7 +1660,16 @@ fn post_process_transcription_text(
             if entries.is_empty() {
                 corrected
             } else {
-                entries.apply(&corrected)
+                // Entries for one language apply only to text in it. Without
+                // other evidence, ask the text itself, but only when that can
+                // change the outcome. Still unknown: every entry applies.
+                let language = output_language.language().map(str::to_owned).or_else(|| {
+                    entries
+                        .has_language_rules()
+                        .then(|| detect_output_language(&corrected, supported_languages))
+                        .flatten()
+                });
+                entries.apply_in(&corrected, language.as_deref())
             }
         } else {
             corrected

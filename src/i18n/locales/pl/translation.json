@@ -739,7 +739,8 @@
         "added": "Zaproponowano: {{wrong}} → {{right}}",
         "undo": "Ignoruj",
         "alreadyKnown": "Już przejrzano lub zaproponowano: {{wrong}} → {{right}}",
-        "autoAdded": "Nauczono: {{wrong}} → {{right}}"
+        "autoAdded": "Nauczono: {{wrong}} → {{right}}",
+        "learnedFor": "Nauczono dla języka {{language}}: {{pairs}}"
       },
       "notTranscribed": "Nie przetranskrybowano. Możesz to przetranskrybować za pomocą ikony ponowienia.",
       "transcribeFile": "Transkrybuj plik",
@@ -966,7 +967,12 @@
       "review": "Przejrzyj",
       "automatic": "Automatycznie",
       "automaticHint": "Nauczone ze znanego słownictwa. Stosowane tylko w pobliżu pasującego kontekstu.",
-      "autoUndo": "Cofnij"
+      "autoUndo": "Cofnij",
+      "allLanguages": "Wszystkie",
+      "anyLanguage": "Dowolny język",
+      "languageFilter": "Filtruj poprawki według języka",
+      "languageTitle": "Do którego języka odnosi się ta poprawka",
+      "languageLabel": "Język dla {{wrong}} → {{right}}"
     }
   },
   "footer": {

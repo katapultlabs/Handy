@@ -739,7 +739,8 @@
         "added": "候補: {{wrong}} → {{right}}",
         "undo": "無視",
         "alreadyKnown": "確認済みまたは提案済み: {{wrong}} → {{right}}",
-        "autoAdded": "学習済み: {{wrong}} → {{right}}"
+        "autoAdded": "学習済み: {{wrong}} → {{right}}",
+        "learnedFor": "{{language}}用に学習しました: {{pairs}}"
       },
       "notTranscribed": "文字起こしされていません。リトライアイコンを使用して文字起こしできます。",
       "transcribeFile": "ファイルを文字起こし",
@@ -966,7 +967,12 @@
       "review": "確認",
       "automatic": "自動",
       "automaticHint": "登録済みの語彙から学習しました。一致する文脈の近くでのみ適用されます。",
-      "autoUndo": "元に戻す"
+      "autoUndo": "元に戻す",
+      "allLanguages": "すべて",
+      "anyLanguage": "すべての言語",
+      "languageFilter": "言語で修正を絞り込む",
+      "languageTitle": "この修正を適用する言語",
+      "languageLabel": "{{wrong}} → {{right}} の言語"
     }
   },
   "footer": {

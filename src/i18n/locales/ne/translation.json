@@ -739,7 +739,8 @@
         "added": "सुझाव: {{wrong}} → {{right}}",
         "undo": "बेवास्ता गर्नुहोस्",
         "alreadyKnown": "पहिले नै समीक्षा वा सुझाव गरिएको: {{wrong}} → {{right}}",
-        "autoAdded": "सिकियो: {{wrong}} → {{right}}"
+        "autoAdded": "सिकियो: {{wrong}} → {{right}}",
+        "learnedFor": "{{language}} का लागि सिकियो: {{pairs}}"
       },
       "notTranscribed": "ट्रान्सक्राइब भएको छैन। रिट्राई आइकन प्रयोग गरेर ट्रान्सक्राइब गर्न सक्नुहुन्छ।",
       "transcribeFile": "फाइल ट्रान्सक्राइब गर्नुहोस्",
@@ -966,7 +967,12 @@
       "review": "समीक्षा",
       "automatic": "स्वचालित",
       "automaticHint": "परिचित शब्दावलीबाट सिकिएको। मिल्दो सन्दर्भ नजिक मात्र लागू हुन्छ।",
-      "autoUndo": "पूर्ववत गर्नुहोस्"
+      "autoUndo": "पूर्ववत गर्नुहोस्",
+      "allLanguages": "सबै",
+      "anyLanguage": "जुनसुकै भाषा",
+      "languageFilter": "सुधारहरूलाई भाषाअनुसार फिल्टर गर्नुहोस्",
+      "languageTitle": "यो सुधार कुन भाषामा लागू हुन्छ",
+      "languageLabel": "{{wrong}} → {{right}} को भाषा"
     }
   },
   "footer": {

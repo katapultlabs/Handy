@@ -739,7 +739,8 @@
         "added": "Suggeriment: {{wrong}} → {{right}}",
         "undo": "Ignora",
         "alreadyKnown": "Ja s'ha revisat o suggerit: {{wrong}} → {{right}}",
-        "autoAdded": "Apresa: {{wrong}} → {{right}}"
+        "autoAdded": "Apresa: {{wrong}} → {{right}}",
+        "learnedFor": "Après per a {{language}}: {{pairs}}"
       },
       "notTranscribed": "No s'ha transcrit. Podeu transcriure-ho amb la icona de reintent.",
       "transcribeFile": "Transcriu un fitxer",
@@ -966,7 +967,12 @@
       "review": "Revisa",
       "automatic": "Automàtic",
       "automaticHint": "Apresa del vocabulari conegut. Només s'aplica a prop d'un context coincident.",
-      "autoUndo": "Desfés"
+      "autoUndo": "Desfés",
+      "allLanguages": "Totes",
+      "anyLanguage": "Qualsevol idioma",
+      "languageFilter": "Filtra les correccions per idioma",
+      "languageTitle": "A quin idioma s'aplica aquesta correcció",
+      "languageLabel": "Idioma de {{wrong}} → {{right}}"
     }
   },
   "footer": {

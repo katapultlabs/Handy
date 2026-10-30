@@ -52,6 +52,9 @@ pub struct DictionaryRow {
     /// Local context guard for an automatically active row.
     pub context_words: Vec<String>,
     pub seen_count: i64,
+    /// Primary language subtag the entry applies to ("en", "es"); `None`
+    /// for every language.
+    pub language: Option<String>,
     pub created_at: i64,
     pub updated_at: i64,
 }
@@ -97,6 +100,16 @@ fn set_active_entries(matcher: DictionaryMatcher) {
 
 fn key(s: &str) -> String {
     s.trim().to_lowercase()
+}
+
+/// A language code as the Dictionary stores and compares it: the primary
+/// subtag, lowercase ("en-US" and "EN" are both "en").
+pub fn language_key(code: &str) -> String {
+    code.trim()
+        .split(['-', '_'])
+        .next()
+        .unwrap_or_default()
+        .to_lowercase()
 }
 
 fn case_mode_str(mode: CaseMode) -> &'static str {
@@ -165,13 +178,15 @@ impl DictionaryManager {
             context_words: serde_json::from_str(&row.get::<_, String>("context_words")?)
                 .unwrap_or_default(),
             seen_count: row.get("seen_count")?,
+            language: Some(row.get::<_, String>("language")?).filter(|code| !code.is_empty()),
             created_at: row.get("created_at")?,
             updated_at: row.get("updated_at")?,
         })
     }
 
     const SELECT: &'static str = "SELECT id, wrong, right, case_mode, source, state, enabled, \
-         auto_learned, context_words, seen_count, created_at, updated_at FROM dictionary";
+         auto_learned, context_words, seen_count, language, created_at, updated_at \
+         FROM dictionary";
 
     /// Every row, newest change first.
     pub fn list(&self) -> Result<Vec<DictionaryRow>> {
@@ -295,6 +310,7 @@ impl DictionaryManager {
         conn: &Connection,
         candidates: &[LearningCandidate],
         source: &str,
+        language: &str,
     ) -> Result<LearnReport> {
         let mut report = LearnReport {
             added: Vec::new(),
@@ -336,9 +352,9 @@ impl DictionaryManager {
                 "INSERT INTO dictionary
                    (wrong, right, match_mode, case_mode, source, state, enabled,
                     seen_count, applied_count, app_id, wrong_key, right_key,
-                    created_at, updated_at, auto_learned, context_words)
+                    created_at, updated_at, auto_learned, context_words, language)
                  VALUES (?1, ?2, 'word', ?3, ?4, ?5, 1, 1, 0, '', ?6, ?7,
-                         ?8, ?8, ?10, ?9)",
+                         ?8, ?8, ?10, ?9, ?11)",
                 params![
                     wrong,
                     right,
@@ -350,6 +366,7 @@ impl DictionaryManager {
                     ts,
                     context_words,
                     activate,
+                    language,
                 ],
             )?;
             report.added.push(
@@ -378,11 +395,16 @@ impl DictionaryManager {
     /// Classify an observed edit and store its candidates. This work is never
     /// called from the paste path. The lock keeps the trusted-vocabulary read,
     /// classification decision, and database write in one mutation order.
+    ///
+    /// `language` is the language of the transcription that was edited. New
+    /// entries apply only to it; `None` makes them apply to every language.
+    /// A pair that already exists keeps its language.
     pub fn learn_from_edit(
         &self,
         original: &str,
         corrected: &str,
         source: &str,
+        language: Option<&str>,
     ) -> Result<LearnReport> {
         let _guard = self
             .mutation_lock
@@ -410,7 +432,8 @@ impl DictionaryManager {
             });
         }
         let tx = conn.transaction()?;
-        let report = Self::learn_candidates(&tx, &candidates, source)?;
+        let language = language.map(language_key).unwrap_or_default();
+        let report = Self::learn_candidates(&tx, &candidates, source, &language)?;
         tx.commit()?;
         self.notify();
         crate::correction_notices::enqueue(&self.app_handle, report.added.clone());
@@ -516,6 +539,25 @@ impl DictionaryManager {
         Self::get_by_keys(conn, &wk, &rk)?.ok_or_else(|| anyhow!("row missing"))
     }
 
+    /// Set the language an entry applies to; `None` for every language.
+    pub fn set_language(&self, id: i64, language: Option<&str>) -> Result<DictionaryRow> {
+        let _guard = self
+            .mutation_lock
+            .lock()
+            .map_err(|_| anyhow!("dictionary mutation lock poisoned"))?;
+        let conn = self.conn()?;
+        let changed = conn.execute(
+            "UPDATE dictionary SET language = ?2, updated_at = ?3 WHERE id = ?1",
+            params![id, language.map(language_key).unwrap_or_default(), now()],
+        )?;
+        if changed == 0 {
+            return Err(anyhow!("entry {id} not found"));
+        }
+        let row = Self::get_by_id(&conn, id)?.ok_or_else(|| anyhow!("row missing"))?;
+        self.notify();
+        Ok(row)
+    }
+
     /// Accept a learned proposal. This is the only learned-entry path that can
     /// replace an already approved correction for the same wrong text.
     pub fn confirm_dictionary_entry(&self, id: i64) -> Result<DictionaryRow> {
@@ -618,7 +660,7 @@ impl DictionaryManager {
 
     fn load_active_rules(conn: &Connection) -> Result<Vec<DictionaryRule>> {
         let mut stmt = conn.prepare(
-            "SELECT wrong, right, case_mode, source, auto_learned, context_words
+            "SELECT wrong, right, case_mode, source, auto_learned, context_words, language
              FROM dictionary
              WHERE state = 'active' AND enabled = 1 ORDER BY id",
         )?;
@@ -633,12 +675,13 @@ impl DictionaryManager {
                 },
                 row.get::<_, i64>(4)? != 0,
                 row.get::<_, String>(5)?,
+                row.get::<_, String>(6)?,
             ))
         })?;
 
         let mut rules = Vec::new();
         for row in rows {
-            let (entry, auto_learned, encoded_context) = row?;
+            let (entry, auto_learned, encoded_context, language) = row?;
             let context_words = if auto_learned {
                 // Automatic rules fail closed if their guard is absent or the
                 // persisted JSON is corrupt. Explicit rules need no guard.
@@ -657,6 +700,7 @@ impl DictionaryManager {
             rules.push(DictionaryRule {
                 entry,
                 context_words,
+                language,
             });
         }
         Ok(rules)
@@ -720,7 +764,8 @@ mod tests {
                 wrong_key TEXT NOT NULL, right_key TEXT NOT NULL,
                 created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
                 auto_learned INTEGER NOT NULL DEFAULT 0,
-                context_words TEXT NOT NULL DEFAULT '[]');
+                context_words TEXT NOT NULL DEFAULT '[]',
+                language TEXT NOT NULL DEFAULT '');
              CREATE UNIQUE INDEX dictionary_pair ON dictionary (wrong_key, right_key, app_id);
              CREATE UNIQUE INDEX dictionary_active_wrong ON dictionary (wrong_key, app_id)
                 WHERE state = 'active' AND wrong_key != '';",
@@ -861,12 +906,52 @@ mod tests {
     }
 
     #[test]
+    fn learned_entries_keep_the_language_they_were_learned_in() {
+        let conn = fresh();
+        let report = DictionaryManager::learn_candidates(
+            &conn,
+            &[candidate("con", "Kahn", &["call"])],
+            "history",
+            "en",
+        )
+        .unwrap();
+        assert_eq!(report.added[0].language.as_deref(), Some("en"));
+        let rules = DictionaryManager::load_active_rules(&conn).unwrap();
+        assert_eq!(rules[0].language, "en");
+
+        // Seen again in another language: the pair keeps its language.
+        let again = DictionaryManager::learn_candidates(
+            &conn,
+            &[candidate("con", "Kahn", &["call"])],
+            "history",
+            "es",
+        )
+        .unwrap();
+        assert_eq!(again.known[0].language.as_deref(), Some("en"));
+
+        // Manual entries apply to every language.
+        let (manual, _) =
+            DictionaryManager::upsert(&conn, &entry("cloud code", "Claude Code"), "manual", true)
+                .unwrap();
+        assert_eq!(manual.language, None);
+    }
+
+    #[test]
+    fn language_key_keeps_the_primary_subtag() {
+        assert_eq!(language_key("en-US"), "en");
+        assert_eq!(language_key(" ES "), "es");
+        assert_eq!(language_key("zh_Hant"), "zh");
+        assert_eq!(language_key(""), "");
+    }
+
+    #[test]
     fn strong_new_candidate_activates_with_context_guard() {
         let conn = fresh();
         let report = DictionaryManager::learn_candidates(
             &conn,
             &[candidate("Catapult", "Katapult", &["releases", "team"])],
             "history",
+            "",
         )
         .unwrap();
 
@@ -887,6 +972,7 @@ mod tests {
             &conn,
             &[candidate("Catapult", "Katapult", &[])],
             "capture",
+            "",
         )
         .unwrap();
 
@@ -932,6 +1018,7 @@ mod tests {
             &conn,
             &[candidate("Maine", "Mane", &["branch"])],
             "history",
+            "",
         )
         .unwrap();
         assert_eq!(report.added[0].state, "proposed");
@@ -950,12 +1037,12 @@ mod tests {
     fn repeats_never_promote_suggestions_or_rejected_rows() {
         let conn = fresh();
         let weak = candidate("Catapult", "Katapult", &[]);
-        let proposed = DictionaryManager::learn_candidates(&conn, &[weak.clone()], "history")
+        let proposed = DictionaryManager::learn_candidates(&conn, &[weak.clone()], "history", "")
             .unwrap()
             .added
             .remove(0);
         let strong = candidate("Catapult", "Katapult", &["releases"]);
-        let repeated = DictionaryManager::learn_candidates(&conn, &[strong], "capture")
+        let repeated = DictionaryManager::learn_candidates(&conn, &[strong], "capture", "")
             .unwrap()
             .known
             .remove(0);
@@ -965,7 +1052,7 @@ mod tests {
         assert!(repeated.context_words.is_empty());
 
         DictionaryManager::reject(&conn, proposed.id).unwrap();
-        let ignored = DictionaryManager::learn_candidates(&conn, &[weak], "history")
+        let ignored = DictionaryManager::learn_candidates(&conn, &[weak], "history", "")
             .unwrap()
             .known
             .remove(0);
@@ -980,6 +1067,7 @@ mod tests {
             &conn,
             &[candidate("catapult", "Katapult", &["team"])],
             "history",
+            "",
         )
         .unwrap();
         DictionaryManager::upsert(&conn, &entry("github", "GitHub"), "manual", true).unwrap();
@@ -996,6 +1084,7 @@ mod tests {
             &conn,
             &[candidate("Catapult", "Katapult", &["team"])],
             "history",
+            "",
         )
         .unwrap()
         .added
@@ -1009,6 +1098,7 @@ mod tests {
             &conn,
             &[candidate("Bededa", "Pereira", &["flight"])],
             "capture",
+            "",
         )
         .unwrap()
         .added
@@ -1048,6 +1138,7 @@ mod tests {
             &conn,
             &[candidate("Catapult", "Katapult", &["team"])],
             "history",
+            "",
         )
         .unwrap()
         .added
@@ -1075,7 +1166,7 @@ mod tests {
         let candidates = classify_pairs(original, corrected, &trusted);
         assert_eq!(candidates.len(), 1);
         assert!(!candidates[0].context_words.is_empty());
-        let learned = DictionaryManager::learn_candidates(&conn, &candidates, "history")
+        let learned = DictionaryManager::learn_candidates(&conn, &candidates, "history", "")
             .unwrap()
             .added
             .remove(0);
@@ -1095,7 +1186,7 @@ mod tests {
             DictionaryMatcher::new(DictionaryManager::load_active_rules(&conn).unwrap()).unwrap();
         assert_eq!(rejected_matcher.apply(original), original);
 
-        let repeated = DictionaryManager::learn_candidates(&conn, &candidates, "capture")
+        let repeated = DictionaryManager::learn_candidates(&conn, &candidates, "capture", "")
             .unwrap()
             .known
             .remove(0);

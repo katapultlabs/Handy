@@ -739,7 +739,8 @@
         "added": "Sugerencia: {{wrong}} → {{right}}",
         "undo": "Ignorar",
         "alreadyKnown": "Ya se revisó o sugirió: {{wrong}} → {{right}}",
-        "autoAdded": "Aprendida: {{wrong}} → {{right}}"
+        "autoAdded": "Aprendida: {{wrong}} → {{right}}",
+        "learnedFor": "Aprendido para {{language}}: {{pairs}}"
       },
       "notTranscribed": "Sin transcribir. Puedes transcribirlo usando el icono de reintentar.",
       "transcribeFile": "Transcribir archivo",
@@ -966,7 +967,12 @@
       "review": "Revisar",
       "automatic": "Automático",
       "automaticHint": "Aprendida del vocabulario conocido. Solo se aplica cerca de un contexto coincidente.",
-      "autoUndo": "Deshacer"
+      "autoUndo": "Deshacer",
+      "allLanguages": "Todas",
+      "anyLanguage": "Cualquier idioma",
+      "languageFilter": "Filtrar correcciones por idioma",
+      "languageTitle": "A qué idioma se aplica esta corrección",
+      "languageLabel": "Idioma de {{wrong}} → {{right}}"
     }
   },
   "footer": {

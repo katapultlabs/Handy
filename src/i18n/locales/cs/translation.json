@@ -739,7 +739,8 @@
         "added": "Navrženo: {{wrong}} → {{right}}",
         "undo": "Ignorovat",
         "alreadyKnown": "Již zkontrolováno nebo navrženo: {{wrong}} → {{right}}",
-        "autoAdded": "Naučeno: {{wrong}} → {{right}}"
+        "autoAdded": "Naučeno: {{wrong}} → {{right}}",
+        "learnedFor": "Naučeno pro {{language}}: {{pairs}}"
       },
       "notTranscribed": "Nepřepsáno. Můžete to přepsat pomocí ikony opakování.",
       "transcribeFile": "Přepsat soubor",
@@ -966,7 +967,12 @@
       "review": "Zkontrolovat",
       "automatic": "Automaticky",
       "automaticHint": "Naučeno ze známé slovní zásoby. Použije se pouze v blízkosti odpovídajícího kontextu.",
-      "autoUndo": "Vrátit zpět"
+      "autoUndo": "Vrátit zpět",
+      "allLanguages": "Vše",
+      "anyLanguage": "Libovolný jazyk",
+      "languageFilter": "Filtrovat opravy podle jazyka",
+      "languageTitle": "Pro který jazyk tato oprava platí",
+      "languageLabel": "Jazyk pro {{wrong}} → {{right}}"
     }
   },
   "footer": {

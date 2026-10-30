@@ -500,6 +500,7 @@ mod tests {
             auto_learned: false,
             context_words: vec![],
             seen_count: 1,
+            language: None,
             created_at: 0,
             updated_at: 0,
         }

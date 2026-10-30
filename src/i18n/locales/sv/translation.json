@@ -739,7 +739,8 @@
         "added": "Föreslaget: {{wrong}} → {{right}}",
         "undo": "Ignorera",
         "alreadyKnown": "Redan granskat eller föreslaget: {{wrong}} → {{right}}",
-        "autoAdded": "Inlärt: {{wrong}} → {{right}}"
+        "autoAdded": "Inlärt: {{wrong}} → {{right}}",
+        "learnedFor": "Inlärt för {{language}}: {{pairs}}"
       },
       "notTranscribed": "Inte transkriberad. Du kan transkribera den med hjälp av ikonen för nytt försök.",
       "transcribeFile": "Transkribera fil",
@@ -966,7 +967,12 @@
       "review": "Granska",
       "automatic": "Automatiskt",
       "automaticHint": "Inlärt från känt ordförråd. Används endast nära ett matchande sammanhang.",
-      "autoUndo": "Ångra"
+      "autoUndo": "Ångra",
+      "allLanguages": "Alla",
+      "anyLanguage": "Alla språk",
+      "languageFilter": "Filtrera rättelser efter språk",
+      "languageTitle": "Vilket språk rättelsen gäller",
+      "languageLabel": "Språk för {{wrong}} → {{right}}"
     }
   },
   "footer": {

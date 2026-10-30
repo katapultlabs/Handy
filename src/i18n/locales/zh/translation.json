@@ -739,7 +739,8 @@
         "added": "建议：{{wrong}} → {{right}}",
         "undo": "忽略",
         "alreadyKnown": "已查看或建议：{{wrong}} → {{right}}",
-        "autoAdded": "已学习：{{wrong}} → {{right}}"
+        "autoAdded": "已学习：{{wrong}} → {{right}}",
+        "learnedFor": "已为{{language}}学习：{{pairs}}"
       },
       "notTranscribed": "尚未转录。您可以使用重试图标进行转录。",
       "transcribeFile": "转录文件",
@@ -966,7 +967,12 @@
       "review": "查看",
       "automatic": "自动",
       "automaticHint": "从已知词汇中学习。仅在匹配的上下文附近应用。",
-      "autoUndo": "撤销"
+      "autoUndo": "撤销",
+      "allLanguages": "全部",
+      "anyLanguage": "任何语言",
+      "languageFilter": "按语言筛选更正",
+      "languageTitle": "此更正适用的语言",
+      "languageLabel": "{{wrong}} → {{right}} 的语言"
     }
   },
   "footer": {

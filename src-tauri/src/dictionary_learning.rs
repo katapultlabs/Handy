@@ -500,6 +500,7 @@ mod tests {
             crate::dictionary_matcher::DictionaryRule {
                 entry: candidate.entry,
                 context_words: candidate.context_words,
+                language: String::new(),
             },
         ])
         .unwrap();

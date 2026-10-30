@@ -418,11 +418,23 @@ async rejectDictionaryEntry(id: number) : Promise<Result<DictionaryRow, string>>
 },
 /**
  * Diff the text Handy pasted against the user's edit (History screen),
- * then store what the learn gates accept.
+ * then store what the learn gates accept. `language` is the History
+ * entry's language; new entries apply only to it.
  */
-async learnDictionaryFromEdit(original: string, corrected: string) : Promise<Result<LearnReport, string>> {
+async learnDictionaryFromEdit(original: string, corrected: string, language: string | null) : Promise<Result<LearnReport, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("learn_dictionary_from_edit", { original, corrected }) };
+    return { status: "ok", data: await TAURI_INVOKE("learn_dictionary_from_edit", { original, corrected, language }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Set the language an entry applies to; `None` for every language.
+ */
+async setDictionaryEntryLanguage(id: number, language: string | null) : Promise<Result<DictionaryRow, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_dictionary_entry_language", { id, language }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -1407,7 +1419,12 @@ auto_learned: boolean;
 /**
  * Local context guard for an automatically active row.
  */
-context_words: string[]; seen_count: number; created_at: number; updated_at: number }
+context_words: string[]; seen_count: number; 
+/**
+ * Primary language subtag the entry applies to ("en", "es"); `None`
+ * for every language.
+ */
+language: string | null; created_at: number; updated_at: number }
 export type GpuDeviceOption = { id: string; name: string; total_vram_mb: number }
 export type HistoryEntry = { id: number; file_name: string; timestamp: number; saved: boolean; title: string; transcription_text: string; post_processed_text: string | null; post_process_prompt: string | null; post_process_requested: boolean; 
 /**

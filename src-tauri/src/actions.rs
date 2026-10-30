@@ -789,6 +789,12 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
+                            // Fork: Dictionary capture tags what it learns
+                            // from this paste with its language.
+                            let paste_language = language
+                                .as_ref()
+                                .and_then(|decision| decision.language.clone());
+
                             // Save to history if WAV was saved
                             if wav_saved {
                                 if let Err(err) = hm.save_entry(
@@ -834,6 +840,9 @@ impl ShortcutAction for TranscribeAction {
                                             return;
                                         }
 
+                                        crate::dictionary_capture::set_paste_language(
+                                            paste_language,
+                                        );
                                         let outcome =
                                             match utils::paste(final_text, ah_clone.clone()) {
                                                 Ok(()) => {
@@ -974,7 +983,9 @@ impl ShortcutAction for PasteLastTranscriptAction {
 
         // Paste runs on the main thread, like the transcription pipeline.
         let ah = app.clone();
+        let language = entry.language.clone();
         let _ = app.run_on_main_thread(move || {
+            crate::dictionary_capture::set_paste_language(language);
             if let Err(e) = utils::paste(text, ah.clone()) {
                 error!("paste_last_transcript: paste failed: {}", e);
                 let _ = ah.emit("paste-error", ());

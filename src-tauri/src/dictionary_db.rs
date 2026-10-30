@@ -69,13 +69,23 @@ const ADD_AUTO_LEARNING: &str = "ALTER TABLE dictionary
      ALTER TABLE dictionary
          ADD COLUMN context_words TEXT NOT NULL DEFAULT '[]';";
 
+// The spoken language an entry applies to, as a primary language subtag
+// ("en", "es"). `''` means every language, like `app_id`. Learned entries get
+// the language of the transcription they came from; manual entries start
+// as `''`.
+const ADD_LANGUAGE: &str = "ALTER TABLE dictionary
+         ADD COLUMN language TEXT NOT NULL DEFAULT '';";
+
 static MIGRATIONS: &[M] = &[
     M::up(CREATE_TABLE),
     M::up(DEMOTE_LEARNED),
     M::up(ADD_AUTO_LEARNING),
+    M::up(ADD_LANGUAGE),
 ];
 
-/// Every column, in table order. The move copies them by name.
+/// The columns that `history.db` builds had, in table order. The move copies
+/// them by name. Do not add later columns: the old table does not have them,
+/// and their defaults fill the copied rows.
 const COLUMNS: &str = "wrong, right, match_mode, case_mode, source, state, enabled, \
      seen_count, applied_count, app_id, wrong_key, right_key, created_at, updated_at, \
      auto_learned, context_words";
