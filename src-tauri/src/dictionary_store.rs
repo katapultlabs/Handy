@@ -422,6 +422,17 @@ impl DictionaryManager {
         trusted_terms.extend(Self::explicit_trusted_terms(&conn)?);
 
         let mut candidates = classify_pairs(original, corrected, &trusted_terms);
+        // Debug builds only: the texts are dictation content. Release builds
+        // never log them.
+        #[cfg(debug_assertions)]
+        log::debug!(
+            "dictionary: learn ({source}) original={original:?} corrected={corrected:?} \
+             candidates={:?}",
+            candidates
+                .iter()
+                .map(|c| format!("{} -> {}", c.entry.wrong, c.entry.right))
+                .collect::<Vec<_>>()
+        );
         if source == "capture" {
             candidates.truncate(3);
         }
