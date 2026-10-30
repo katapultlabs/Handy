@@ -117,18 +117,14 @@ mod macos {
     const SETTINGS_OPEN_TIMEOUT: Duration = Duration::from_secs(10);
     /// How long "All set" stays on screen.
     const GRANTED_LINGER: Duration = Duration::from_millis(1600);
-    /// The main window's minimum size outside the helper (see `lib.rs`).
-    const MAIN_MIN_SIZE: NSSize = NSSize {
-        width: 680.0,
-        height: 570.0,
-    };
-
     /// One follower thread at a time.
     static FOLLOWING: AtomicBool = AtomicBool::new(false);
     /// Set by the close button; the follower thread restores and ends.
     static CLOSE_REQUESTED: AtomicBool = AtomicBool::new(false);
-    /// The main window's frame (AppKit coordinates) before it became the tile.
-    static SAVED: Mutex<Option<NSRect>> = Mutex::new(None);
+    /// The main window's frame (AppKit coordinates) and minimum content size
+    /// before it became the tile. The minimum is read from the window, not
+    /// copied from `lib.rs`, so it stays right when that size changes.
+    static SAVED: Mutex<Option<(NSRect, NSSize)>> = Mutex::new(None);
 
     pub fn open(app: &AppHandle) -> Result<(), String> {
         app.opener()
@@ -301,7 +297,8 @@ mod macos {
             let _ = window.set_always_on_top(true);
         }
         with_ns_window(app, move |ns_window, mtm| {
-            *SAVED.lock().unwrap_or_else(|e| e.into_inner()) = Some(ns_window.frame());
+            *SAVED.lock().unwrap_or_else(|e| e.into_inner()) =
+                Some((ns_window.frame(), ns_window.contentMinSize()));
             set_chrome(ns_window, false);
             ns_window.setContentMinSize(NSSize::new(0.0, 0.0));
             ns_window.setFrame_display_animate(
@@ -331,8 +328,8 @@ mod macos {
         with_ns_window(app, |ns_window, _| {
             let saved = SAVED.lock().unwrap_or_else(|e| e.into_inner()).take();
             set_chrome(ns_window, true);
-            ns_window.setContentMinSize(MAIN_MIN_SIZE);
-            if let Some(frame) = saved {
+            if let Some((frame, min_size)) = saved {
+                ns_window.setContentMinSize(min_size);
                 ns_window.setFrame_display_animate(frame, true, true);
             }
         });
