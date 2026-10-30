@@ -99,11 +99,17 @@ export const HistorySettings: React.FC = () => {
   const correctLatestPending = useUiStore((s) => s.correctLatestPending);
 
   // The tray's "Correct Last Transcript" sets this flag. Open the newest
-  // entry in edit mode once the list has loaded.
+  // dictation in edit mode once the list has loaded. Like the backend's
+  // latest completed entry, skip file transcriptions and empty entries.
   useEffect(() => {
     if (correctLatestPending && !loading && entries.length > 0) {
       useUiStore.getState().clearCorrectLatest();
-      setAutoEditId(entries[0].id);
+      const latest = entries.find(
+        (entry) =>
+          entry.source_name === null &&
+          entry.transcription_text.trim().length > 0,
+      );
+      if (latest) setAutoEditId(latest.id);
     }
   }, [correctLatestPending, loading, entries]);
   const [hasMore, setHasMore] = useState(true);
