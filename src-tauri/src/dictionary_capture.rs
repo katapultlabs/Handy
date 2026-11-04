@@ -25,7 +25,21 @@
 // other platforms see them as dead code.
 #![cfg_attr(not(target_os = "macos"), allow(dead_code))]
 
+use std::cell::RefCell;
 use tauri::AppHandle;
+
+thread_local! {
+    /// The language of the text this thread pastes next. `clipboard::paste`
+    /// snapshots on the calling thread, so the pasting code sets this just
+    /// before it calls `paste`, and the snapshot takes it.
+    static PASTE_LANGUAGE: RefCell<Option<String>> = const { RefCell::new(None) };
+}
+
+/// Set the language of the next paste on this thread (`None` when unknown).
+/// Entries learned from an edit to that paste apply only to this language.
+pub fn set_paste_language(language: Option<String>) {
+    PASTE_LANGUAGE.with(|cell| *cell.borrow_mut() = language);
+}
 
 const SNAPSHOT_BUDGET_MS: u64 = 100;
 const ANCHOR_TTL_SECS: u64 = 180;
@@ -53,6 +67,8 @@ const FALLBACK_WINDOW: usize = 16 * 1024;
 const ALIGNMENT_CELL_BUDGET: usize = 64 * 1024;
 const ALIGNMENT_SUFFIX_CHARS: usize = 24;
 const MAX_ALIGNMENT_EDIT_RATIO: f64 = 0.6;
+/// How far past the best match the end of a fixed last word may lie.
+const MAX_END_EXTENSION_CHARS: usize = 48;
 
 #[derive(Debug, PartialEq, Eq)]
 enum SettledObservation {
@@ -273,15 +289,34 @@ fn align_captured_edit(pasted: &str, window: &str, expected_start_u16: usize) ->
     }
 
     let best_cost = previous.iter().skip(1).copied().min()?;
-    let mut best_ends = previous
+    let best_ends: Vec<usize> = previous
         .iter()
         .enumerate()
         .skip(1)
-        .filter_map(|(end, cost)| (*cost == best_cost).then_some(end));
-    let end = best_ends.next()?;
-    if best_ends.next().is_some() {
-        return None;
-    }
+        .filter_map(|(end, cost)| (*cost == best_cost).then_some(end))
+        .collect();
+    let last = *pasted_chars.last()?;
+    let sentence_end = last.is_ascii_punctuation();
+    let end = match best_ends.as_slice() {
+        [end] if !sentence_end || tail[*end - 1] == last => *end,
+        // A fix that lengthens the last word ("the SLN." -> "the asadón.")
+        // aligns best as a deletion that stops early, often with ties. When
+        // the paste ended in punctuation, its end is the first such mark at a
+        // word boundary after the best match, on the same line. Without that
+        // mark the span stays ambiguous.
+        ends if sentence_end => {
+            let from = *ends.first()?;
+            let limit = (from + MAX_END_EXTENSION_CHARS).min(tail.len());
+            let mark = (from..limit)
+                .take_while(|&index| tail[index] != '\n')
+                .find(|&index| {
+                    tail[index] == last && tail.get(index + 1).map_or(true, |c| c.is_whitespace())
+                })?;
+            mark + 1
+        }
+        _ => return None,
+    };
+    let best_cost = previous[end];
     let longer = pasted_chars.len().max(end);
     if (best_cost as f64) / (longer as f64) > MAX_ALIGNMENT_EDIT_RATIO {
         return None;
@@ -312,6 +347,7 @@ impl CaptureManager {
     /// Called just before a paste. Blocks for at most [`SNAPSHOT_BUDGET_MS`];
     /// on timeout the paste proceeds and this dictation is not captured.
     pub fn snapshot_before_paste(&self, pasted_text: String) {
+        let language = PASTE_LANGUAGE.with(|cell| cell.borrow_mut().take());
         #[cfg(target_os = "macos")]
         {
             let deadline =
@@ -321,6 +357,7 @@ impl CaptureManager {
                 .tx
                 .send(macos_impl::Msg::Snapshot {
                     pasted: pasted_text,
+                    language,
                     deadline,
                     ack: ack_tx,
                 })
@@ -331,7 +368,7 @@ impl CaptureManager {
         }
         #[cfg(not(target_os = "macos"))]
         {
-            let _ = pasted_text;
+            let _ = (pasted_text, language);
         }
     }
 
@@ -359,8 +396,8 @@ mod macos_impl {
         kAXErrorSuccess, kAXValueChangedNotification, AXError, AXObserverAddNotification,
         AXObserverCreate, AXObserverGetRunLoopSource, AXObserverRef, AXObserverRemoveNotification,
         AXUIElementCopyAttributeValue, AXUIElementCopyParameterizedAttributeValue,
-        AXUIElementCreateSystemWide, AXUIElementGetPid, AXUIElementRef,
-        AXUIElementSetMessagingTimeout, AXValueCreate, AXValueGetValue, AXValueRef,
+        AXUIElementCreateApplication, AXUIElementCreateSystemWide, AXUIElementGetPid,
+        AXUIElementRef, AXUIElementSetMessagingTimeout, AXValueCreate, AXValueGetValue, AXValueRef,
     };
     use core_foundation::base::{CFRange, CFRelease, CFTypeRef, TCFType};
     use core_foundation::number::CFNumber;
@@ -381,6 +418,8 @@ mod macos_impl {
     pub enum Msg {
         Snapshot {
             pasted: String,
+            /// The pasted text's language; see [`super::set_paste_language`].
+            language: Option<String>,
             /// Discard the request past this point: the caller stopped
             /// waiting, the paste went ahead, and a late snapshot would
             /// anchor the wrong caret or application.
@@ -500,8 +539,15 @@ mod macos_impl {
         caret: usize,
         pasted: String,
         pasted_u16: usize,
+        /// The pasted text's language; learned entries apply only to it.
+        language: Option<String>,
         created: Instant,
         temporal: CaptureTemporalState,
+        /// Fields that keep changing (a terminal, a live document) repeat the
+        /// same outcome every few hundred milliseconds. Log each one at info
+        /// once per paste, then at debug.
+        noted_unaligned: bool,
+        noted_no_pairs: bool,
     }
 
     pub fn spawn(app: AppHandle) -> Sender<Msg> {
@@ -583,6 +629,7 @@ mod macos_impl {
         match msg {
             Msg::Snapshot {
                 pasted,
+                language,
                 deadline,
                 ack,
             } => {
@@ -594,7 +641,7 @@ mod macos_impl {
                     debug!("capture: discarding stale snapshot request");
                     return;
                 }
-                let taken = take_snapshot(pasted);
+                let taken = take_snapshot(pasted, language);
                 // AX calls carry their own messaging timeouts and can outlive
                 // the caller's budget. A late caret can be post-paste, so the
                 // temporary anchor (including observer) must be discarded.
@@ -653,7 +700,42 @@ mod macos_impl {
         Some(s.to_string())
     }
 
+    /// The focused element and its process. Ask the frontmost application
+    /// first: on current macOS the system-wide element answers
+    /// `AXFocusedUIElement` with `kAXErrorCannotComplete`, even for a trusted
+    /// process, while the application's own element answers. The system-wide
+    /// query stays as the fallback.
     fn focused_element() -> Option<(Retained, i32)> {
+        frontmost_pid()
+            .and_then(focused_in_application)
+            .or_else(focused_system_wide)
+    }
+
+    fn frontmost_pid() -> Option<i32> {
+        let app = objc2_app_kit::NSWorkspace::sharedWorkspace().frontmostApplication()?;
+        Some(app.processIdentifier())
+    }
+
+    fn focused_in_application(pid: i32) -> Option<(Retained, i32)> {
+        unsafe {
+            let app = AXUIElementCreateApplication(pid);
+            if app.is_null() {
+                return None;
+            }
+            AXUIElementSetMessagingTimeout(app, 0.1);
+            let app = Retained(app as CFTypeRef);
+            let app_ref = app.0 as AXUIElementRef;
+            // Chromium and Electron apps (Slack, Superhuman) answer only after
+            // a client sets AXManualAccessibility. Do not set it: the app then
+            // keeps its full accessibility tree until it quits, which made
+            // Slack visibly slower. Such apps are skipped.
+            let elem = ax_attr(app_ref, "AXFocusedUIElement")?;
+            AXUIElementSetMessagingTimeout(elem.0 as AXUIElementRef, 0.1);
+            Some((elem, pid))
+        }
+    }
+
+    fn focused_system_wide() -> Option<(Retained, i32)> {
         unsafe {
             let system = AXUIElementCreateSystemWide();
             if system.is_null() {
@@ -761,7 +843,7 @@ mod macos_impl {
     // Snapshot and check
     // ------------------------------------------------------------------
 
-    fn take_snapshot(pasted: String) -> Option<Anchor> {
+    fn take_snapshot(pasted: String, language: Option<String>) -> Option<Anchor> {
         let Some((element, pid)) = focused_element() else {
             info!("capture: no focused AX element; skipping this dictation");
             return None;
@@ -790,14 +872,17 @@ mod macos_impl {
             caret: range.location as usize,
             pasted,
             pasted_u16,
+            language,
             created: now,
             // Keep the fallback active until the observer proves that this
             // application actually delivers AXValueChanged notifications.
             temporal: CaptureTemporalState::new(now, false),
+            noted_unaligned: false,
+            noted_no_pairs: false,
         })
     }
 
-    fn observe_anchor(a: &Anchor) -> SettledObservation {
+    fn observe_anchor(a: &mut Anchor) -> SettledObservation {
         let start = a.caret.saturating_sub(PRE_MARGIN);
         let len = a.pasted_u16 + PRE_MARGIN + POST_MARGIN;
         let window = match read_window(a.element.0 as AXUIElementRef, start, len) {
@@ -821,9 +906,13 @@ mod macos_impl {
         let pasted = a.pasted.trim_end();
         let expected_start_u16 = a.caret.saturating_sub(start);
         let Some(corrected) = align_captured_edit(pasted, &window, expected_start_u16) else {
-            info!(
-                "capture: edit detected but the pasted span could not be aligned safely; keeping anchor"
-            );
+            const MSG: &str =
+                "capture: edit detected but the pasted span could not be aligned safely; keeping anchor";
+            if std::mem::replace(&mut a.noted_unaligned, true) {
+                debug!("{MSG}");
+            } else {
+                info!("{MSG}");
+            }
             return SettledObservation::Unresolved;
         };
         let corrected = corrected.trim();
@@ -851,12 +940,23 @@ mod macos_impl {
                 let Some(a) = anchor.as_mut() else {
                     return;
                 };
-                match store_learned(app, a.pasted.trim_end(), corrected.trim()) {
+                match store_learned(
+                    app,
+                    a.pasted.trim_end(),
+                    corrected.trim(),
+                    a.language.as_deref(),
+                ) {
                     StoreOutcome::NoPairs => {
                         // A rewrite or incomplete correction can pass AX
                         // alignment but fail the conservative learning gates.
                         // Keep watching without retaining its content.
-                        info!("capture: settled edit produced no learnable pairs; keeping anchor");
+                        const MSG: &str =
+                            "capture: settled edit produced no learnable pairs; keeping anchor";
+                        if std::mem::replace(&mut a.noted_no_pairs, true) {
+                            debug!("{MSG}");
+                        } else {
+                            info!("{MSG}");
+                        }
                         a.temporal.learning_rejected();
                     }
                     StoreOutcome::Done => *anchor = None,
@@ -871,7 +971,12 @@ mod macos_impl {
         Done,
     }
 
-    fn store_learned(app: &AppHandle, original: &str, corrected: &str) -> StoreOutcome {
+    fn store_learned(
+        app: &AppHandle,
+        original: &str,
+        corrected: &str,
+        language: Option<&str>,
+    ) -> StoreOutcome {
         let settings = crate::settings::get_settings(app);
         // Authoritative runtime gate: the user may have turned the feature (or
         // Experimental as a whole) off while this anchor was live.
@@ -887,7 +992,7 @@ mod macos_impl {
             warn!("capture: dictionary store not ready; discarding");
             return StoreOutcome::Done;
         };
-        let report = match manager.learn_from_edit(original, corrected, "capture") {
+        let report = match manager.learn_from_edit(original, corrected, "capture", language) {
             Ok(report) => report,
             Err(err) => {
                 warn!("capture: could not store learned pairs: {err}");
@@ -947,6 +1052,31 @@ mod tests {
         // "ab" (delete c) and "abx" (replace c) are equally close. Without
         // surrounding context there is no safe way to choose the edit span.
         assert_eq!(align_captured_edit("abc", "abx suffix", 0), None);
+    }
+
+    #[test]
+    fn alignment_keeps_a_fix_to_the_last_word() {
+        // From a real capture in Notes: the suffix anchor contains the edit,
+        // and the fallback tied "…asadón" with "…asadón.".
+        let pasted = "We're gonna eat some great lunch and then I'm gonna grab the SLN.";
+        let prefix = "notes: ";
+        let window = format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón.\nNext line");
+        let aligned = align_captured_edit(pasted, &window, prefix.encode_utf16().count());
+        assert_eq!(
+            aligned.as_deref(),
+            Some("We're gonna eat some great lunch and then I'm gonna grab the asadón.")
+        );
+        // At the very end of the field, too.
+        let window =
+            format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón.");
+        let aligned = align_captured_edit(pasted, &window, prefix.encode_utf16().count());
+        assert!(aligned.is_some_and(|text| text.ends_with("asadón.")));
+        // The final mark was removed: never borrow one from the next line.
+        let window = format!("{prefix}We're gonna eat some great lunch and then I'm gonna grab the asadón\nNext line.");
+        assert_eq!(
+            align_captured_edit(pasted, &window, prefix.encode_utf16().count()),
+            None
+        );
     }
 
     #[test]

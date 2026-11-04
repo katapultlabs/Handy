@@ -13,6 +13,8 @@ pub struct DictionaryRule {
     /// Lowercase alphanumeric words observed near an automatic correction.
     /// Empty for an explicit, globally applicable correction.
     pub context_words: Vec<String>,
+    /// Primary language subtag the rule applies to; empty for every language.
+    pub language: String,
 }
 
 #[derive(Default)]
@@ -96,7 +98,21 @@ impl DictionaryMatcher {
         self.rules.is_empty()
     }
 
+    /// True when some rule applies to one language only.
+    pub fn has_language_rules(&self) -> bool {
+        self.rules.iter().any(|rule| !rule.language.is_empty())
+    }
+
+    /// Applies every rule, whatever its language.
+    #[cfg(test)]
     pub fn apply(&self, text: &str) -> String {
+        self.apply_in(text, None)
+    }
+
+    /// Applies the rules for `language` and the rules for every language.
+    /// An unknown language (`None`) applies every rule.
+    pub fn apply_in(&self, text: &str, language: Option<&str>) -> String {
+        let language = language.map(crate::dictionary_store::language_key);
         let Some(matcher) = &self.matcher else {
             return text.to_string();
         };
@@ -119,6 +135,11 @@ impl DictionaryMatcher {
             }
             pattern_ends[index] = found.end();
             let rule = &self.rules[index];
+            if !rule.language.is_empty()
+                && language.as_ref().is_some_and(|code| *code != rule.language)
+            {
+                continue;
+            }
             let start = folded.orig_start(found.start());
             let end = folded.orig_end(found.end(), text);
             if !boundaries_ok(text, start, end, &rule.entry.wrong) {
@@ -179,7 +200,40 @@ mod tests {
                 case_mode: CaseMode::Exact,
             },
             context_words: context.iter().map(|word| (*word).into()).collect(),
+            language: String::new(),
         }
+    }
+
+    fn scoped(wrong: &str, right: &str, language: &str) -> DictionaryRule {
+        DictionaryRule {
+            language: language.into(),
+            ..rule(wrong, right, &[])
+        }
+    }
+
+    #[test]
+    fn language_rules_apply_only_in_their_language() {
+        let matcher = DictionaryMatcher::new(vec![
+            scoped("con", "Kahn", "en"),
+            rule("cloud code", "Claude Code", &[]),
+        ])
+        .unwrap();
+        assert!(matcher.has_language_rules());
+        assert_eq!(
+            matcher.apply_in("call con about cloud code", Some("en")),
+            "call Kahn about Claude Code"
+        );
+        // Region subtags and case do not matter.
+        assert_eq!(
+            matcher.apply_in("call con today", Some("EN-us")),
+            "call Kahn today"
+        );
+        assert_eq!(
+            matcher.apply_in("voy con María a cloud code", Some("es")),
+            "voy con María a Claude Code"
+        );
+        // Unknown language: every rule applies, as before languages existed.
+        assert_eq!(matcher.apply_in("call con", None), "call Kahn");
     }
 
     #[test]

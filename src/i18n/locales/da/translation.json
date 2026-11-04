@@ -739,7 +739,8 @@
         "added": "Foreslået: {{wrong}} → {{right}}",
         "undo": "Ignorer",
         "alreadyKnown": "Allerede gennemgået eller foreslået: {{wrong}} → {{right}}",
-        "autoAdded": "Lært: {{wrong}} → {{right}}"
+        "autoAdded": "Lært: {{wrong}} → {{right}}",
+        "learnedFor": "Lært for {{language}}: {{pairs}}"
       },
       "notTranscribed": "Ikke transskriberet. Du kan transskribere den ved hjælp af genforsøgsikonet.",
       "transcribeFile": "Transskriber fil",
@@ -966,7 +967,12 @@
       "review": "Gennemgå",
       "automatic": "Automatisk",
       "automaticHint": "Lært fra kendt ordforråd. Anvendes kun i nærheden af en matchende kontekst.",
-      "autoUndo": "Fortryd"
+      "autoUndo": "Fortryd",
+      "allLanguages": "Alle",
+      "anyLanguage": "Alle sprog",
+      "languageFilter": "Filtrer rettelser efter sprog",
+      "languageTitle": "Hvilket sprog denne rettelse gælder for",
+      "languageLabel": "Sprog for {{wrong}} → {{right}}"
     }
   },
   "footer": {

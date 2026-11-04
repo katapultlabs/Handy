@@ -739,7 +739,8 @@
         "added": "Voorgesteld: {{wrong}} → {{right}}",
         "undo": "Negeren",
         "alreadyKnown": "Al beoordeeld of voorgesteld: {{wrong}} → {{right}}",
-        "autoAdded": "Aangeleerd: {{wrong}} → {{right}}"
+        "autoAdded": "Aangeleerd: {{wrong}} → {{right}}",
+        "learnedFor": "Geleerd voor {{language}}: {{pairs}}"
       },
       "notTranscribed": "Niet getranscribeerd. Je kunt het transcriberen via het herlaad-pictogram.",
       "transcribeFile": "Bestand transcriberen",
@@ -966,7 +967,12 @@
       "review": "Beoordelen",
       "automatic": "Automatisch",
       "automaticHint": "Aangeleerd vanuit bekende woordenschat. Wordt alleen bij een overeenkomende context toegepast.",
-      "autoUndo": "Ongedaan maken"
+      "autoUndo": "Ongedaan maken",
+      "allLanguages": "Alle",
+      "anyLanguage": "Elke taal",
+      "languageFilter": "Correcties filteren op taal",
+      "languageTitle": "Voor welke taal deze correctie geldt",
+      "languageLabel": "Taal voor {{wrong}} → {{right}}"
     }
   },
   "footer": {

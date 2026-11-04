@@ -739,7 +739,8 @@
         "added": "Vorgeschlagen: {{wrong}} → {{right}}",
         "undo": "Ignorieren",
         "alreadyKnown": "Bereits geprüft oder vorgeschlagen: {{wrong}} → {{right}}",
-        "autoAdded": "Gelernt: {{wrong}} → {{right}}"
+        "autoAdded": "Gelernt: {{wrong}} → {{right}}",
+        "learnedFor": "Für {{language}} gelernt: {{pairs}}"
       },
       "notTranscribed": "Nicht transkribiert. Du kannst es über das Wiederholen-Symbol transkribieren.",
       "transcribeFile": "Datei transkribieren",
@@ -966,7 +967,12 @@
       "review": "Prüfen",
       "automatic": "Automatisch",
       "automaticHint": "Aus bekanntem Wortschatz gelernt. Wird nur bei passendem Kontext angewendet.",
-      "autoUndo": "Rückgängig"
+      "autoUndo": "Rückgängig",
+      "allLanguages": "Alle",
+      "anyLanguage": "Jede Sprache",
+      "languageFilter": "Korrekturen nach Sprache filtern",
+      "languageTitle": "Für welche Sprache diese Korrektur gilt",
+      "languageLabel": "Sprache für {{wrong}} → {{right}}"
     }
   },
   "footer": {

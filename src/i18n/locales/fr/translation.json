@@ -739,7 +739,8 @@
         "added": "Suggestion : {{wrong}} → {{right}}",
         "undo": "Ignorer",
         "alreadyKnown": "Déjà examinée ou suggérée : {{wrong}} → {{right}}",
-        "autoAdded": "Appris : {{wrong}} → {{right}}"
+        "autoAdded": "Appris : {{wrong}} → {{right}}",
+        "learnedFor": "Appris pour {{language}} : {{pairs}}"
       },
       "notTranscribed": "Non transcrit. Vous pouvez le transcrire en utilisant l'icône de réessai.",
       "transcribeFile": "Transcrire un fichier",
@@ -966,7 +967,12 @@
       "review": "Examiner",
       "automatic": "Automatique",
       "automaticHint": "Apprise à partir du vocabulaire connu. S'applique uniquement à proximité d'un contexte correspondant.",
-      "autoUndo": "Annuler"
+      "autoUndo": "Annuler",
+      "allLanguages": "Toutes",
+      "anyLanguage": "Toutes les langues",
+      "languageFilter": "Filtrer les corrections par langue",
+      "languageTitle": "Langue à laquelle s'applique cette correction",
+      "languageLabel": "Langue de {{wrong}} → {{right}}"
     }
   },
   "footer": {

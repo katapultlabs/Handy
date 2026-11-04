@@ -4,6 +4,8 @@ import { listen } from "@tauri-apps/api/event";
 import { Check, Pencil, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { commands, type DictionaryRow } from "@/bindings";
+import { useSettings } from "@/hooks/useSettings";
+import { languageName } from "@/lib/constants/languages";
 import { Button } from "../../ui/Button";
 import { Input } from "../../ui/Input";
 import { SettingsGroup } from "../../ui/SettingsGroup";
@@ -24,6 +26,13 @@ const SOURCE_KEYS: Record<string, string> = {
 
 const isActive = (row: DictionaryRow) => row.state === "active" && row.enabled;
 
+// The backend stores the primary subtag ("en-US" -> "en"); compare the same way.
+const languageKey = (code: string) => code.split(/[-_]/)[0].toLowerCase();
+
+// Language filter: every entry, entries for every language, or one language.
+const ALL = "all";
+const ANY = "any";
+
 /**
  * Top-level Dictionary section. Shown in the sidebar once the Dictionary is
  * turned on under Advanced -> Experimental. Entries live in SQLite; every
@@ -31,8 +40,10 @@ const isActive = (row: DictionaryRow) => row.state === "active" && row.enabled;
  * event tells this page to reload.
  */
 export const DictionarySettings: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { getSetting } = useSettings();
   const [rows, setRows] = useState<DictionaryRow[]>([]);
+  const [languageFilter, setLanguageFilter] = useState(ALL);
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
   const [wrong, setWrong] = useState("");
@@ -70,7 +81,7 @@ export const DictionarySettings: React.FC = () => {
     rightClean.length <= 80 &&
     !busy;
 
-  const visible = useMemo(() => {
+  const searched = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter(
@@ -78,6 +89,25 @@ export const DictionarySettings: React.FC = () => {
         e.wrong.toLowerCase().includes(q) || e.right.toLowerCase().includes(q),
     );
   }, [rows, query]);
+
+  // Language scope shows only for people who speak more than one language.
+  // The list also keeps a language an entry still uses after it was removed
+  // from the spoken languages.
+  const spoken = getSetting("spoken_languages") ?? [];
+  const showLanguages = spoken.length >= 2;
+  const languages = useMemo(() => {
+    const codes = new Set(spoken.map(languageKey));
+    for (const row of rows) if (row.language) codes.add(row.language);
+    return [...codes];
+  }, [spoken, rows]);
+  const matchesLanguage = (row: DictionaryRow, filter: string) =>
+    filter === ALL ||
+    (filter === ANY ? row.language === null : row.language === filter);
+
+  const visible =
+    showLanguages && languageFilter !== ALL
+      ? searched.filter((row) => matchesLanguage(row, languageFilter))
+      : searched;
 
   const suggested = visible.filter((row) => row.state === "proposed");
   const approved = visible.filter((row) => row.state === "active");
@@ -136,6 +166,14 @@ export const DictionarySettings: React.FC = () => {
 
   const handleRemove = (row: DictionaryRow) =>
     run(() => commands.deleteDictionaryEntry(row.id));
+
+  const handleSetLanguage = (row: DictionaryRow, language: string) =>
+    run(() =>
+      commands.setDictionaryEntryLanguage(
+        row.id,
+        language === ANY ? null : language,
+      ),
+    );
 
   const handleToggleActive = (row: DictionaryRow, active: boolean) =>
     run(() =>
@@ -253,6 +291,31 @@ export const DictionarySettings: React.FC = () => {
             <span className="font-medium">{row.right}</span>
           </span>
         )}
+        {showLanguages && !editing && (
+          <select
+            id={`dictionary-language-${row.id}`}
+            className={`shrink-0 text-xs font-medium rounded-md border px-1 py-0.5 cursor-pointer disabled:cursor-not-allowed ${
+              row.language
+                ? "border-logo-primary/60 bg-logo-primary/15"
+                : "border-line bg-wash"
+            }`}
+            value={row.language ?? ANY}
+            disabled={busy}
+            onChange={(e) => handleSetLanguage(row, e.target.value)}
+            title={t("settings.dictionary.languageTitle")}
+            aria-label={t("settings.dictionary.languageLabel", {
+              wrong: row.wrong,
+              right: row.right,
+            })}
+          >
+            <option value={ANY}>{t("settings.dictionary.anyLanguage")}</option>
+            {languages.map((code) => (
+              <option key={code} value={code}>
+                {languageName(code, i18n.language)}
+              </option>
+            ))}
+          </select>
+        )}
         <span className="shrink-0 text-xs text-text/50 rounded-md border border-mid-gray/20 px-1.5 py-0.5">
           {t(SOURCE_KEYS[row.source] ?? SOURCE_KEYS.manual)}
         </span>
@@ -365,6 +428,37 @@ export const DictionarySettings: React.FC = () => {
           variant="compact"
         />
       </div>
+
+      {showLanguages && (
+        <div
+          className="flex flex-wrap gap-1.5 px-1"
+          role="group"
+          aria-label={t("settings.dictionary.languageFilter")}
+        >
+          {[ALL, ...languages, ANY].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              aria-pressed={languageFilter === filter}
+              onClick={() => setLanguageFilter(filter)}
+              className={`text-xs rounded-full border px-2.5 py-1 cursor-pointer transition-colors ${
+                languageFilter === filter
+                  ? "border-logo-primary bg-logo-primary/20"
+                  : "border-line bg-wash hover:border-logo-primary"
+              }`}
+            >
+              {filter === ALL
+                ? t("settings.dictionary.allLanguages")
+                : filter === ANY
+                  ? t("settings.dictionary.anyLanguage")
+                  : languageName(filter, i18n.language)}
+              <span className="ms-1.5 text-ink-3 tabular-nums">
+                {searched.filter((row) => matchesLanguage(row, filter)).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <SettingsGroup
         title={t("settings.dictionary.suggestedGroup", {

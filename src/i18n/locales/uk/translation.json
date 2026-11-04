@@ -739,7 +739,8 @@
         "added": "Запропоновано: {{wrong}} → {{right}}",
         "undo": "Ігнорувати",
         "alreadyKnown": "Уже перевірено або запропоновано: {{wrong}} → {{right}}",
-        "autoAdded": "Вивчено: {{wrong}} → {{right}}"
+        "autoAdded": "Вивчено: {{wrong}} → {{right}}",
+        "learnedFor": "Вивчено для мови {{language}}: {{pairs}}"
       },
       "notTranscribed": "Не транскрибовано. Ви можете транскрибувати за допомогою іконки повтору.",
       "transcribeFile": "Розшифрувати файл",
@@ -966,7 +967,12 @@
       "review": "Перевірити",
       "automatic": "Автоматично",
       "automaticHint": "Вивчено з відомого словника. Застосовується лише поруч із відповідним контекстом.",
-      "autoUndo": "Скасувати"
+      "autoUndo": "Скасувати",
+      "allLanguages": "Усі",
+      "anyLanguage": "Будь-яка мова",
+      "languageFilter": "Фільтр виправлень за мовою",
+      "languageTitle": "До якої мови застосовується це виправлення",
+      "languageLabel": "Мова для {{wrong}} → {{right}}"
     }
   },
   "footer": {

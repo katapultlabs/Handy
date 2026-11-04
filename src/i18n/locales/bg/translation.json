@@ -739,7 +739,8 @@
         "added": "Предложено: {{wrong}} → {{right}}",
         "undo": "Игнориране",
         "alreadyKnown": "Вече е прегледано или предложено: {{wrong}} → {{right}}",
-        "autoAdded": "Научено: {{wrong}} → {{right}}"
+        "autoAdded": "Научено: {{wrong}} → {{right}}",
+        "learnedFor": "Научено за {{language}}: {{pairs}}"
       },
       "notTranscribed": "Не е транскрибирано. Можете да го транскрибирате с иконата за повторен опит.",
       "transcribeFile": "Транскрибиране на файл",
@@ -966,7 +967,12 @@
       "review": "Преглед",
       "automatic": "Автоматично",
       "automaticHint": "Научено от познат речник. Прилага се само близо до съответстващ контекст.",
-      "autoUndo": "Отмяна"
+      "autoUndo": "Отмяна",
+      "allLanguages": "Всички",
+      "anyLanguage": "Всеки език",
+      "languageFilter": "Филтриране на корекциите по език",
+      "languageTitle": "За кой език важи тази корекция",
+      "languageLabel": "Език за {{wrong}} → {{right}}"
     }
   },
   "footer": {

@@ -764,6 +764,7 @@ pub fn run(cli_args: CliArgs) {
             commands::dictionary::confirm_dictionary_entry,
             commands::dictionary::reject_dictionary_entry,
             commands::dictionary::learn_dictionary_from_edit,
+            commands::dictionary::set_dictionary_entry_language,
             correction_notices::get_correction_notice,
             correction_notices::acknowledge_correction_notice,
             correction_notices::pause_correction_notice,
