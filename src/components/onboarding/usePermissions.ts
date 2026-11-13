@@ -232,7 +232,9 @@ export const usePermissions = (preview: boolean): Permissions => {
   const requestAccessibility = async () => {
     if (preview) return;
     try {
-      // Fork: System Settings with the drag-to-add tile, not the bare prompt.
+      // A stale grant from an earlier signature hides the real state; clear it
+      // first. Fork: then System Settings with the drag-to-add tile.
+      await commands.resetMacosPermission("accessibility");
       await openAccessibilitySetup();
       setAccessibility("waiting");
       startPolling();
@@ -249,6 +251,7 @@ export const usePermissions = (preview: boolean): Permissions => {
       if (isWindows || microphoneAsked)
         await commands.openMicrophonePrivacySettings();
       else {
+        if (isMacOS) await commands.resetMacosPermission("microphone");
         await requestMicrophonePermission();
         // A prompt takes focus from Handy; still in front a moment later
         // means there was none (denied before), so go back to asking.
