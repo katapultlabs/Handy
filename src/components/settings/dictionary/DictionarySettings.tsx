@@ -381,31 +381,31 @@ export const DictionarySettings: React.FC = () => {
                   {t("settings.dictionary.approve")}
                 </Button>
               )}
-              {row.state !== "rejected" &&
-                (approved && row.source === "manual" ? (
-                  <button
-                    onClick={() => handleRemove(row)}
-                    disabled={busy}
-                    className={iconButton}
-                    title={t("settings.advanced.dictionary.remove", row)}
-                    aria-label={t("settings.advanced.dictionary.remove", row)}
-                  >
-                    <Trash2 width={16} height={16} />
-                  </button>
-                ) : (
-                  <Button
-                    onClick={() => handleIgnore(row)}
-                    disabled={busy}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    {t(
-                      row.auto_learned && approved
-                        ? "settings.dictionary.autoUndo"
-                        : "settings.dictionary.ignore",
-                    )}
-                  </Button>
-                ))}
+              {/* Ignore keeps a learned pair so it is never suggested
+                  again; the trash deletes any entry. */}
+              {row.state !== "rejected" && row.source !== "manual" && (
+                <Button
+                  onClick={() => handleIgnore(row)}
+                  disabled={busy}
+                  variant="ghost"
+                  size="sm"
+                >
+                  {t(
+                    row.auto_learned && approved
+                      ? "settings.dictionary.autoUndo"
+                      : "settings.dictionary.ignore",
+                  )}
+                </Button>
+              )}
+              <button
+                onClick={() => handleRemove(row)}
+                disabled={busy}
+                className={iconButton}
+                title={t("settings.advanced.dictionary.remove", row)}
+                aria-label={t("settings.advanced.dictionary.remove", row)}
+              >
+                <Trash2 width={16} height={16} />
+              </button>
             </>
           )}
         </div>
