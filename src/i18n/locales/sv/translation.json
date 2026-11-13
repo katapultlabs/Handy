@@ -22,7 +22,8 @@
     "history": "Historik",
     "debug": "Felsökning",
     "about": "Om",
-    "dictionary": "Ordbok"
+    "dictionary": "Ordbok",
+    "dictionaryWaiting": "Förslag som väntar på godkännande: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Stöds inte officiellt",

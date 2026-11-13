@@ -22,7 +22,8 @@
     "history": "Historia",
     "debug": "Debugowanie",
     "about": "O programie",
-    "dictionary": "Słownik"
+    "dictionary": "Słownik",
+    "dictionaryWaiting": "Sugestie czekające na akceptację: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Nieoficjalnie wspierane",

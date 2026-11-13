@@ -22,7 +22,8 @@
     "history": "История",
     "debug": "Отладка",
     "about": "О программе",
-    "dictionary": "Словарь"
+    "dictionary": "Словарь",
+    "dictionaryWaiting": "Предложения ждут подтверждения: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Официально не поддерживается",

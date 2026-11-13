@@ -22,7 +22,8 @@
     "history": "Lịch sử",
     "debug": "Gỡ lỗi",
     "about": "Giới thiệu",
-    "dictionary": "Từ điển"
+    "dictionary": "Từ điển",
+    "dictionaryWaiting": "Gợi ý đang chờ duyệt: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Không được hỗ trợ chính thức",

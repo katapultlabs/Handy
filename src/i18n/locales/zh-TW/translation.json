@@ -22,7 +22,8 @@
     "history": "歷史紀錄",
     "debug": "偵錯",
     "about": "關於",
-    "dictionary": "字典"
+    "dictionary": "字典",
+    "dictionaryWaiting": "等待確認的建議：{{count}}"
   },
   "onboarding": {
     "customModelDescription": "官方不支援",

@@ -22,7 +22,8 @@
     "history": "히스토리",
     "debug": "디버그",
     "about": "정보",
-    "dictionary": "사전"
+    "dictionary": "사전",
+    "dictionaryWaiting": "승인 대기 중인 제안: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "공식 지원되지 않음",

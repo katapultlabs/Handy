@@ -22,7 +22,8 @@
     "history": "Geschiedenis",
     "debug": "Probleemoplossing",
     "about": "Over Handy",
-    "dictionary": "Woordenboek"
+    "dictionary": "Woordenboek",
+    "dictionaryWaiting": "Suggesties die op goedkeuring wachten: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Niet officieel ondersteund",

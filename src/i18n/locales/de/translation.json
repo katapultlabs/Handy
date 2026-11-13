@@ -22,7 +22,8 @@
     "history": "Verlauf",
     "debug": "Debug",
     "about": "Info",
-    "dictionary": "Wörterbuch"
+    "dictionary": "Wörterbuch",
+    "dictionaryWaiting": "Vorschläge, die auf Freigabe warten: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Nicht offiziell unterstützt",

@@ -22,7 +22,8 @@
     "history": "History",
     "debug": "Debug",
     "about": "About",
-    "dictionary": "Dictionary"
+    "dictionary": "Dictionary",
+    "dictionaryWaiting": "Suggestions waiting for approval: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Not officially supported",

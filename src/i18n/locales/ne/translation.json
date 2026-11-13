@@ -22,7 +22,8 @@
     "history": "हिस्ट्री",
     "debug": "डिबग",
     "about": "बारेमा",
-    "dictionary": "शब्दकोश"
+    "dictionary": "शब्दकोश",
+    "dictionaryWaiting": "स्वीकृतिको पर्खाइमा सुझावहरू: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "आधिकारिक रूपमा समर्थित छैन",

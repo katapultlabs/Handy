@@ -22,7 +22,8 @@
     "history": "Historik",
     "debug": "Fejlfinding",
     "about": "Om",
-    "dictionary": "Ordbog"
+    "dictionary": "Ordbog",
+    "dictionaryWaiting": "Forslag, der venter på godkendelse: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Ikke officielt understøttet",

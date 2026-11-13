@@ -109,7 +109,10 @@ export const DictionarySettings: React.FC = () => {
       ? searched.filter((row) => matchesLanguage(row, languageFilter))
       : searched;
 
-  const suggested = visible.filter((row) => row.state === "proposed");
+  // The pair corrected most often first: it is the one most worth approving.
+  const suggested = visible
+    .filter((row) => row.state === "proposed")
+    .sort((a, b) => b.seen_count - a.seen_count || b.updated_at - a.updated_at);
   const approved = visible.filter((row) => row.state === "active");
   const ignored = visible.filter((row) => row.state === "rejected");
 

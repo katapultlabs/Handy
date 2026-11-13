@@ -22,7 +22,8 @@
     "history": "Historial",
     "debug": "Depuració",
     "about": "Quant a",
-    "dictionary": "Diccionari"
+    "dictionary": "Diccionari",
+    "dictionaryWaiting": "Suggeriments pendents d'aprovació: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Sense suport oficial",

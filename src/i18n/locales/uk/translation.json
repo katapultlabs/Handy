@@ -22,7 +22,8 @@
     "history": "Історія",
     "debug": "Дебаг",
     "about": "Інфо",
-    "dictionary": "Словник"
+    "dictionary": "Словник",
+    "dictionaryWaiting": "Пропозиції чекають на схвалення: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Офіційно не підтримується",

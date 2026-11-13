@@ -22,7 +22,8 @@
     "history": "履歴",
     "debug": "デバッグ",
     "about": "概要",
-    "dictionary": "辞書"
+    "dictionary": "辞書",
+    "dictionaryWaiting": "承認待ちの提案: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "公式サポート対象外",

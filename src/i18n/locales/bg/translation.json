@@ -22,7 +22,8 @@
     "history": "История",
     "debug": "Отстраняване",
     "about": "За приложението",
-    "dictionary": "Речник"
+    "dictionary": "Речник",
+    "dictionaryWaiting": "Предложения, чакащи одобрение: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Не се поддържа официално",

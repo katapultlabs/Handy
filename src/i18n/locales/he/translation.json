@@ -22,7 +22,8 @@
     "history": "היסטוריה",
     "debug": "ניפוי שגיאות",
     "about": "אודות",
-    "dictionary": "מילון"
+    "dictionary": "מילון",
+    "dictionaryWaiting": "הצעות שממתינות לאישור: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "לא נתמך באופן רשמי",

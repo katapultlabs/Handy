@@ -22,7 +22,8 @@
     "history": "Historie",
     "debug": "Ladění",
     "about": "O aplikaci",
-    "dictionary": "Slovník"
+    "dictionary": "Slovník",
+    "dictionaryWaiting": "Návrhy čekající na schválení: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Oficiálně nepodporováno",

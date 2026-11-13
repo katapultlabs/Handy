@@ -18,6 +18,7 @@
     "general": "عام",
     "models": "النماذج",
     "dictionary": "القاموس",
+    "dictionaryWaiting": "اقتراحات بانتظار الموافقة: {{count}}",
     "advanced": "متقدم",
     "postProcessing": "معالجة لاحقة",
     "history": "السجل",

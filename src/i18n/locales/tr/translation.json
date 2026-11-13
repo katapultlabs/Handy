@@ -22,7 +22,8 @@
     "history": "Geçmiş",
     "debug": "Hata Ayıklama",
     "about": "Hakkında",
-    "dictionary": "Sözlük"
+    "dictionary": "Sözlük",
+    "dictionaryWaiting": "Onay bekleyen öneriler: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Resmi olarak desteklenmiyor",

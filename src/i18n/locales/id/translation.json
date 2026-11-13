@@ -22,7 +22,8 @@
     "history": "Riwayat",
     "debug": "Debug",
     "about": "Tentang",
-    "dictionary": "Kamus"
+    "dictionary": "Kamus",
+    "dictionaryWaiting": "Saran menunggu persetujuan: {{count}}"
   },
   "onboarding": {
     "customModelDescription": "Tidak didukung secara resmi",
