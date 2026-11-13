@@ -747,7 +747,10 @@
         "undo": "Yok say",
         "alreadyKnown": "Zaten incelendi veya önerildi: {{wrong}} → {{right}}",
         "autoAdded": "Öğrenildi: {{wrong}} → {{right}}",
-        "learnedFor": "{{language}} için öğrenildi: {{pairs}}"
+        "learnedFor": "{{language}} için öğrenildi: {{pairs}}",
+        "waiting": "Onayınızı bekliyor: {{pairs}}",
+        "approved": "Artık her zaman değiştiriliyor: {{pairs}}",
+        "learned": "Öğrenildi: {{pairs}}"
       },
       "notTranscribed": "Transkribe edilmedi. Yeniden deneme simgesini kullanarak transkribe edebilirsiniz.",
       "transcribeFile": "Dosyayı Yazıya Dök",

@@ -782,7 +782,10 @@
         "undo": "تجاهل",
         "alreadyKnown": "تمت مراجعته أو اقتراحه بالفعل: {{wrong}} → {{right}}",
         "autoAdded": "تم التعلّم: {{wrong}} → {{right}}",
-        "learnedFor": "تم التعلّم لـ {{language}}: {{pairs}}"
+        "learnedFor": "تم التعلّم لـ {{language}}: {{pairs}}",
+        "waiting": "بانتظار موافقتك: {{pairs}}",
+        "approved": "يُستبدل دائمًا الآن: {{pairs}}",
+        "learned": "تم التعلّم: {{pairs}}"
       },
       "notTranscribed": "لم يتم النسخ. يمكنك نسخه باستخدام أيقونة إعادة المحاولة.",
       "transcribeFile": "نسخ ملف",

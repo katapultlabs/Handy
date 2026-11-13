@@ -747,7 +747,10 @@
         "undo": "Ignorera",
         "alreadyKnown": "Redan granskat eller föreslaget: {{wrong}} → {{right}}",
         "autoAdded": "Inlärt: {{wrong}} → {{right}}",
-        "learnedFor": "Inlärt för {{language}}: {{pairs}}"
+        "learnedFor": "Inlärt för {{language}}: {{pairs}}",
+        "waiting": "Väntar på ditt godkännande: {{pairs}}",
+        "approved": "Ersätts nu alltid: {{pairs}}",
+        "learned": "Inlärt: {{pairs}}"
       },
       "notTranscribed": "Inte transkriberad. Du kan transkribera den med hjälp av ikonen för nytt försök.",
       "transcribeFile": "Transkribera fil",

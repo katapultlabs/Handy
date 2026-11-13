@@ -24,6 +24,7 @@ import { notify } from "@/stores/noticeStore";
 import {
   commands,
   events,
+  type DictionaryRow,
   type HistoryEntry,
   type HistoryUpdatePayload,
 } from "@/bindings";
@@ -470,14 +471,34 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   // not the raw transcription — otherwise applied corrections re-learn.
   const pastedText = entry.post_processed_text ?? entry.transcription_text;
   const [draft, setDraft] = useState("");
-  // What the last save learned, shown under the entry for a moment. Notices
-  // are only for errors and warnings.
-  const [learnNote, setLearnNote] = useState<string | null>(null);
+  // What the last save did, shown under the entry. Notices are only for
+  // errors and warnings. A pair that waits for approval keeps its line and an
+  // "Always replace" button: re-learning a pair never promotes it, so without
+  // the button a correction the user made again would seem to do nothing.
+  const [learnNote, setLearnNote] = useState<{
+    text: string;
+    approve?: { ids: number[]; pairs: string };
+  } | null>(null);
   useEffect(() => {
-    if (!learnNote) return;
+    if (!learnNote || learnNote.approve) return;
     const timer = setTimeout(() => setLearnNote(null), LEARN_NOTE_MS);
     return () => clearTimeout(timer);
   }, [learnNote]);
+
+  const approveLearned = async (ids: number[], pairs: string) => {
+    try {
+      for (const id of ids) {
+        const result = await commands.confirmDictionaryEntry(id);
+        if (result.status !== "ok") throw new Error(result.error);
+      }
+      setLearnNote({
+        text: t("settings.history.dictionary.approved", { pairs }),
+      });
+    } catch (error) {
+      console.error("Failed to approve learned pairs:", error);
+      notify({ title: t("settings.dictionary.actionError") });
+    }
+  };
 
   const startEdit = () => {
     setDraft(pastedText);
@@ -512,19 +533,46 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
         return;
       }
       const { added, known } = result.data;
+      const pairList = (rows: DictionaryRow[]) =>
+        rows.map((row) => `${row.wrong} → ${row.right}`).join(", ");
+      // New suggestions, earlier suggestions, and pairs once ignored.
+      const pending = [...added, ...known].filter(
+        (row) => row.state !== "active",
+      );
+      const learned = added.filter((row) => row.state === "active");
       if (added.length === 0 && known.length === 0) {
-        setLearnNote(t("settings.history.dictionary.nothingLearned"));
-      } else if (
-        added[0]?.language &&
-        (getSetting("spoken_languages") ?? []).length >= 2
-      ) {
-        // The backend detects the language when the entry has none.
-        setLearnNote(
-          t("settings.history.dictionary.learnedFor", {
-            language: languageName(added[0].language, i18n.language),
-            pairs: added.map((row) => `${row.wrong} → ${row.right}`).join(", "),
+        setLearnNote({ text: t("settings.history.dictionary.nothingLearned") });
+      } else if (pending.length > 0) {
+        setLearnNote({
+          text: t("settings.history.dictionary.waiting", {
+            pairs: pairList(pending),
           }),
-        );
+          approve: {
+            ids: pending.map((row) => row.id),
+            pairs: pairList(pending),
+          },
+        });
+      } else if (learned.length > 0) {
+        // The backend detects the language when the entry has none.
+        const language = learned[0].language;
+        setLearnNote({
+          text:
+            language && (getSetting("spoken_languages") ?? []).length >= 2
+              ? t("settings.history.dictionary.learnedFor", {
+                  language: languageName(language, i18n.language),
+                  pairs: pairList(learned),
+                })
+              : t("settings.history.dictionary.learned", {
+                  pairs: pairList(learned),
+                }),
+        });
+      } else {
+        setLearnNote({
+          text: t("settings.history.dictionary.alreadyKnown", {
+            wrong: known[0].wrong,
+            right: known[0].right,
+          }),
+        });
       }
     } catch (error) {
       console.error("Failed to learn from edit:", error);
@@ -723,9 +771,24 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       )}
 
       {learnNote && (
-        <p className="text-xs text-ink-3" role="status">
-          {learnNote}
-        </p>
+        <div className="flex flex-wrap items-center gap-2" role="status">
+          <p className="text-xs text-ink-3">{learnNote.text}</p>
+          {learnNote.approve && (
+            <Button
+              variant="primary-soft"
+              size="sm"
+              onClick={() => {
+                const { ids, pairs } = learnNote.approve ?? {
+                  ids: [],
+                  pairs: "",
+                };
+                void approveLearned(ids, pairs);
+              }}
+            >
+              {t("settings.dictionary.approve")}
+            </Button>
+          )}
+        </div>
       )}
 
       <AudioPlayer onLoadRequest={handleLoadAudio} className="w-full" />

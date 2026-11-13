@@ -747,7 +747,10 @@
         "undo": "無視",
         "alreadyKnown": "確認済みまたは提案済み: {{wrong}} → {{right}}",
         "autoAdded": "学習済み: {{wrong}} → {{right}}",
-        "learnedFor": "{{language}}用に学習しました: {{pairs}}"
+        "learnedFor": "{{language}}用に学習しました: {{pairs}}",
+        "waiting": "承認待ち: {{pairs}}",
+        "approved": "今後は常に置き換え: {{pairs}}",
+        "learned": "学習しました: {{pairs}}"
       },
       "notTranscribed": "文字起こしされていません。リトライアイコンを使用して文字起こしできます。",
       "transcribeFile": "ファイルを文字起こし",

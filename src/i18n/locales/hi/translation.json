@@ -747,7 +747,10 @@
         "undo": "नज़रअंदाज़ करें",
         "alreadyKnown": "पहले ही समीक्षा की गई या सुझाया गया: {{wrong}} → {{right}}",
         "autoAdded": "सीखा गया: {{wrong}} → {{right}}",
-        "learnedFor": "{{language}} के लिए सीखा गया: {{pairs}}"
+        "learnedFor": "{{language}} के लिए सीखा गया: {{pairs}}",
+        "waiting": "आपकी स्वीकृति की प्रतीक्षा: {{pairs}}",
+        "approved": "अब हमेशा बदला जाएगा: {{pairs}}",
+        "learned": "सीखा गया: {{pairs}}"
       },
       "notTranscribed": "ट्रांसक्राइब नहीं हुआ. आप रीट्राई आइकन से इसे ट्रांसक्राइब कर सकते हैं.",
       "transcribeFile": "फ़ाइल ट्रांसक्राइब करें",

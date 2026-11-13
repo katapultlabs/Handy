@@ -747,7 +747,10 @@
         "undo": "Negeren",
         "alreadyKnown": "Al beoordeeld of voorgesteld: {{wrong}} → {{right}}",
         "autoAdded": "Aangeleerd: {{wrong}} → {{right}}",
-        "learnedFor": "Geleerd voor {{language}}: {{pairs}}"
+        "learnedFor": "Geleerd voor {{language}}: {{pairs}}",
+        "waiting": "Wacht op je goedkeuring: {{pairs}}",
+        "approved": "Wordt nu altijd vervangen: {{pairs}}",
+        "learned": "Geleerd: {{pairs}}"
       },
       "notTranscribed": "Niet getranscribeerd. Je kunt het transcriberen via het herlaad-pictogram.",
       "transcribeFile": "Bestand transcriberen",

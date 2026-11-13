@@ -747,7 +747,10 @@
         "undo": "Abaikan",
         "alreadyKnown": "Sudah ditinjau atau disarankan: {{wrong}} → {{right}}",
         "autoAdded": "Dipelajari: {{wrong}} → {{right}}",
-        "learnedFor": "Dipelajari untuk {{language}}: {{pairs}}"
+        "learnedFor": "Dipelajari untuk {{language}}: {{pairs}}",
+        "waiting": "Menunggu persetujuan Anda: {{pairs}}",
+        "approved": "Sekarang selalu diganti: {{pairs}}",
+        "learned": "Dipelajari: {{pairs}}"
       },
       "notTranscribed": "Belum ditranskripsikan. Anda dapat mentranskripsikannya menggunakan ikon coba lagi.",
       "transcribeFile": "Transkripsikan File",

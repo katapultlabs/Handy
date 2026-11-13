@@ -747,7 +747,10 @@
         "undo": "Игнорировать",
         "alreadyKnown": "Уже проверено или предложено: {{wrong}} → {{right}}",
         "autoAdded": "Изучено: {{wrong}} → {{right}}",
-        "learnedFor": "Выучено для языка {{language}}: {{pairs}}"
+        "learnedFor": "Выучено для языка {{language}}: {{pairs}}",
+        "waiting": "Ждёт вашего подтверждения: {{pairs}}",
+        "approved": "Теперь всегда заменяется: {{pairs}}",
+        "learned": "Выучено: {{pairs}}"
       },
       "notTranscribed": "Не транскрибировано. Вы можете транскрибировать, используя значок повтора.",
       "transcribeFile": "Расшифровать файл",

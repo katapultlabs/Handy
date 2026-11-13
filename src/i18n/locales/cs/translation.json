@@ -747,7 +747,10 @@
         "undo": "Ignorovat",
         "alreadyKnown": "Již zkontrolováno nebo navrženo: {{wrong}} → {{right}}",
         "autoAdded": "Naučeno: {{wrong}} → {{right}}",
-        "learnedFor": "Naučeno pro {{language}}: {{pairs}}"
+        "learnedFor": "Naučeno pro {{language}}: {{pairs}}",
+        "waiting": "Čeká na vaše schválení: {{pairs}}",
+        "approved": "Nyní se vždy nahrazuje: {{pairs}}",
+        "learned": "Naučeno: {{pairs}}"
       },
       "notTranscribed": "Nepřepsáno. Můžete to přepsat pomocí ikony opakování.",
       "transcribeFile": "Přepsat soubor",

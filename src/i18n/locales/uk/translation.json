@@ -747,7 +747,10 @@
         "undo": "Ігнорувати",
         "alreadyKnown": "Уже перевірено або запропоновано: {{wrong}} → {{right}}",
         "autoAdded": "Вивчено: {{wrong}} → {{right}}",
-        "learnedFor": "Вивчено для мови {{language}}: {{pairs}}"
+        "learnedFor": "Вивчено для мови {{language}}: {{pairs}}",
+        "waiting": "Очікує вашого схвалення: {{pairs}}",
+        "approved": "Тепер завжди замінюється: {{pairs}}",
+        "learned": "Вивчено: {{pairs}}"
       },
       "notTranscribed": "Не транскрибовано. Ви можете транскрибувати за допомогою іконки повтору.",
       "transcribeFile": "Розшифрувати файл",

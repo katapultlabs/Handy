@@ -747,7 +747,10 @@
         "undo": "Ignorer",
         "alreadyKnown": "Allerede gennemgået eller foreslået: {{wrong}} → {{right}}",
         "autoAdded": "Lært: {{wrong}} → {{right}}",
-        "learnedFor": "Lært for {{language}}: {{pairs}}"
+        "learnedFor": "Lært for {{language}}: {{pairs}}",
+        "waiting": "Venter på din godkendelse: {{pairs}}",
+        "approved": "Erstattes nu altid: {{pairs}}",
+        "learned": "Lært: {{pairs}}"
       },
       "notTranscribed": "Ikke transskriberet. Du kan transskribere den ved hjælp af genforsøgsikonet.",
       "transcribeFile": "Transskriber fil",

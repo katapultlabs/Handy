@@ -747,7 +747,10 @@
         "undo": "忽略",
         "alreadyKnown": "已查看或建议：{{wrong}} → {{right}}",
         "autoAdded": "已学习：{{wrong}} → {{right}}",
-        "learnedFor": "已为{{language}}学习：{{pairs}}"
+        "learnedFor": "已为{{language}}学习：{{pairs}}",
+        "waiting": "等待你的确认：{{pairs}}",
+        "approved": "现在总是替换：{{pairs}}",
+        "learned": "已学习：{{pairs}}"
       },
       "notTranscribed": "尚未转录。您可以使用重试图标进行转录。",
       "transcribeFile": "转录文件",

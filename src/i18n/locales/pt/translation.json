@@ -747,7 +747,10 @@
         "undo": "Ignorar",
         "alreadyKnown": "Já analisado ou sugerido: {{wrong}} → {{right}}",
         "autoAdded": "Aprendida: {{wrong}} → {{right}}",
-        "learnedFor": "Aprendido para {{language}}: {{pairs}}"
+        "learnedFor": "Aprendido para {{language}}: {{pairs}}",
+        "waiting": "Aguardando sua aprovação: {{pairs}}",
+        "approved": "Agora sempre substituído: {{pairs}}",
+        "learned": "Aprendido: {{pairs}}"
       },
       "notTranscribed": "Não transcrito. Você pode transcrevê-lo usando o ícone de tentar novamente.",
       "transcribeFile": "Transcrever arquivo",

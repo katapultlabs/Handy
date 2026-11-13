@@ -747,7 +747,10 @@
         "undo": "Игнориране",
         "alreadyKnown": "Вече е прегледано или предложено: {{wrong}} → {{right}}",
         "autoAdded": "Научено: {{wrong}} → {{right}}",
-        "learnedFor": "Научено за {{language}}: {{pairs}}"
+        "learnedFor": "Научено за {{language}}: {{pairs}}",
+        "waiting": "Очаква вашето одобрение: {{pairs}}",
+        "approved": "Вече винаги се заменя: {{pairs}}",
+        "learned": "Научено: {{pairs}}"
       },
       "notTranscribed": "Не е транскрибирано. Можете да го транскрибирате с иконата за повторен опит.",
       "transcribeFile": "Транскрибиране на файл",

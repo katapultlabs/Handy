@@ -747,7 +747,10 @@
         "undo": "Ignore",
         "alreadyKnown": "Already reviewed or suggested: {{wrong}} → {{right}}",
         "autoAdded": "Learned: {{wrong}} → {{right}}",
-        "learnedFor": "Learned for {{language}}: {{pairs}}"
+        "learnedFor": "Learned for {{language}}: {{pairs}}",
+        "waiting": "Waiting for your approval: {{pairs}}",
+        "approved": "Now always replaced: {{pairs}}",
+        "learned": "Learned: {{pairs}}"
       },
       "notTranscribed": "Not transcribed. You can transcribe it using the retry icon.",
       "transcribeFile": "Transcribe File",

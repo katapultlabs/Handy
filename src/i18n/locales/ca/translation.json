@@ -747,7 +747,10 @@
         "undo": "Ignora",
         "alreadyKnown": "Ja s'ha revisat o suggerit: {{wrong}} → {{right}}",
         "autoAdded": "Apresa: {{wrong}} → {{right}}",
-        "learnedFor": "Après per a {{language}}: {{pairs}}"
+        "learnedFor": "Après per a {{language}}: {{pairs}}",
+        "waiting": "Pendent de la teva aprovació: {{pairs}}",
+        "approved": "Ara sempre es reemplaça: {{pairs}}",
+        "learned": "Après: {{pairs}}"
       },
       "notTranscribed": "No s'ha transcrit. Podeu transcriure-ho amb la icona de reintent.",
       "transcribeFile": "Transcriu un fitxer",

@@ -747,7 +747,10 @@
         "undo": "התעלם",
         "alreadyKnown": "כבר נבדק או הוצע: {{wrong}} → {{right}}",
         "autoAdded": "נלמד: {{wrong}} → {{right}}",
-        "learnedFor": "נלמד עבור {{language}}: {{pairs}}"
+        "learnedFor": "נלמד עבור {{language}}: {{pairs}}",
+        "waiting": "ממתין לאישורך: {{pairs}}",
+        "approved": "מעכשיו מוחלף תמיד: {{pairs}}",
+        "learned": "נלמד: {{pairs}}"
       },
       "notTranscribed": "לא תומלל. אפשר לתמלל באמצעות אייקון הניסיון החוזר.",
       "transcribeFile": "תמלול קובץ",
