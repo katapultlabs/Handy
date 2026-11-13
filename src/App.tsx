@@ -36,6 +36,8 @@ import { QuitPrompt } from "./components/quit-prompt/QuitPrompt";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useUiStore } from "./stores/uiStore";
+import { notify } from "./stores/noticeStore";
+import { pickAndTranscribeFiles } from "./components/settings/history/transcribeFiles";
 import { commands } from "@/bindings";
 import { deleteRetiredModel } from "@/lib/models/retired";
 import { NoticePanel } from "@/components/notices/NoticePanel";
@@ -116,6 +118,22 @@ function App() {
 
   // Tray: "Correct Last Transcript" navigates to History and opens the
   // newest entry in edit mode (HistorySettings consumes the flag).
+  // Menu bar: File → Transcribe File… opens the picker in History.
+  useEffect(() => {
+    const unlisten = listen("menu-transcribe-file", async () => {
+      setCurrentSection("history");
+      try {
+        await pickAndTranscribeFiles();
+      } catch (error) {
+        console.error("Failed to pick a file to transcribe:", error);
+        notify({ title: t("settings.history.transcribeFailed") });
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [t]);
+
   useEffect(() => {
     const unlisten = listen("correct-last-transcript", () => {
       useUiStore.getState().requestCorrectLatest();

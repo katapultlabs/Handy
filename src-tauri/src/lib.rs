@@ -983,8 +983,11 @@ pub fn run(cli_args: CliArgs) {
             .plugin(tauri_plugin_drag::init())
             .menu(quit_shortcut::build_app_menu)
             .on_menu_event(|app, event| {
-                if event.id().as_ref() == quit_shortcut::QUIT_MENU_ID {
+                let id = event.id().as_ref();
+                if id == quit_shortcut::QUIT_MENU_ID {
                     quit_shortcut::handle_quit_shortcut(app);
+                } else if id == quit_shortcut::TRANSCRIBE_FILE_MENU_ID {
+                    quit_shortcut::handle_transcribe_file(app);
                 }
             });
     }

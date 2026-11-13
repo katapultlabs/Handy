@@ -1173,6 +1173,7 @@ mod tests {
             hold_threshold: TAP_THRESHOLD,
             external: false,
             double_tap_lock,
+            received_at: Instant::now(),
         }
     }
 
