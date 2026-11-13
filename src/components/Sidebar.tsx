@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { listen } from "@tauri-apps/api/event";
+import { commands } from "@/bindings";
 import {
   BookA,
   Cog,
@@ -100,12 +102,42 @@ interface SidebarProps {
   onSectionChange: (section: SidebarSection) => void;
 }
 
+// Learned pairs waiting in Suggested. They never apply until approved, so the
+// sidebar shows how many there are instead of letting them pile up unseen.
+const useDictionarySuggestionCount = (enabled: boolean) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!enabled) {
+      setCount(0);
+      return;
+    }
+    let disposed = false;
+    const refresh = async () => {
+      const result = await commands.listDictionaryEntries();
+      if (!disposed && result.status === "ok") {
+        setCount(result.data.filter((row) => row.state === "proposed").length);
+      }
+    };
+    void refresh();
+    const unlisten = listen("dictionary-entries-changed", () => void refresh());
+    return () => {
+      disposed = true;
+      unlisten.then((fn) => fn());
+    };
+  }, [enabled]);
+  return count;
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
   activeSection,
   onSectionChange,
 }) => {
   const { t } = useTranslation();
   const { settings } = useSettings();
+
+  const suggestionCount = useDictionarySuggestionCount(
+    SECTIONS_CONFIG.dictionary.enabled(settings),
+  );
 
   const availableSections = Object.entries(SECTIONS_CONFIG)
     .filter(([_, config]) => config.enabled(settings))
@@ -136,6 +168,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 {t(section.labelKey)}
               </p>
+              {section.id === "dictionary" && suggestionCount > 0 && (
+                <span
+                  className="ms-auto shrink-0 rounded-full bg-logo-primary/30 px-1.5 text-xs font-medium tabular-nums"
+                  title={t("sidebar.dictionaryWaiting", {
+                    count: suggestionCount,
+                  })}
+                  aria-label={t("sidebar.dictionaryWaiting", {
+                    count: suggestionCount,
+                  })}
+                >
+                  {suggestionCount}
+                </span>
+              )}
             </div>
           );
         })}

@@ -7,7 +7,7 @@ import {
   checkMicrophonePermission,
   requestMicrophonePermission,
 } from "tauri-plugin-macos-permissions-api";
-import { toast } from "sonner";
+import { notify } from "@/stores/noticeStore";
 import { commands } from "@/bindings";
 import { openAccessibilitySetup } from "@/lib/accessibilitySetup";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -120,7 +120,7 @@ export const usePermissions = (preview: boolean): Permissions => {
           if (acc && mic) await onAllGranted();
         } catch (error) {
           console.error("Failed to check macOS permissions:", error);
-          toast.error(t("onboarding.permissions.errors.checkFailed"));
+          notify({ title: t("onboarding.permissions.errors.checkFailed") });
           setAccessibility("needed");
           setMicrophone("needed");
           setNeeded(true);
@@ -182,7 +182,7 @@ export const usePermissions = (preview: boolean): Permissions => {
         errorCountRef.current += 1;
         if (errorCountRef.current >= MAX_POLLING_ERRORS) {
           stopPolling();
-          toast.error(t("onboarding.permissions.errors.checkFailed"));
+          notify({ title: t("onboarding.permissions.errors.checkFailed") });
         }
       }
     }, 1000);
@@ -232,13 +232,15 @@ export const usePermissions = (preview: boolean): Permissions => {
   const requestAccessibility = async () => {
     if (preview) return;
     try {
-      // Fork: System Settings with the drag-to-add tile, not the bare prompt.
+      // A stale grant from an earlier signature hides the real state; clear it
+      // first. Fork: then System Settings with the drag-to-add tile.
+      await commands.resetMacosPermission("accessibility");
       await openAccessibilitySetup();
       setAccessibility("waiting");
       startPolling();
     } catch (error) {
       console.error("Failed to request accessibility permission:", error);
-      toast.error(t("onboarding.permissions.errors.requestFailed"));
+      notify({ title: t("onboarding.permissions.errors.requestFailed") });
     }
   };
 
@@ -249,6 +251,7 @@ export const usePermissions = (preview: boolean): Permissions => {
       if (isWindows || microphoneAsked)
         await commands.openMicrophonePrivacySettings();
       else {
+        if (isMacOS) await commands.resetMacosPermission("microphone");
         await requestMicrophonePermission();
         // A prompt takes focus from Handy; still in front a moment later
         // means there was none (denied before), so go back to asking.
@@ -261,7 +264,7 @@ export const usePermissions = (preview: boolean): Permissions => {
       startPolling();
     } catch (error) {
       console.error("Failed to request microphone permission:", error);
-      toast.error(t("onboarding.permissions.errors.requestFailed"));
+      notify({ title: t("onboarding.permissions.errors.requestFailed") });
     }
   };
 

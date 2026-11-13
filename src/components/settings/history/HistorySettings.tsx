@@ -20,10 +20,11 @@ import {
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { notify } from "@/stores/noticeStore";
 import {
   commands,
   events,
+  type DictionaryRow,
   type HistoryEntry,
   type HistoryUpdatePayload,
 } from "@/bindings";
@@ -39,7 +40,11 @@ import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
 import { copyToClipboard } from "./clipboard";
-import { pickAndTranscribeFiles } from "./transcribeFiles";
+import {
+  pickAndTranscribeFiles,
+  useFileReadsStore,
+  type FileRead,
+} from "./transcribeFiles";
 
 const IconButton: React.FC<{
   onClick: () => void;
@@ -66,6 +71,43 @@ const PAGE_SIZE = 30;
 
 // Long text folds to this many lines until "Show more".
 const FOLDED_LINES = 4;
+
+// The pulse of an entry's text while it's being transcribed.
+// How long the line under an edited entry says what the edit taught.
+const LEARN_NOTE_MS = 4000;
+
+const TRANSCRIBE_PULSE = {
+  animation: "transcribe-pulse 3s ease-in-out infinite",
+};
+
+const TranscribePulseKeyframes: React.FC = () => (
+  <style>{`
+    @keyframes transcribe-pulse {
+      0%, 100% { color: var(--color-ink-3); }
+      50% { color: var(--color-text); }
+    }
+  `}</style>
+);
+
+// A dropped or picked file while its audio is read, before it's an entry.
+const FileReadRow: React.FC<{ read: FileRead }> = ({ read }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="px-4 py-2 pb-5 flex flex-col gap-3">
+      <span
+        className="flex items-center gap-1 min-w-0 h-7 text-sm text-ink-3"
+        title={read.name}
+      >
+        <FileAudio width={14} height={14} className="shrink-0" />
+        <span className="truncate">{read.name}</span>
+      </span>
+      <p className="italic text-sm w-full" style={TRANSCRIBE_PULSE}>
+        <TranscribePulseKeyframes />
+        {t("settings.history.readingFile")}
+      </p>
+    </div>
+  );
+};
 
 interface HeaderButtonProps {
   onClick: () => void;
@@ -94,6 +136,7 @@ export const HistorySettings: React.FC = () => {
   const { t } = useTranslation();
   const osType = useOsType();
   const jobs = useTranscriptionJobsStore((state) => state.jobs);
+  const reads = useFileReadsStore((state) => state.reads);
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoEditId, setAutoEditId] = useState<number | null>(null);
@@ -256,12 +299,12 @@ export const HistorySettings: React.FC = () => {
     try {
       const result = await commands.deleteHistoryEntry(id);
       if (result.status !== "ok") {
-        // Reload on failure
-        loadPage();
+        throw new Error(String(result.error));
       }
     } catch (error) {
       console.error("Failed to delete entry:", error);
       loadPage();
+      throw error;
     }
   };
 
@@ -270,7 +313,7 @@ export const HistorySettings: React.FC = () => {
       await pickAndTranscribeFiles();
     } catch (error) {
       console.error("Failed to pick a file to transcribe:", error);
-      toast.error(t("settings.history.transcribeFailed"));
+      notify({ title: t("settings.history.transcribeFailed") });
     }
   };
 
@@ -293,7 +336,7 @@ export const HistorySettings: React.FC = () => {
         {t("settings.history.loading")}
       </div>
     );
-  } else if (entries.length === 0) {
+  } else if (entries.length === 0 && reads.length === 0) {
     content = (
       <div className="px-4 py-3 text-center text-ink-2">
         {t("settings.history.empty")}
@@ -304,6 +347,9 @@ export const HistorySettings: React.FC = () => {
       <>
         <AudioPlayerGroup>
           <div className="divide-y divide-line">
+            {reads.map((read) => (
+              <FileReadRow key={`read-${read.id}`} read={read} />
+            ))}
             {entries.map((entry) => (
               <HistoryEntryComponent
                 key={entry.id}
@@ -425,6 +471,34 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   // not the raw transcription — otherwise applied corrections re-learn.
   const pastedText = entry.post_processed_text ?? entry.transcription_text;
   const [draft, setDraft] = useState("");
+  // What the last save did, shown under the entry. Notices are only for
+  // errors and warnings. A pair that waits for approval keeps its line and an
+  // "Always replace" button: re-learning a pair never promotes it, so without
+  // the button a correction the user made again would seem to do nothing.
+  const [learnNote, setLearnNote] = useState<{
+    text: string;
+    approve?: { ids: number[]; pairs: string };
+  } | null>(null);
+  useEffect(() => {
+    if (!learnNote || learnNote.approve) return;
+    const timer = setTimeout(() => setLearnNote(null), LEARN_NOTE_MS);
+    return () => clearTimeout(timer);
+  }, [learnNote]);
+
+  const approveLearned = async (ids: number[], pairs: string) => {
+    try {
+      for (const id of ids) {
+        const result = await commands.confirmDictionaryEntry(id);
+        if (result.status !== "ok") throw new Error(result.error);
+      }
+      setLearnNote({
+        text: t("settings.history.dictionary.approved", { pairs }),
+      });
+    } catch (error) {
+      console.error("Failed to approve learned pairs:", error);
+      notify({ title: t("settings.dictionary.actionError") });
+    }
+  };
 
   const startEdit = () => {
     setDraft(pastedText);
@@ -459,19 +533,46 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
         return;
       }
       const { added, known } = result.data;
+      const pairList = (rows: DictionaryRow[]) =>
+        rows.map((row) => `${row.wrong} → ${row.right}`).join(", ");
+      // New suggestions, earlier suggestions, and pairs once ignored.
+      const pending = [...added, ...known].filter(
+        (row) => row.state !== "active",
+      );
+      const learned = added.filter((row) => row.state === "active");
       if (added.length === 0 && known.length === 0) {
-        toast.info(t("settings.history.dictionary.nothingLearned"));
-      } else if (
-        added[0]?.language &&
-        (getSetting("spoken_languages") ?? []).length >= 2
-      ) {
-        // The backend detects the language when the entry has none.
-        toast.success(
-          t("settings.history.dictionary.learnedFor", {
-            language: languageName(added[0].language, i18n.language),
-            pairs: added.map((row) => `${row.wrong} → ${row.right}`).join(", "),
+        setLearnNote({ text: t("settings.history.dictionary.nothingLearned") });
+      } else if (pending.length > 0) {
+        setLearnNote({
+          text: t("settings.history.dictionary.waiting", {
+            pairs: pairList(pending),
           }),
-        );
+          approve: {
+            ids: pending.map((row) => row.id),
+            pairs: pairList(pending),
+          },
+        });
+      } else if (learned.length > 0) {
+        // The backend detects the language when the entry has none.
+        const language = learned[0].language;
+        setLearnNote({
+          text:
+            language && (getSetting("spoken_languages") ?? []).length >= 2
+              ? t("settings.history.dictionary.learnedFor", {
+                  language: languageName(language, i18n.language),
+                  pairs: pairList(learned),
+                })
+              : t("settings.history.dictionary.learned", {
+                  pairs: pairList(learned),
+                }),
+        });
+      } else {
+        setLearnNote({
+          text: t("settings.history.dictionary.alreadyKnown", {
+            wrong: known[0].wrong,
+            right: known[0].right,
+          }),
+        });
       }
     } catch (error) {
       console.error("Failed to learn from edit:", error);
@@ -490,7 +591,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
 
     const copied = await onCopyText();
     if (!copied) {
-      toast.error(t("settings.history.copyError"));
+      notify({ title: t("settings.history.copyError") });
       return;
     }
 
@@ -503,7 +604,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       await deleteAudio(entry.id);
     } catch (error) {
       console.error("Failed to delete entry:", error);
-      toast.error(t("settings.history.deleteError"));
+      notify({ title: t("settings.history.deleteError") });
     }
   };
 
@@ -634,7 +735,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
             }`}
             style={
               retrying
-                ? { animation: "transcribe-pulse 3s ease-in-out infinite" }
+                ? TRANSCRIBE_PULSE
                 : folded
                   ? {
                       display: "-webkit-box",
@@ -645,14 +746,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
                   : undefined
             }
           >
-            {retrying && (
-              <style>{`
-            @keyframes transcribe-pulse {
-              0%, 100% { color: var(--color-ink-3); }
-              50% { color: var(--color-text); }
-            }
-          `}</style>
-            )}
+            {retrying && <TranscribePulseKeyframes />}
             {retrying
               ? progressText
               : hasTranscription
@@ -672,6 +766,27 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
                 ? t("settings.history.showLess")
                 : t("settings.history.showMore")}
             </button>
+          )}
+        </div>
+      )}
+
+      {learnNote && (
+        <div className="flex flex-wrap items-center gap-2" role="status">
+          <p className="text-xs text-ink-3">{learnNote.text}</p>
+          {learnNote.approve && (
+            <Button
+              variant="primary-soft"
+              size="sm"
+              onClick={() => {
+                const { ids, pairs } = learnNote.approve ?? {
+                  ids: [],
+                  pairs: "",
+                };
+                void approveLearned(ids, pairs);
+              }}
+            >
+              {t("settings.dictionary.approve")}
+            </Button>
           )}
         </div>
       )}

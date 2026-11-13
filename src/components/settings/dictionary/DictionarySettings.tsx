@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
 import { Check, Pencil, Search, Trash2, X } from "lucide-react";
-import { toast } from "sonner";
 import { commands, type DictionaryRow } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
+import { notify } from "@/stores/noticeStore";
 import { languageName } from "@/lib/constants/languages";
 import { Button } from "../../ui/Button";
 import { Input } from "../../ui/Input";
@@ -58,7 +58,7 @@ export const DictionarySettings: React.FC = () => {
     if (result.status === "ok") {
       setRows(result.data);
     } else {
-      toast.error(t("settings.dictionary.actionError"));
+      notify({ title: t("settings.dictionary.actionError") });
     }
   }, [t]);
 
@@ -109,7 +109,10 @@ export const DictionarySettings: React.FC = () => {
       ? searched.filter((row) => matchesLanguage(row, languageFilter))
       : searched;
 
-  const suggested = visible.filter((row) => row.state === "proposed");
+  // The pair corrected most often first: it is the one most worth approving.
+  const suggested = visible
+    .filter((row) => row.state === "proposed")
+    .sort((a, b) => b.seen_count - a.seen_count || b.updated_at - a.updated_at);
   const approved = visible.filter((row) => row.state === "active");
   const ignored = visible.filter((row) => row.state === "rejected");
 
@@ -124,14 +127,14 @@ export const DictionarySettings: React.FC = () => {
       const result = await action();
       if (result.status === "error") {
         if (onError) onError(result.error);
-        else toast.error(t("settings.dictionary.actionError"));
+        else notify({ title: t("settings.dictionary.actionError") });
         return false;
       }
       await reload();
       return true;
     } catch (error) {
       console.error("Dictionary command failed:", error);
-      toast.error(t("settings.dictionary.actionError"));
+      notify({ title: t("settings.dictionary.actionError") });
       return false;
     } finally {
       setBusy(false);
@@ -144,11 +147,13 @@ export const DictionarySettings: React.FC = () => {
       () => commands.addDictionaryEntry(wrongClean, rightClean),
       (error) => {
         if (error === "duplicate") {
-          toast.error(
-            t("settings.advanced.dictionary.duplicate", { wrong: wrongClean }),
-          );
+          notify({
+            title: t("settings.advanced.dictionary.duplicate", {
+              wrong: wrongClean,
+            }),
+          });
         } else {
-          toast.error(t("settings.dictionary.actionError"));
+          notify({ title: t("settings.dictionary.actionError") });
         }
       },
     );
@@ -209,11 +214,11 @@ export const DictionarySettings: React.FC = () => {
         ),
       (error) => {
         if (error === "duplicate") {
-          toast.error(
-            t("settings.advanced.dictionary.duplicate", { wrong: w }),
-          );
+          notify({
+            title: t("settings.advanced.dictionary.duplicate", { wrong: w }),
+          });
         } else {
-          toast.error(t("settings.dictionary.actionError"));
+          notify({ title: t("settings.dictionary.actionError") });
         }
       },
     );
@@ -379,31 +384,31 @@ export const DictionarySettings: React.FC = () => {
                   {t("settings.dictionary.approve")}
                 </Button>
               )}
-              {row.state !== "rejected" &&
-                (approved && row.source === "manual" ? (
-                  <button
-                    onClick={() => handleRemove(row)}
-                    disabled={busy}
-                    className={iconButton}
-                    title={t("settings.advanced.dictionary.remove", row)}
-                    aria-label={t("settings.advanced.dictionary.remove", row)}
-                  >
-                    <Trash2 width={16} height={16} />
-                  </button>
-                ) : (
-                  <Button
-                    onClick={() => handleIgnore(row)}
-                    disabled={busy}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    {t(
-                      row.auto_learned && approved
-                        ? "settings.dictionary.autoUndo"
-                        : "settings.dictionary.ignore",
-                    )}
-                  </Button>
-                ))}
+              {/* Ignore keeps a learned pair so it is never suggested
+                  again; the trash deletes any entry. */}
+              {row.state !== "rejected" && row.source !== "manual" && (
+                <Button
+                  onClick={() => handleIgnore(row)}
+                  disabled={busy}
+                  variant="ghost"
+                  size="sm"
+                >
+                  {t(
+                    row.auto_learned && approved
+                      ? "settings.dictionary.autoUndo"
+                      : "settings.dictionary.ignore",
+                  )}
+                </Button>
+              )}
+              <button
+                onClick={() => handleRemove(row)}
+                disabled={busy}
+                className={iconButton}
+                title={t("settings.advanced.dictionary.remove", row)}
+                aria-label={t("settings.advanced.dictionary.remove", row)}
+              >
+                <Trash2 width={16} height={16} />
+              </button>
             </>
           )}
         </div>

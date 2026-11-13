@@ -16,6 +16,10 @@ use crate::settings::{self, QuitShortcutAction};
 
 /// Menu id of the app menu's "Quit Handy" item.
 pub const QUIT_MENU_ID: &str = "app_menu_quit";
+/// File → Transcribe File… in the menu bar.
+pub const TRANSCRIBE_FILE_MENU_ID: &str = "app_menu_transcribe_file";
+/// Asks the main window to open the file picker in History.
+pub const TRANSCRIBE_FILE_EVENT: &str = "menu-transcribe-file";
 
 /// Asks the main window to show the quit prompt.
 #[derive(Clone, Debug, Serialize, Type, tauri_specta::Event)]
@@ -28,6 +32,7 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<tauri::menu::Menu<tauri:
     use tauri::menu::{Menu, MenuItem, MenuItemKind};
 
     let menu = Menu::default(app)?;
+    add_transcribe_file_item(app, &menu)?;
     let Some(MenuItemKind::Submenu(app_menu)) = menu.items()?.into_iter().next() else {
         log::warn!("App menu not found; ⌘Q keeps the default quit");
         return Ok(menu);
@@ -53,6 +58,45 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<tauri::menu::Menu<tauri:
     )?;
     app_menu.append(&quit)?;
     Ok(menu)
+}
+
+#[cfg(target_os = "macos")]
+/// Puts "Transcribe File…" (⌘O) first in the File menu, where a Mac app
+/// opens files. Without a File menu the menu bar stays as it is.
+fn add_transcribe_file_item(
+    app: &AppHandle,
+    menu: &tauri::menu::Menu<tauri::Wry>,
+) -> tauri::Result<()> {
+    use tauri::menu::{MenuItem, MenuItemKind, PredefinedMenuItem};
+
+    for item in menu.items()? {
+        if let MenuItemKind::Submenu(submenu) = item {
+            if submenu.text()? == "File" {
+                let transcribe = MenuItem::with_id(
+                    app,
+                    TRANSCRIBE_FILE_MENU_ID,
+                    "Transcribe File…",
+                    true,
+                    Some("CmdOrCtrl+O"),
+                )?;
+                submenu.insert(&transcribe, 0)?;
+                submenu.insert(&PredefinedMenuItem::separator(app)?, 1)?;
+                return Ok(());
+            }
+        }
+    }
+    log::warn!("File menu not found; no Transcribe File item in the menu bar");
+    Ok(())
+}
+
+/// File → Transcribe File…: bring Handy forward and open the picker in History.
+#[cfg(target_os = "macos")]
+pub fn handle_transcribe_file(app: &AppHandle) {
+    use tauri::Emitter;
+    crate::show_main_window(app);
+    if let Err(e) = app.emit(TRANSCRIBE_FILE_EVENT, ()) {
+        log::error!("Failed to open the file picker from the menu: {}", e);
+    }
 }
 
 /// Runs when the user presses ⌘Q or picks "Quit Handy" in the app menu.

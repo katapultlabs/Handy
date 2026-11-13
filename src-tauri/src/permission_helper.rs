@@ -115,6 +115,8 @@ mod macos {
     const POLL: Duration = Duration::from_millis(150);
     /// Settings has this long to open its window before the helper gives up.
     const SETTINGS_OPEN_TIMEOUT: Duration = Duration::from_secs(10);
+    /// When to take focus back again after the tile appears.
+    const REFOCUS_AFTER: Duration = Duration::from_millis(600);
     /// How long "All set" stays on screen.
     const GRANTED_LINGER: Duration = Duration::from_millis(1600);
     /// One follower thread at a time.
@@ -306,6 +308,20 @@ mod macos {
                 true,
                 true,
             );
+        });
+        // System Settings is now the active app, so the first click on the
+        // tile would only activate Handy and the drag would need a second
+        // click. Take focus back; a drop onto the list does not need
+        // Settings to be active. Settings can finish launching and take
+        // focus once more, so ask again shortly after while the tile is up.
+        crate::show_main_window(app);
+        let app = app.clone();
+        std::thread::spawn(move || {
+            std::thread::sleep(REFOCUS_AFTER);
+            let tile_up = SAVED.lock().unwrap_or_else(|e| e.into_inner()).is_some();
+            if tile_up {
+                crate::show_main_window(&app);
+            }
         });
     }
 
