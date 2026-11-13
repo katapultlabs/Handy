@@ -4,6 +4,7 @@
     "checkUpdates": "Sök efter uppdateringar...",
     "copyLastTranscript": "Kopiera senaste transkriptionen",
     "correctLastTranscript": "Korrigera senaste transkriptionen...",
+    "transcribeFile": "Transkribera fil...",
     "unloadModel": "Avlasta modell",
     "model": "Modell",
     "quit": "Avsluta",

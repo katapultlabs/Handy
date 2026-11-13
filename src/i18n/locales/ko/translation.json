@@ -4,6 +4,7 @@
     "checkUpdates": "업데이트 확인...",
     "copyLastTranscript": "마지막 녹음 내용 복사",
     "correctLastTranscript": "마지막 녹음 내용 수정...",
+    "transcribeFile": "파일 받아쓰기...",
     "unloadModel": "모델 언로드",
     "model": "모델",
     "quit": "종료",

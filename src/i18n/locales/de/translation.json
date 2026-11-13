@@ -4,6 +4,7 @@
     "checkUpdates": "Nach Updates suchen...",
     "copyLastTranscript": "Letzte Transkription kopieren",
     "correctLastTranscript": "Letzte Transkription korrigieren...",
+    "transcribeFile": "Datei transkribieren...",
     "unloadModel": "Modell entladen",
     "model": "Modell",
     "quit": "Beenden",

@@ -4,6 +4,7 @@
     "checkUpdates": "Tjek for opdateringer...",
     "copyLastTranscript": "Kopiér seneste transskription",
     "correctLastTranscript": "Ret seneste transskription...",
+    "transcribeFile": "Transskriber fil...",
     "unloadModel": "Frigør model",
     "model": "Model",
     "quit": "Afslut",

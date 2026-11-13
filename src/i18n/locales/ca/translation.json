@@ -9,6 +9,7 @@
     "cancel": "Cancel·la",
     "secureInputWarning": "⚠ Dreceres blocades per l'entrada segura",
     "correctLastTranscript": "Corregeix l'última transcripció...",
+    "transcribeFile": "Transcriu un fitxer...",
     "language": "Llengua",
     "autoLanguage": "Automàtica",
     "otherLanguages": "Altres llengües"

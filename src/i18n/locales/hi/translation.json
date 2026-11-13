@@ -4,6 +4,7 @@
     "checkUpdates": "अपडेट जांचें...",
     "copyLastTranscript": "पिछला ट्रांसक्रिप्ट कॉपी करें",
     "correctLastTranscript": "पिछला ट्रांसक्रिप्ट सुधारें...",
+    "transcribeFile": "फ़ाइल ट्रांसक्राइब करें...",
     "unloadModel": "मॉडल अनलोड करें",
     "model": "मॉडल",
     "quit": "बाहर निकलें",

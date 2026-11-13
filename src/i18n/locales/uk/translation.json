@@ -4,6 +4,7 @@
     "checkUpdates": "Перевірити оновлення...",
     "copyLastTranscript": "Скопіювати останню транскрипцію",
     "correctLastTranscript": "Виправити останню транскрипцію...",
+    "transcribeFile": "Розшифрувати файл...",
     "unloadModel": "Вивантажити модель",
     "model": "Модель",
     "quit": "Вийти",

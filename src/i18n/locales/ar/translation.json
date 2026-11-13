@@ -4,6 +4,7 @@
     "checkUpdates": "التحقق من وجود تحديثات...",
     "copyLastTranscript": "نسخ آخر نص تم تفريغه",
     "correctLastTranscript": "تصحيح آخر نص تم تفريغه...",
+    "transcribeFile": "تفريغ ملف...",
     "unloadModel": "تفريغ النموذج",
     "model": "النموذج",
     "quit": "إنهاء",

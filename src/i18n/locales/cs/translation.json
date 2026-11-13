@@ -4,6 +4,7 @@
     "checkUpdates": "Zkontrolovat aktualizace...",
     "copyLastTranscript": "Zkopírovat poslední přepis",
     "correctLastTranscript": "Opravit poslední přepis...",
+    "transcribeFile": "Přepsat soubor...",
     "unloadModel": "Uvolnit model",
     "model": "Model",
     "quit": "Ukončit",

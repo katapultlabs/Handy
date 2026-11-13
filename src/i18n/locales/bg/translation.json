@@ -4,6 +4,7 @@
     "checkUpdates": "Проверка за актуализации...",
     "copyLastTranscript": "Копиране на последния транскрипт",
     "correctLastTranscript": "Коригиране на последния транскрипт...",
+    "transcribeFile": "Транскрибиране на файл...",
     "unloadModel": "Разтоварване на модела",
     "model": "Модел",
     "quit": "Изход",

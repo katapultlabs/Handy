@@ -4,6 +4,7 @@
     "checkUpdates": "检查更新...",
     "copyLastTranscript": "复制最新转录",
     "correctLastTranscript": "修正最新转录...",
+    "transcribeFile": "转录文件...",
     "unloadModel": "卸载模型",
     "model": "模型",
     "quit": "退出",

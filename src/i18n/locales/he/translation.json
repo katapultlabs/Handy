@@ -4,6 +4,7 @@
     "checkUpdates": "בדוק עדכונים...",
     "copyLastTranscript": "העתק את התמלול האחרון",
     "correctLastTranscript": "תקן את התמלול האחרון...",
+    "transcribeFile": "תמלול קובץ...",
     "unloadModel": "פרוק מודל",
     "model": "מודל",
     "quit": "יציאה",

@@ -4,6 +4,7 @@
     "checkUpdates": "Kiểm tra cập nhật...",
     "copyLastTranscript": "Sao chép bản chép lời mới nhất",
     "correctLastTranscript": "Sửa bản chép lời mới nhất...",
+    "transcribeFile": "Chép lời tệp...",
     "unloadModel": "Dỡ mô hình",
     "model": "Mô hình",
     "quit": "Thoát",

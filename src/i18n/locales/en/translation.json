@@ -4,6 +4,7 @@
     "checkUpdates": "Check for Updates...",
     "copyLastTranscript": "Copy Last Transcript",
     "correctLastTranscript": "Correct Last Transcript...",
+    "transcribeFile": "Transcribe File...",
     "unloadModel": "Unload Model",
     "model": "Model",
     "quit": "Quit",

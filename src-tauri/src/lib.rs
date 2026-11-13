@@ -367,6 +367,11 @@ fn initialize_core_logic(app_handle: &AppHandle) {
                 show_main_window(app);
                 let _ = app.emit("correct-last-transcript", ());
             }
+            "transcribe_file" => {
+                // Show History and open the file picker there.
+                show_main_window(app);
+                let _ = app.emit(quit_shortcut::TRANSCRIBE_FILE_EVENT, ());
+            }
             "unload_model" => {
                 let transcription_manager = app.state::<Arc<TranscriptionManager>>();
                 if !transcription_manager.is_model_loaded() {

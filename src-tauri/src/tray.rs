@@ -703,6 +703,13 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
         correct_enabled,
         None::<&str>,
     )?;
+    let transcribe_file_i = MenuItem::with_id(
+        app,
+        "transcribe_file",
+        &strings.transcribe_file,
+        true,
+        None::<&str>,
+    )?;
     let quit_i = MenuItem::with_id(app, "quit", &strings.quit, true, quit_accelerator)?;
     let separator = || PredefinedMenuItem::separator(app);
 
@@ -717,6 +724,7 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
                 &separator()?,
                 &copy_last_transcript_i,
                 &correct_last_transcript_i,
+                &transcribe_file_i,
                 &separator()?,
                 &settings_i,
                 &check_updates_i,
@@ -757,6 +765,7 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
                 &separator()?,
                 &copy_last_transcript_i,
                 &correct_last_transcript_i,
+                &transcribe_file_i,
                 &separator()?,
                 &model_submenu,
                 &unload_model_i,

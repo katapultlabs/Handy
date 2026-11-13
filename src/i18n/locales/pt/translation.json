@@ -4,6 +4,7 @@
     "checkUpdates": "Verificar Atualizações...",
     "copyLastTranscript": "Copiar última transcrição",
     "correctLastTranscript": "Corrigir última transcrição...",
+    "transcribeFile": "Transcrever arquivo...",
     "unloadModel": "Descarregar modelo",
     "model": "Modelo",
     "quit": "Sair",
